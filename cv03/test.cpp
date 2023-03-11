@@ -12,6 +12,28 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
+class Record {
+	private:
+	string name;
+	string surname;
+	int number;
+	public:
+	bool setRecord(const string & line) {
+		istringstream iss(line);
+		iss >> name >> surname >> setw(9) >> number;
+		if (!iss.eof()) {
+			iss >> ws;
+		}
+		return !iss.fail() && iss.eof() && number >= 100000000;
+	}
+	bool cmpName(string otherName) const {
+		return otherName == name || otherName == surname;
+	}
+	void writeRecord(ostream & out) const {
+		out << name << " " << surname << " " << number << "\n";
+	}
+};
+
 bool report ( const string & fileName, ostream & out )
 {
   // TODO
