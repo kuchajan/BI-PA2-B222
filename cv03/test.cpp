@@ -36,7 +36,7 @@ class Record {
 
 bool getRecords (ifstream & ifs, vector<Record> & records) {
 	string line;
-	for(size_t i = 0; getline(ifs,line), !ifs.eof();i++) { //TODO: chybí prázdná řádka za seznamem čísel.
+	for(size_t i = 0; getline(ifs,line), line != "" && !ifs.eof();i++) { //TODO: chybí prázdná řádka za seznamem čísel.
 		records.push_back(Record());
 		if(!(records[i].setRecord(line))) {
 			return false;
