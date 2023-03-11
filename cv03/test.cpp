@@ -34,11 +34,23 @@ class Record {
 	}
 };
 
+bool getRecords (ifstream & ifs, vector<Record> & records) {
+	string line;
+	for(size_t i = 0; getline(ifs,line), !ifs.eof();i++) { //TODO: chybí prázdná řádka za seznamem čísel.
+		records.push_back(Record());
+		if(!(records[i].setRecord(line))) {
+			return false;
+		}
+	}
+	
+	return (line == "");
+}
+
 bool report ( const string & fileName, ostream & out )
 {
 	vector<Record> records;
 	ifstream ifs = ifstream(fileName);
-	if (false) {
+	if (!getRecords(ifs,records)) {
 		return false;
 	}
 	
