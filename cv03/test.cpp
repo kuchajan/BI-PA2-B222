@@ -71,10 +71,10 @@ void findRecords (ifstream & ifs, vector<Record> & records, ostream & out) {
 bool report ( const string & fileName, ostream & out ) {
 	vector<Record> records;
 	ifstream ifs = ifstream(fileName);
-	if (!getRecords(ifs, records)) {
+
+	if (!ifs.is_open() || !getRecords(ifs, records)) {
 		return false;
 	}
-	
 	
 	findRecords(ifs,records,out);
 	return true;
