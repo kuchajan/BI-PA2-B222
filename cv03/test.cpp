@@ -17,6 +17,10 @@ class Record {
 	string name;
 	string surname;
 	int number;
+	inline bool numberValid(){
+		return number >= 100000000 && number <= 999999999;
+	}
+
 	public:
 	bool setRecord(const string & line) {
 		istringstream iss(line);
@@ -24,7 +28,7 @@ class Record {
 		if (!iss.eof()) {
 			iss >> ws;
 		}
-		return !iss.fail() && iss.eof() && number >= 100000000;
+		return !iss.fail() && iss.eof() && numberValid();
 	}
 	bool cmpName(string otherName) const {
 		return otherName == name || otherName == surname;
@@ -36,7 +40,7 @@ class Record {
 
 bool getRecords (ifstream & ifs, vector<Record> & records) {
 	string line;
-	for(size_t i = 0; getline(ifs,line), line != "" && !ifs.eof();i++) { //TODO: chybí prázdná řádka za seznamem čísel.
+	for(size_t i = 0; getline(ifs,line), line != "" && !ifs.eof();i++) {
 		records.push_back(Record());
 		if(!(records[i].setRecord(line))) {
 			return false;
@@ -100,6 +104,9 @@ int main ()
 	assert ( report( "tests/test5_in.txt", oss ) == false ); //number not decimal
 	assert ( report( "tests/test5_in.txt", oss ) == false ); //Attribute missing
 	assert ( report( "tests/test5_in.txt", oss ) == false ); //Extra attribute
+	
+	assert ( report( "tests/test6_in.txt", oss ) == false ); //Number big?
+
 	return 0;
 }
 #endif /* __PROGTEST__ */
