@@ -18,20 +18,145 @@ enum class fileMode {
 
 class CfileInput {
 private:
-	vector<char> input;
+	vector<unsigned char> buffer;
 	fileMode mode;
 	size_t currentByte;
 	uint8_t currentBit;
 
-	void readUTF8(vector<uint32_t> & numbers);
-	void readFIB(vector<uint32_t> & numbers);
+	bool readUTF8(vector<uint32_t> & numbers);
+	bool readFIB(vector<uint32_t> & numbers);
+
+	int getTypeUTF8(unsigned char ch);
+	inline uint32_t getNumUTF8(unsigned char ch, int type);
+	
+	inline uint32_t addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits);
 public:
 	CfileInput(ifstream & ifs, fileMode mod);
-	vector<uint32_t> getNumbers();
+	bool getNumbers(vector<uint32_t> &numbers);
 };
 
-bool utf8ToFibonacci(const char *inFile, const char *outFile) {
+const unsigned char headerMasks[] = {
+	0b10000000, // 1 byte long char
+	0b11100000, // 2 byte long char
+	0b11110000, // 3 byte long char
+	0b11111000, // 4 byte long char
+	0b11000000  // leading char
+};
+
+const unsigned char valueMasks[] = {
+	0b01111111, // 1 byte long char
+	0b00011111, // 2 byte long char
+	0b00001111, // 3 byte long char
+	0b00000111, // 4 byte long char
+	0b00111111  // leading char
+};
+
+const unsigned char headers[] = {
+	0b00000000, // 1 byte long char
+	0b11000000, // 2 byte long char
+	0b11100000, // 3 byte long char
+	0b11110000, // 4 byte long char
+	0b10000000  // leading char
+};
+
+int CfileInput::getTypeUTF8(unsigned char ch) {
+	for (int i = 0; i < 5; i++) {
+		if ((ch & headerMasks[i]) == headers[i]) {
+			return i;
+		}	
+	}
+	return -1;
+}
+
+uint32_t CfileInput::getNumUTF8(unsigned char ch, int type) {
+	return (uint32_t) ch & valueMasks[type];
+}
+
+uint32_t CfileInput::addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits) {
+	return (destination << nOfBits) | source;
+}
+
+bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
+	while (currentByte < buffer.size()) {
+		unsigned char ch = buffer[currentByte];
+		int type = getTypeUTF8(ch);
+		
+		if(type == -1 || type == 4) { //Detect error and type can't be leading char
+			return false;
+		}
+
+		uint8_t NOfLeadingBytes = ((uint8_t)type) - 1;
+		if (currentByte + NOfLeadingBytes >= buffer.size()) { //outside of range
+			return false;
+		}
+
+		//Evaluate current byte
+		uint32_t number = getNumUTF8(ch, type);
+
+		//Get leading bytes
+		for (size_t i = 0; i < NOfLeadingBytes; i++) {
+			unsigned char otherCh = buffer[currentByte+i];
+			if(getTypeUTF8(otherCh) != 4) {
+				return false;
+			}
+			uint32_t otherNum = getNumUTF8(otherCh, 4);
+			number = addToNumber(number, otherNum, 6);
+		}
+		
+		numbers.push_back(number);
+		currentByte += NOfLeadingBytes + 1;
+	}
+	
+	
+	return true;
+}
+
+bool CfileInput::readFIB(vector<uint32_t> &numbers) {
 	// todo
+	return false;
+}
+
+CfileInput::CfileInput(ifstream &ifs, fileMode mod) {
+	mode = mod;
+	currentByte = 0;
+	currentBit = 0;
+	vector<unsigned char> buffer(std::istreambuf_iterator<char>(ifs), {});
+}
+
+bool CfileInput::getNumbers(vector<uint32_t> & numbers) {
+	switch (mode) {
+		case fileMode::UTF8: {
+			return readUTF8(numbers);
+			break;
+		}
+		case fileMode::FIB: {
+			return readFIB(numbers);
+			break;
+		}
+	}
+	return false;
+}
+
+bool readFile(const char * inFile, fileMode mode, vector<uint32_t> & numbers) {
+	ifstream ifs(inFile, std::ios::binary);
+	if(!ifs.is_open()) {
+		return false;
+	}
+	CfileInput input(ifs,mode);
+	
+	return input.getNumbers(numbers);
+}
+
+bool utf8ToFibonacci(const char *inFile, const char *outFile) {
+	vector<uint32_t> numbers;
+	if (!readFile(inFile, fileMode::UTF8, numbers)) {
+		return false;
+	}
+
+
+	// todo
+
+	return true;
 }
 
 bool fibonacciToUtf8(const char *inFile, const char *outFile) {
