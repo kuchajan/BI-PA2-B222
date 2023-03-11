@@ -11,6 +11,25 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
+enum class fileMode {
+	UTF8,
+	FIB
+};
+
+class CfileInput {
+private:
+	vector<char> input;
+	fileMode mode;
+	size_t currentByte;
+	uint8_t currentBit;
+
+	void readUTF8(vector<uint32_t> & numbers);
+	void readFIB(vector<uint32_t> & numbers);
+public:
+	CfileInput(ifstream & ifs, fileMode mod);
+	vector<uint32_t> getNumbers();
+};
+
 bool utf8ToFibonacci(const char *inFile, const char *outFile) {
 	// todo
 }
