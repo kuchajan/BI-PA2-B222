@@ -1,0 +1,1 @@
+Before testing this file, make sure you do chmod 000 test8_in.txt
