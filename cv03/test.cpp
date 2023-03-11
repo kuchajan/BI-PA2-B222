@@ -64,13 +64,13 @@ void findRecords (ifstream & ifs, vector<Record> & records, ostream & out) {
 	//return true;
 }
 
-bool report ( const string & fileName, ostream & out )
-{
+bool report ( const string & fileName, ostream & out ) {
 	vector<Record> records;
 	ifstream ifs = ifstream(fileName);
-	if (!getRecords(ifs,records)) {
+	if (!getRecords(ifs, records)) {
 		return false;
 	}
+	
 	
 	findRecords(ifs,records,out);
 	return true;
@@ -79,21 +79,27 @@ bool report ( const string & fileName, ostream & out )
 #ifndef __PROGTEST__
 int main ()
 {
-  ostringstream oss;
-  oss . str ( "" );
-  assert ( report( "tests/test0_in.txt", oss ) == true );
-  assert ( oss . str () ==
-    "John Christescu 258452362\n"
-    "John Harmson 861647702\n"
-    "-> 2\n"
-    "-> 0\n"
-    "Josh Dakhov 264112084\n"
-    "Dakhov Speechley 865216101\n"
-    "-> 2\n"
-    "John Harmson 861647702\n"
-    "-> 1\n" );
-  oss . str ( "" );
-  assert ( report( "tests/test1_in.txt", oss ) == false );
-  return 0;
+	ostringstream oss;
+	oss . str ( "" );
+	assert ( report( "tests/test0_in.txt", oss ) == true );
+	assert ( oss . str () ==
+		"John Christescu 258452362\n"
+		"John Harmson 861647702\n"
+		"-> 2\n"
+		"-> 0\n"
+		"Josh Dakhov 264112084\n"
+		"Dakhov Speechley 865216101\n"
+		"-> 2\n"
+		"John Harmson 861647702\n"
+		"-> 1\n" );
+	oss . str ( "" );
+	assert ( report( "tests/test1_in.txt", oss ) == false ); //number has other characters than 0-9
+	assert ( report( "tests/test2_in.txt", oss ) == false ); //missing empty line
+	assert ( report( "tests/test3_in.txt", oss ) == false ); //number small
+	assert ( report( "tests/test4_in.txt", oss ) == false ); //number big
+	assert ( report( "tests/test5_in.txt", oss ) == false ); //number not decimal
+	assert ( report( "tests/test5_in.txt", oss ) == false ); //Attribute missing
+	assert ( report( "tests/test5_in.txt", oss ) == false ); //Extra attribute
+	return 0;
 }
 #endif /* __PROGTEST__ */
