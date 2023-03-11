@@ -101,11 +101,11 @@ int main ()
 	assert ( report( "tests/test2_in.txt", oss ) == false ); //missing empty line
 	assert ( report( "tests/test3_in.txt", oss ) == false ); //number small
 	assert ( report( "tests/test4_in.txt", oss ) == false ); //number big
-	assert ( report( "tests/test5_in.txt", oss ) == false ); //number not decimal
-	assert ( report( "tests/test5_in.txt", oss ) == false ); //Attribute missing
 	assert ( report( "tests/test5_in.txt", oss ) == false ); //Extra attribute
+	assert ( report( "tests/test6_in.txt", oss ) == false ); //Attribute missing
+	assert ( report( "tests/test7_in.txt", oss ) == false ); //Number big?
 	
-	assert ( report( "tests/test6_in.txt", oss ) == false ); //Number big?
+	assert ( report( "tests/test8_in.txt", oss ) == false ); //File unreadable
 
 	return 0;
 }
