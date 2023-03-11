@@ -36,8 +36,14 @@ class Record {
 
 bool report ( const string & fileName, ostream & out )
 {
-  // TODO
-  return false;
+	vector<Record> records;
+	ifstream ifs = ifstream(fileName);
+	if (false) {
+		return false;
+	}
+	
+	
+	return false;
 }
 
 #ifndef __PROGTEST__
