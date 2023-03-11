@@ -46,10 +46,10 @@ bool getRecords (ifstream & ifs, vector<Record> & records) {
 	return (line == "");
 }
 
-bool findRecords (ifstream & ifs, vector<Record> & records, ostream & out) {
+void findRecords (ifstream & ifs, vector<Record> & records, ostream & out) {
 	string line;
-	int count = 0;
 	while (getline(ifs,line), !ifs.fail()) {
+		int count = 0;
 		for (size_t i = 0; i < records.size(); i++) {
 			if(records[i].cmpName(line)) {
 				records[i].writeRecord(out);
@@ -59,7 +59,9 @@ bool findRecords (ifstream & ifs, vector<Record> & records, ostream & out) {
 		out << "-> " << count << "\n";
 	}
 	
-	return count > 0;
+	
+	
+	//return true;
 }
 
 bool report ( const string & fileName, ostream & out )
@@ -70,9 +72,7 @@ bool report ( const string & fileName, ostream & out )
 		return false;
 	}
 	
-	if(!findRecords(ifs,records,out)){
-		return false;
-	}
+	findRecords(ifs,records,out);
 	return true;
 }
 
