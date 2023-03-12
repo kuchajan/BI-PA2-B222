@@ -16,12 +16,10 @@ enum class fileMode {
 	FIB
 };
 
-class CfileInput {
+class CFileInput {
 private:
-	vector<unsigned char> buffer;
+	ifstream ifs;
 	fileMode mode;
-	size_t currentByte;
-	uint8_t currentBit;
 
 	bool readUTF8(vector<uint32_t> & numbers);
 	bool readFIB(vector<uint32_t> & numbers);
@@ -31,7 +29,7 @@ private:
 	
 	inline uint32_t addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits);
 public:
-	CfileInput(ifstream & ifs, fileMode mod);
+	CFileInput(const char * file, fileMode mod);
 	bool getNumbers(vector<uint32_t> &numbers);
 };
 
@@ -59,7 +57,7 @@ const unsigned char headers[] = {
 	0b10000000  // leading char
 };
 
-int CfileInput::getTypeUTF8(unsigned char ch) {
+int CFileInput::getTypeUTF8(unsigned char ch) {
 	for (int i = 0; i < 5; i++) {
 		if ((ch & headerMasks[i]) == headers[i]) {
 			return i;
@@ -68,25 +66,20 @@ int CfileInput::getTypeUTF8(unsigned char ch) {
 	return -1;
 }
 
-uint32_t CfileInput::getNumUTF8(unsigned char ch, int type) {
+uint32_t CFileInput::getNumUTF8(unsigned char ch, int type) {
 	return (uint32_t) ch & valueMasks[type];
 }
 
-uint32_t CfileInput::addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits) {
+uint32_t CFileInput::addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits) {
 	return (destination << nOfBits) | source;
 }
 
-bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
-	while (currentByte < buffer.size()) {
-		unsigned char ch = buffer[currentByte];
+bool CFileInput::readUTF8(vector<uint32_t> &numbers) {
+	unsigned char ch;
+	while (ch = ifs.get(), ifs.good()) {
 		int type = getTypeUTF8(ch);
 		
-		if(type == -1 || type == 4) { //Detect error and type can't be leading char
-			return false;
-		}
-
-		uint8_t NOfLeadingBytes = (uint8_t)type;
-		if (currentByte + NOfLeadingBytes >= buffer.size()) { //outside of range
+		if(type == -1 || type == 4) { //Byte isn't UTF8 or is leading
 			return false;
 		}
 
@@ -94,9 +87,9 @@ bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
 		uint32_t number = getNumUTF8(ch, type);
 
 		//Get leading bytes
-		for (size_t i = 0; i < NOfLeadingBytes; i++) {
-			unsigned char otherCh = buffer[currentByte+i+1];
-			if(getTypeUTF8(otherCh) != 4) {
+		for (uint8_t i = 0; i < type /*type also gives out number of leading bytes*/; i++) {
+			unsigned char otherCh = ifs.get();
+			if(ifs.eof() || getTypeUTF8(otherCh) != 4) { //outside of range or not leading byte
 				return false;
 			}
 			uint32_t otherNum = getNumUTF8(otherCh, 4);
@@ -104,7 +97,6 @@ bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
 		}
 		
 		numbers.push_back(number);
-		currentByte += NOfLeadingBytes + 1;
 	}
 	
 	
@@ -117,15 +109,15 @@ void fibCalcNext(uint32_t & currentFib, uint32_t & nextFib) {
 	nextFib = temp;
 }
 
-bool CfileInput::readFIB(vector<uint32_t> &numbers) {
+bool CFileInput::readFIB(vector<uint32_t> &numbers) {
 	// todo
 	uint32_t currentFib = 1, nextFib = 2;
 	uint32_t val = 0;
 	bool previousWasOne = false;
 	bool thereIsNewNum = false;
-	while (currentByte < buffer.size()) {
-		unsigned char ch = buffer[currentByte];
-		for (int bit = 0; bit < 8; bit++) {
+	unsigned char ch;
+	while (ch = ifs.get(), ifs.good()) {
+		for (uint8_t bit = 0; bit < 8; bit++) {
 			bool isSet = ((ch >> bit) & 1) == 1;
 			if (isSet && previousWasOne) {
 				numbers.push_back(val - 1);
@@ -146,25 +138,19 @@ bool CfileInput::readFIB(vector<uint32_t> &numbers) {
 			}
 			fibCalcNext(currentFib, nextFib);
 		}
-		currentByte++;
 	}
 	
-	if(thereIsNewNum) { //reading stopped too early
+	return !(thereIsNewNum || !ifs.eof()); //unfinished number or reading stopped too early
+}
+
+CFileInput::CFileInput(const char *file, fileMode mod) : ifs(file, std::ios::binary) {
+	mode = mod;
+}
+
+bool CFileInput::getNumbers(vector<uint32_t> & numbers) {
+	if(!ifs.is_open()) {
 		return false;
 	}
-
-	return true;
-}
-
-CfileInput::CfileInput(ifstream &ifs, fileMode mod)
-	: buffer(std::istreambuf_iterator<char>(ifs), (istreambuf_iterator<char>())) {
-	mode = mod;
-	currentByte = 0;
-	currentBit = 0;
-	ifs.close();
-}
-
-bool CfileInput::getNumbers(vector<uint32_t> & numbers) {
 	switch (mode) {
 		case fileMode::UTF8: {
 			return readUTF8(numbers);
@@ -179,12 +165,7 @@ bool CfileInput::getNumbers(vector<uint32_t> & numbers) {
 }
 
 bool readFile(const char * inFile, fileMode mode, vector<uint32_t> & numbers) {
-	ifstream ifs(inFile, std::ios::binary);
-	if(!ifs.is_open()) {
-		return false;
-	}
-	CfileInput input(ifs,mode);
-	
+	CFileInput input(inFile,mode);
 	return input.getNumbers(numbers);
 }
 
@@ -201,6 +182,11 @@ bool utf8ToFibonacci(const char *inFile, const char *outFile) {
 }
 
 bool fibonacciToUtf8(const char *inFile, const char *outFile) {
+	vector<uint32_t> numbers;
+	if (!readFile(inFile, fileMode::FIB, numbers)) {
+		return false;
+	}
+
 	// todo
 }
 
