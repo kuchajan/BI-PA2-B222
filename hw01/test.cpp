@@ -85,7 +85,7 @@ bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
 			return false;
 		}
 
-		uint8_t NOfLeadingBytes = ((uint8_t)type) - 1;
+		uint8_t NOfLeadingBytes = (uint8_t)type;
 		if (currentByte + NOfLeadingBytes >= buffer.size()) { //outside of range
 			return false;
 		}
@@ -95,7 +95,7 @@ bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
 
 		//Get leading bytes
 		for (size_t i = 0; i < NOfLeadingBytes; i++) {
-			unsigned char otherCh = buffer[currentByte+i];
+			unsigned char otherCh = buffer[currentByte+i+1];
 			if(getTypeUTF8(otherCh) != 4) {
 				return false;
 			}
@@ -111,16 +111,57 @@ bool CfileInput::readUTF8(vector<uint32_t> &numbers) {
 	return true;
 }
 
-bool CfileInput::readFIB(vector<uint32_t> &numbers) {
-	// todo
-	return false;
+void fibCalcNext(uint32_t & currentFib, uint32_t & nextFib) {
+	uint32_t temp = currentFib + nextFib;
+	currentFib = nextFib;
+	nextFib = temp;
 }
 
-CfileInput::CfileInput(ifstream &ifs, fileMode mod) {
+bool CfileInput::readFIB(vector<uint32_t> &numbers) {
+	// todo
+	uint32_t currentFib = 1, nextFib = 2;
+	uint32_t val = 0;
+	bool previousWasOne = false;
+	bool thereIsNewNum = false;
+	while (currentByte < buffer.size()) {
+		unsigned char ch = buffer[currentByte];
+		for (int bit = 0; bit < 8; bit++) {
+			bool isSet = ((ch >> bit) & 1) == 1;
+			if (isSet && previousWasOne) {
+				numbers.push_back(val - 1);
+				val = 0;
+				currentFib = 1;
+				nextFib = 2;
+				previousWasOne = false;
+				thereIsNewNum = false;
+				continue;
+			}
+			if (isSet) {
+				previousWasOne = true;
+				thereIsNewNum = true;
+				val += currentFib;
+			}
+			else {
+				previousWasOne = false;
+			}
+			fibCalcNext(currentFib, nextFib);
+		}
+		currentByte++;
+	}
+	
+	if(thereIsNewNum) { //reading stopped too early
+		return false;
+	}
+
+	return true;
+}
+
+CfileInput::CfileInput(ifstream &ifs, fileMode mod)
+	: buffer(std::istreambuf_iterator<char>(ifs), (istreambuf_iterator<char>())) {
 	mode = mod;
 	currentByte = 0;
 	currentBit = 0;
-	vector<unsigned char> buffer(std::istreambuf_iterator<char>(ifs), {});
+	ifs.close();
 }
 
 bool CfileInput::getNumbers(vector<uint32_t> & numbers) {
