@@ -169,6 +169,145 @@ bool readFile(const char * inFile, fileMode mode, vector<uint32_t> & numbers) {
 	return input.getNumbers(numbers);
 }
 
+class CFileOutput {
+private:
+	ofstream ofs;
+	fileMode mode;
+
+	//UTF8 methods
+	int getNumType(uint32_t number);
+	unsigned char getUTF8Byte(uint32_t & number, int type);
+	bool numberToUTF8(uint32_t number, vector<unsigned char> & toOutput);
+	bool writeUTF8(vector<uint32_t> & numbers);
+	
+	//FIB methods
+	bool writeFIB (vector<uint32_t> & numbers);
+public:
+	CFileOutput(const char * file, fileMode mod);
+	bool write(vector<uint32_t> & numbers);
+};
+
+int CFileOutput::getNumType(uint32_t number) {
+	if(number < 128) {
+		return 0; //1 byte - 1 header, 0 leading
+	}
+	if(number < 2048) {
+		return 1; //2 bytes - 1 header, 1 leading
+	}
+	if(number < 65538) {
+		return 2; //3 bytes - 1 header, 2 leading
+	}
+	if(number < 1114112) {
+		return 3; //4 bytes - 1 header, 3 leading
+	}
+	return -1; //number too large
+}
+
+unsigned char CFileOutput::getUTF8Byte(uint32_t &number, int type) {
+	unsigned char ch = headers[type] | (number & valueMasks[type]);
+	int bitsToShift = -1;
+	switch (type)
+	{
+		case 0: {
+			bitsToShift = 7;
+			break;
+		}
+		case 1: {
+			bitsToShift = 5;
+			break;
+		}
+		case 2: {
+			bitsToShift = 4;
+			break;
+		}
+		case 3: {
+			bitsToShift = 3;
+			break;
+		}
+		case 4: {
+			bitsToShift = 6;
+			break;
+		}
+		default: {
+			return 0xFF; //This shouldn't happen
+		} 
+	}
+
+	number = number >> bitsToShift;
+
+	return ch;
+}
+
+bool CFileOutput::numberToUTF8(uint32_t number, vector<unsigned char> & toOutput) {
+	int type = getNumType(number);
+	if (type == -1) {
+		return false;
+	}
+
+	toOutput.resize(type + 1);
+
+	for (int i = type; i >= 0; i--) {
+		unsigned char ch;
+		if(i == 0 || type == 0) {
+			ch = getUTF8Byte(number,type);
+		}
+		else {
+			ch = getUTF8Byte(number,4);
+		}
+		//todo
+
+
+		toOutput[i] = ch;
+	}
+	
+
+	return true;
+}
+
+bool CFileOutput::writeUTF8(vector<uint32_t> &numbers) {
+	for(size_t i = 0; i < numbers.size(); i++) {
+		vector<unsigned char> toOutput;
+		if (!numberToUTF8(numbers[i], toOutput)) {
+			return false;
+		}
+		ofs.write((char *)toOutput.data(),toOutput.size());
+		if(ofs.bad()) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool CFileOutput::writeFIB(vector<uint32_t> & numbers) {
+	return false;
+}
+
+CFileOutput::CFileOutput(const char *file, fileMode mod) : ofs(file, std::ios::binary) {
+	mode = mod;
+}
+
+bool CFileOutput::write(vector<uint32_t> &numbers) {
+	if(!ofs.is_open()) {
+		return false;
+	}
+
+	switch (mode) {
+		case fileMode::UTF8: {
+			return writeUTF8(numbers);
+		}
+		case fileMode::FIB: {
+			return writeFIB(numbers);
+		}
+	}
+
+	return false;
+}
+
+bool writeFile(const char * outFile, fileMode mode, vector<uint32_t> & numbers) {
+	CFileOutput output(outFile,mode);
+	return output.write(numbers);
+} 
+
 bool utf8ToFibonacci(const char *inFile, const char *outFile) {
 	vector<uint32_t> numbers;
 	if (!readFile(inFile, fileMode::UTF8, numbers)) {
@@ -187,7 +326,11 @@ bool fibonacciToUtf8(const char *inFile, const char *outFile) {
 		return false;
 	}
 
-	// todo
+	if(!writeFile(outFile, fileMode::UTF8, numbers)) {
+		return false;
+	}
+
+	return true;
 }
 
 #ifndef __PROGTEST__
