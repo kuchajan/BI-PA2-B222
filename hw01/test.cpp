@@ -29,6 +29,7 @@ private:
 
 	// FIB methods
 	bool readFIB(vector<uint32_t> &numbers);
+	void fibCalcNext(uint32_t &currentFib, uint32_t &nextFib);
 
 public:
 	CFileInput(const char *file, fileMode mod);
@@ -104,7 +105,7 @@ bool CFileInput::readUTF8(vector<uint32_t> &numbers) {
 	return true;
 }
 
-void fibCalcNext(uint32_t &currentFib, uint32_t &nextFib) {
+void CFileInput::fibCalcNext(uint32_t &currentFib, uint32_t &nextFib) {
 	uint32_t temp = currentFib + nextFib;
 	currentFib = nextFib;
 	nextFib = temp;
