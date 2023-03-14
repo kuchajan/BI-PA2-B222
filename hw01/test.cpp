@@ -120,6 +120,9 @@ bool CFileInput::readFIB(vector<uint32_t> &numbers) {
 		for (uint8_t bit = 0; bit < 8; bit++) {
 			bool isSet = ((ch >> bit) & 1) == 1;
 			if (isSet && previousWasOne) {
+				if(val - 1 > 2097151) {
+					return false; //normally, I would put this into the writeUTF8 function, but we only use these two encodings
+				}
 				numbers.push_back(val - 1);
 				val = 0;
 				currentFib = 1;
@@ -190,16 +193,16 @@ public:
 };
 
 int CFileOutput::getNumType(uint32_t number) {
-	if(number < 128) {
+	if(number <= 127) {
 		return 0; //1 byte - 1 header, 0 leading
 	}
-	if(number < 2048) {
+	if(number <= 2047) {
 		return 1; //2 bytes - 1 header, 1 leading
 	}
-	if(number < 65538) {
+	if(number <= 65537) {
 		return 2; //3 bytes - 1 header, 2 leading
 	}
-	if(number < 1114112) {
+	if(number <= 2097151) {
 		return 3; //4 bytes - 1 header, 3 leading
 	}
 	return -1; //number too large
@@ -293,12 +296,13 @@ void CFileOutput::bitshiftWithOverflow(vector<unsigned char> & bytes) {
 }
 
 const uint32_t fibonacciSeq[] = {
-	     1,      2,      3,      5,      8,
-	    13,     21,     34,     55,     89,
-	   144,    233,    377,    610,    987,
-	  1597,   2584,   4181,   6765,
-	 10946,	 17711,  28657,  46368,  75025,
-	121393, 196418, 317811, 514229, 832040
+	      1,       2,       3,       5,       8,
+	     13,      21,      34,      55,      89,
+	    144,     233,     377,     610,     987,
+	   1597,    2584,    4181,    6765,
+	  10946,   17711,   28657,   46368,   75025,
+	 121393,  196418,  317811,  514229,  832040,
+	1346269
 };
 
 void CFileOutput::getFibCode(uint32_t number, vector<unsigned char> & bytes, int & bitCount) {
