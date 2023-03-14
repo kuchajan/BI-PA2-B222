@@ -181,6 +181,8 @@ private:
 	bool writeUTF8(vector<uint32_t> & numbers);
 	
 	//FIB methods
+	void getFibCode(uint32_t number, vector<unsigned char> & bytes, int & bitCount);
+	void bitshiftWithOverflow(vector<unsigned char> & bytes);
 	bool writeFIB (vector<uint32_t> & numbers);
 public:
 	CFileOutput(const char * file, fileMode mod);
@@ -278,8 +280,104 @@ bool CFileOutput::writeUTF8(vector<uint32_t> &numbers) {
 	return true;
 }
 
+void CFileOutput::bitshiftWithOverflow(vector<unsigned char> & bytes) {
+	bool overflow = false;
+	for (size_t i = 0; i < bytes.size(); i++) {
+		bool overflowNext = (bytes[i] & 0b10000000) != 0;
+		bytes[i] = overflow ? (bytes[i] << 1) | 1 : bytes[i] << 1;
+		overflow = overflowNext;
+	}
+	if(overflow) {
+		bytes.push_back(1);
+	}
+}
+
+const uint32_t fibonacciSeq[] = {
+	     1,      2,      3,      5,      8,
+	    13,     21,     34,     55,     89,
+	   144,    233,    377,    610,    987,
+	  1597,   2584,   4181,   6765,
+	 10946,	 17711,  28657,  46368,  75025,
+	121393, 196418, 317811, 514229, 832040
+};
+
+void CFileOutput::getFibCode(uint32_t number, vector<unsigned char> & bytes, int & bitCount) {
+	int index = -1;
+	bytes.push_back(0b11);
+
+	for (int i = (sizeof(fibonacciSeq) / sizeof(uint32_t)) - 1; i >= 0; i--) {
+		if(fibonacciSeq[i] <= number) {
+			index = i;
+			number -= fibonacciSeq[i];
+			break;
+		}
+	}
+
+	bitCount = index + 2; //index + 1 because we're counting from zero + 1 because of the end bit
+	
+	for (int i = index - 1; i >= 0; i--) {
+		bitshiftWithOverflow(bytes);
+		if(fibonacciSeq[i] <= number) {
+			bytes[0] |= 0b1;
+			number -= fibonacciSeq[i];
+		}
+	}
+	
+}
+
 bool CFileOutput::writeFIB(vector<uint32_t> & numbers) {
-	return false;
+	int bitsToShift = 0;
+	unsigned char lastByte = 0;
+	
+	for(size_t i = 0; i < numbers.size(); i++) {
+		//Because the number can exceed a single byte, I save it into a vector
+		//I get the current number's bytes in fibonacci
+		vector<unsigned char> toOutput;
+		int bitCount;
+		getFibCode(numbers[i] + 1, toOutput, bitCount);
+		
+		//Bitshift with overflow, so I won't overwrite the lastByte
+		for(int j = 0; j < bitsToShift; j++, bitCount++) {
+			bitshiftWithOverflow(toOutput);
+		}
+
+		//or the lastByte with the first byte of toOutput
+		lastByte |= toOutput[0];
+		
+		//write the last byte (if it's finished)
+		if(bitCount >= 8) {
+			ofs << lastByte;
+		}
+		
+
+		//write the remaining except for the last one
+		for(size_t j = 1; j < toOutput.size() - 1; j++) {
+			ofs << toOutput[j];
+		}
+
+		//if the last byte was written,
+		//we need to change what the last byte is now
+		//but if the last byte of the output vector is
+		//also full and it's not the last byte, we need to write it, and thus the
+		//last byte is 0
+		//else, last byte is the last byte of the vector
+		if(bitCount >= 8) { //if last byte was written
+			//change the last byte
+			lastByte = toOutput[toOutput.size() - 1];
+			if ((bitCount % 8) == 0) {
+				if(bitCount != 8){
+					ofs << lastByte;
+				}
+				lastByte = 0;
+			}
+		}
+		//reset the bitsToShift
+		bitsToShift = bitCount % 8;
+	}
+	if(lastByte > 0) {
+		ofs << lastByte;
+	}
+	return true;
 }
 
 CFileOutput::CFileOutput(const char *file, fileMode mod) : ofs(file, std::ios::binary) {
@@ -314,8 +412,9 @@ bool utf8ToFibonacci(const char *inFile, const char *outFile) {
 		return false;
 	}
 
-
-	// todo
+	if(!writeFile(outFile, fileMode::FIB, numbers)) {
+		return false;
+	}
 
 	return true;
 }
