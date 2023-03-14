@@ -438,11 +438,23 @@ bool fibonacciToUtf8(const char *inFile, const char *outFile) {
 
 #ifndef __PROGTEST__
 
-bool identicalFiles(const char *file1, const char *file2) {
-	// todo
+bool identicalFiles(const char *filename1, const char *filename2) {
+	ifstream file1(filename1, std::ios::binary);
+	if(!file1.is_open()) {
+		return false;
+	}
+	ifstream file2(filename2, std::ios::binary);
+	if(!file2.is_open()) {
+		return false;
+	}
+
+	istreambuf_iterator<char> f1(file1);
+	istreambuf_iterator<char> f2(file2);
+
+	return equal(f1,istreambuf_iterator<char>(),f2);
 }
 
-int main(int argc, char *argv[]) {
+int main(void) {
 	assert(utf8ToFibonacci("example/src_0.utf8", "output.fib") && identicalFiles("output.fib", "example/dst_0.fib"));
 	assert(utf8ToFibonacci("example/src_1.utf8", "output.fib") && identicalFiles("output.fib", "example/dst_1.fib"));
 	assert(utf8ToFibonacci("example/src_2.utf8", "output.fib") && identicalFiles("output.fib", "example/dst_2.fib"));
