@@ -468,6 +468,10 @@ int main(void) {
 	assert(fibonacciToUtf8("example/src_10.fib", "output.utf8") && identicalFiles("output.utf8", "example/dst_10.utf8"));
 	assert(!fibonacciToUtf8("example/src_11.fib", "output.utf8"));
 
+	//utf8ToFibonacci("example/myTests/src_0.utf8","example/myTests/src_1.fib");
+	assert(utf8ToFibonacci("example/myTests/src_0.utf8", "output.fib") && identicalFiles("output.fib", "example/myTests/src_1.fib")); //max utf8
+	assert(fibonacciToUtf8("example/myTests/src_1.fib", "output.utf8") && identicalFiles("output.utf8", "example/myTests/src_0.utf8")); //max utf8
+	assert(!fibonacciToUtf8("example/myTests/src_2.fib", "output.utf8")); //max utf8 + 1
 	return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
