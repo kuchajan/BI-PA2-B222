@@ -126,7 +126,9 @@ bool CConvertReader::readUTF8() {
 			number = addToNumber(number, otherNum, 6);
 		}
 
-		output.write(number); //TODO: replace with write
+		if(!output.write(number)){
+			return false;
+		}
 	}
 	
 	return true;
@@ -154,7 +156,9 @@ bool CConvertReader::readFIB() {
 				if (val - 1 > 1114111) {
 					return false; // normally, I would put this into the writeUTF8 function, but we only use these two encodings
 				}
-				output.write(val - 1);
+				if(!output.write(val - 1)) {
+					return false;
+				}
 				val = 0;
 				fibIndex = 0;
 				previousWasOne = false;
