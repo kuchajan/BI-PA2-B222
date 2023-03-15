@@ -29,7 +29,6 @@ private:
 
 	// FIB methods
 	bool readFIB(vector<uint32_t> &numbers);
-	void fibCalcNext(uint32_t &currentFib, uint32_t &nextFib);
 
 public:
 	CFileInput(const char *file, fileMode mod);
@@ -105,14 +104,18 @@ bool CFileInput::readUTF8(vector<uint32_t> &numbers) {
 	return true;
 }
 
-void CFileInput::fibCalcNext(uint32_t &currentFib, uint32_t &nextFib) {
-	uint32_t temp = currentFib + nextFib;
-	currentFib = nextFib;
-	nextFib = temp;
-}
+const uint32_t fibonacciSeq[] = {
+	      1,       2,       3,       5,       8,
+	     13,      21,      34,      55,      89,
+	    144,     233,     377,     610,     987,
+	   1597,    2584,    4181,    6765,
+	  10946,   17711,   28657,   46368,   75025,
+	 121393,  196418,  317811,  514229,  832040,
+	1346269
+};
 
 bool CFileInput::readFIB(vector<uint32_t> &numbers) {
-	uint32_t currentFib = 1, nextFib = 2;
+	size_t fibIndex = 0;
 	uint32_t val = 0;
 	bool previousWasOne = false;
 	bool thereIsNewNum = false;
@@ -126,20 +129,23 @@ bool CFileInput::readFIB(vector<uint32_t> &numbers) {
 				}
 				numbers.push_back(val - 1);
 				val = 0;
-				currentFib = 1;
-				nextFib = 2;
+				fibIndex = 0;
 				previousWasOne = false;
 				thereIsNewNum = false;
 				continue;
 			}
+			if (fibIndex > (sizeof(fibonacciSeq) / sizeof(uint32_t)) - 1) { //number is too big
+				return false;
+			}
 			if (isSet) {
 				previousWasOne = true;
 				thereIsNewNum = true;
-				val += currentFib;
+				val += fibonacciSeq[fibIndex];
 			} else {
 				previousWasOne = false;
 			}
-			fibCalcNext(currentFib, nextFib);
+
+			fibIndex++;
 		}
 	}
 
@@ -289,16 +295,6 @@ void CFileOutput::bitshiftWithOverflow(vector<unsigned char> &bytes) {
 		bytes.push_back(1);
 	}
 }
-
-const uint32_t fibonacciSeq[] = {
-	      1,       2,       3,       5,       8,
-	     13,      21,      34,      55,      89,
-	    144,     233,     377,     610,     987,
-	   1597,    2584,    4181,    6765,
-	  10946,   17711,   28657,   46368,   75025,
-	 121393,  196418,  317811,  514229,  832040,
-	1346269
-};
 
 void CFileOutput::getFibCode(uint32_t number, vector<unsigned char> &bytes, int &bitCount) {
 	int index = -1;
