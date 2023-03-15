@@ -346,6 +346,9 @@ bool CFileOutput::writeFIB(vector<uint32_t> &numbers) {
 		// write the remaining except for the last one
 		for (size_t j = 1; j < toOutput.size() - 1; j++) {
 			ofs << toOutput[j];
+			if (ofs.bad()) {
+				return false;
+			}
 		}
 
 		// if the last byte was written,
@@ -360,6 +363,9 @@ bool CFileOutput::writeFIB(vector<uint32_t> &numbers) {
 			if ((bitCount % 8) == 0) {
 				if (bitCount != 8) {
 					ofs << lastByte;
+					if (ofs.bad()) {
+						return false;
+					}
 				}
 				lastByte = 0;
 			}
@@ -369,6 +375,9 @@ bool CFileOutput::writeFIB(vector<uint32_t> &numbers) {
 	}
 	if (lastByte > 0) {
 		ofs << lastByte;
+	}
+	if (ofs.bad()) {
+		return false;
 	}
 	return true;
 }
