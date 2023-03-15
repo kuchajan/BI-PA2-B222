@@ -380,10 +380,7 @@ bool CConvertWriter::writeFIB(uint32_t number) {
 	}
 	// reset the bitsToShift
 	bitsToShift = bitCount % 8;
-	if (ofs.bad()) {
-		return false;
-	}
-	return true;
+	return !(ofs.bad());
 }
 
 CConvertWriter::CConvertWriter(const char *fileOutput, fileMode modeOutput) : ofs(fileOutput, std::ios::binary) {
