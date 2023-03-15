@@ -468,6 +468,15 @@ int main(void) {
 	assert(fibonacciToUtf8("example/myTests/src_1.fib", "output.utf8") && identicalFiles("output.utf8", "example/myTests/src_0.utf8")); // max utf8
 	assert(!fibonacciToUtf8("example/myTests/src_2.fib", "output.utf8"));																// max utf8 + 1
 
+	//inaccessible
+	assert(!utf8ToFibonacci("example/myTests/inaccessible.lol", "output.utf8"));
+	assert(!utf8ToFibonacci("example/src_0.utf8", "example/myTests/inaccessible.lol"));
+	assert(!fibonacciToUtf8("example/myTests/inaccessible.lol", "output.fib"));
+	assert(!utf8ToFibonacci("example/src_6.fib", "example/myTests/inaccessible.lol"));
+
+	//non-existant
+	assert(!utf8ToFibonacci("example/myTests/nonexistant.lol", "output.utf8"));
+	assert(!fibonacciToUtf8("example/myTests/nonexistant.lol", "output.fib"));
 	//TODO: fix something idk
 
 	assert(!fibonacciToUtf8("example/hints/in_5026545.bin", "output.utf8")); //number beyond 32 bits
