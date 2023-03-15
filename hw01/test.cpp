@@ -16,23 +16,51 @@ enum class fileMode {
 	FIB
 };
 
-class CFileInput {
+class CConvertWriter {
+private:
+	ofstream ofs;
+	fileMode mode;
+
+	// variables for fib methods
+	int bitsToShift;
+	unsigned char lastByte;
+	
+
+	// UTF8 methods
+	int getNumType(uint32_t number);
+	unsigned char getUTF8Byte(uint32_t &number, int type);
+	bool numberToUTF8(uint32_t number, vector<unsigned char> &toOutput);
+	bool writeUTF8(uint32_t numbers);
+
+	// FIB methods
+	void getFibCode(uint32_t number, vector<unsigned char> &bytes, int &bitCount);
+	void bitshiftWithOverflow(vector<unsigned char> &bytes);
+	bool writeFIB(uint32_t numbers);
+
+public:
+	CConvertWriter(const char *fileOutput, fileMode modeOutput);
+	bool write(uint32_t numbers);
+	bool handleLastByte();
+};
+
+class CConvertReader {
 private:
 	ifstream ifs;
 	fileMode mode;
+	CConvertWriter output;
 
 	// UTF8 methods
-	bool readUTF8(vector<uint32_t> &numbers);
+	bool readUTF8();
 	int getTypeUTF8(unsigned char ch);
 	inline uint32_t getNumUTF8(unsigned char ch, int type);
 	inline uint32_t addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits);
 
 	// FIB methods
-	bool readFIB(vector<uint32_t> &numbers);
+	bool readFIB();
 
 public:
-	CFileInput(const char *file, fileMode mod);
-	bool getNumbers(vector<uint32_t> &numbers);
+	CConvertReader(const char *fileInput, fileMode modeInput, const char *fileOutput, fileMode modeOutput);
+	bool convertNumbers();
 };
 
 const unsigned char headerMasks[] = {
@@ -59,7 +87,7 @@ const unsigned char headers[] = {
 	0b10000000	// leading char
 };
 
-int CFileInput::getTypeUTF8(unsigned char ch) {
+int CConvertReader::getTypeUTF8(unsigned char ch) {
 	for (int i = 0; i < 5; i++) {
 		if ((ch & headerMasks[i]) == headers[i]) {
 			return i;
@@ -68,15 +96,15 @@ int CFileInput::getTypeUTF8(unsigned char ch) {
 	return -1;
 }
 
-uint32_t CFileInput::getNumUTF8(unsigned char ch, int type) {
+uint32_t CConvertReader::getNumUTF8(unsigned char ch, int type) {
 	return (uint32_t)ch & valueMasks[type];
 }
 
-uint32_t CFileInput::addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits) {
+uint32_t CConvertReader::addToNumber(uint32_t destination, uint32_t source, uint8_t nOfBits) {
 	return (destination << nOfBits) | source;
 }
 
-bool CFileInput::readUTF8(vector<uint32_t> &numbers) {
+bool CConvertReader::readUTF8() {
 	unsigned char ch;
 	while (ch = ifs.get(), ifs.good()) {
 		int type = getTypeUTF8(ch);
@@ -98,7 +126,7 @@ bool CFileInput::readUTF8(vector<uint32_t> &numbers) {
 			number = addToNumber(number, otherNum, 6);
 		}
 
-		numbers.push_back(number);
+		output.write(number); //TODO: replace with write
 	}
 	
 	return true;
@@ -113,7 +141,7 @@ const uint32_t fibonacciSeq[] = {
 	 121393,  196418,  317811,  514229,  832040
 };
 
-bool CFileInput::readFIB(vector<uint32_t> &numbers) {
+bool CConvertReader::readFIB() {
 	size_t fibIndex = 0;
 	uint32_t val = 0;
 	bool previousWasOne = false;
@@ -126,7 +154,7 @@ bool CFileInput::readFIB(vector<uint32_t> &numbers) {
 				if (val - 1 > 1114111) {
 					return false; // normally, I would put this into the writeUTF8 function, but we only use these two encodings
 				}
-				numbers.push_back(val - 1);
+				output.write(val - 1);
 				val = 0;
 				fibIndex = 0;
 				previousWasOne = false;
@@ -151,54 +179,40 @@ bool CFileInput::readFIB(vector<uint32_t> &numbers) {
 	return !(thereIsNewNum || !ifs.eof()); // unfinished number or reading stopped too early
 }
 
-CFileInput::CFileInput(const char *file, fileMode mod) : ifs(file, std::ios::binary) {
-	mode = mod;
+CConvertReader::CConvertReader(const char *fileInput, fileMode modeInput, const char *fileOutput, fileMode modeOutput) : ifs(fileInput, std::ios::binary), output(fileOutput, modeOutput) {
+	mode = modeInput;
 }
 
-bool CFileInput::getNumbers(vector<uint32_t> &numbers) {
+bool CConvertReader::convertNumbers() {
 	if (!ifs.is_open()) {
 		return false;
 	}
+
+	bool success = false;
+
 	switch (mode) {
 		case fileMode::UTF8: {
-			return readUTF8(numbers);
+			success = readUTF8();
 			break;
 		}
 		case fileMode::FIB: {
-			return readFIB(numbers);
+			success = readFIB();
 			break;
 		}
 	}
-	return false;
+	if(!success) {
+		return false;
+	}
+	return output.handleLastByte();
 }
 
-bool readFile(const char *inFile, fileMode mode, vector<uint32_t> &numbers) {
-	CFileInput input(inFile, mode);
-	return input.getNumbers(numbers);
-}
+/*
+===========================================================
+				CConvertWriter methods
+===========================================================
+*/
 
-class CFileOutput {
-private:
-	ofstream ofs;
-	fileMode mode;
-
-	// UTF8 methods
-	int getNumType(uint32_t number);
-	unsigned char getUTF8Byte(uint32_t &number, int type);
-	bool numberToUTF8(uint32_t number, vector<unsigned char> &toOutput);
-	bool writeUTF8(vector<uint32_t> &numbers);
-
-	// FIB methods
-	void getFibCode(uint32_t number, vector<unsigned char> &bytes, int &bitCount);
-	void bitshiftWithOverflow(vector<unsigned char> &bytes);
-	bool writeFIB(vector<uint32_t> &numbers);
-
-public:
-	CFileOutput(const char *file, fileMode mod);
-	bool write(vector<uint32_t> &numbers);
-};
-
-int CFileOutput::getNumType(uint32_t number) {
+int CConvertWriter::getNumType(uint32_t number) {
 	if (number <= 127) {
 		return 0; // 1 byte - 1 header, 0 leading
 	}
@@ -214,7 +228,7 @@ int CFileOutput::getNumType(uint32_t number) {
 	return -1; // number too large
 }
 
-unsigned char CFileOutput::getUTF8Byte(uint32_t &number, int type) {
+unsigned char CConvertWriter::getUTF8Byte(uint32_t &number, int type) {
 	unsigned char ch = headers[type] | (number & valueMasks[type]);
 	int bitsToShift = -1;
 	switch (type) {
@@ -248,7 +262,7 @@ unsigned char CFileOutput::getUTF8Byte(uint32_t &number, int type) {
 	return ch;
 }
 
-bool CFileOutput::numberToUTF8(uint32_t number, vector<unsigned char> &toOutput) {
+bool CConvertWriter::numberToUTF8(uint32_t number, vector<unsigned char> &toOutput) {
 	int type = getNumType(number);
 	if (type == -1) {
 		return false;
@@ -269,21 +283,16 @@ bool CFileOutput::numberToUTF8(uint32_t number, vector<unsigned char> &toOutput)
 	return true;
 }
 
-bool CFileOutput::writeUTF8(vector<uint32_t> &numbers) {
-	for (size_t i = 0; i < numbers.size(); i++) {
-		vector<unsigned char> toOutput;
-		if (!numberToUTF8(numbers[i], toOutput)) {
-			return false;
-		}
-		ofs.write((char *)toOutput.data(), toOutput.size());
-		if (ofs.bad()) {
-			return false;
-		}
+bool CConvertWriter::writeUTF8(uint32_t number) {
+	vector<unsigned char> toOutput;
+	if (!numberToUTF8(number, toOutput)) {
+		return false;
 	}
-	return true;
+	ofs.write((char *)toOutput.data(), toOutput.size());
+	return !(ofs.bad());
 }
 
-void CFileOutput::bitshiftWithOverflow(vector<unsigned char> &bytes) {
+void CConvertWriter::bitshiftWithOverflow(vector<unsigned char> &bytes) {
 	bool overflow = false;
 	for (size_t i = 0; i < bytes.size(); i++) {
 		bool overflowNext = (bytes[i] & 0b10000000) != 0;
@@ -295,7 +304,7 @@ void CFileOutput::bitshiftWithOverflow(vector<unsigned char> &bytes) {
 	}
 }
 
-void CFileOutput::getFibCode(uint32_t number, vector<unsigned char> &bytes, int &bitCount) {
+void CConvertWriter::getFibCode(uint32_t number, vector<unsigned char> &bytes, int &bitCount) {
 	int index = -1;
 	bytes.push_back(0b11);
 
@@ -318,119 +327,108 @@ void CFileOutput::getFibCode(uint32_t number, vector<unsigned char> &bytes, int 
 	}
 }
 
-bool CFileOutput::writeFIB(vector<uint32_t> &numbers) {
-	int bitsToShift = 0;
-	unsigned char lastByte = 0;
+bool CConvertWriter::writeFIB(uint32_t number) {
+	// Because the number can exceed a single byte, I save it into a vector
+	// I get the current number's bytes in fibonacci
+	vector<unsigned char> toOutput;
+	int bitCount;
+	getFibCode(number + 1, toOutput, bitCount);
 
-	for (size_t i = 0; i < numbers.size(); i++) {
-		// Because the number can exceed a single byte, I save it into a vector
-		// I get the current number's bytes in fibonacci
-		vector<unsigned char> toOutput;
-		int bitCount;
-		getFibCode(numbers[i] + 1, toOutput, bitCount);
-
-		// Bitshift with overflow, so I won't overwrite the lastByte
-		for (int j = 0; j < bitsToShift; j++, bitCount++) {
-			bitshiftWithOverflow(toOutput);
-		}
-
-		// or the lastByte with the first byte of toOutput
-		lastByte |= toOutput[0];
-
-		// write the last byte (if it's finished)
-		if (bitCount >= 8) {
-			ofs << lastByte;
-		}
-
-		// write the remaining except for the last one
-		for (size_t j = 1; j < toOutput.size() - 1; j++) {
-			ofs << toOutput[j];
-			if (ofs.bad()) {
-				return false;
-			}
-		}
-
-		// if the last byte was written,
-		// we need to change what the last byte is now
-		// but if the last byte of the output vector is
-		// also full and it's not the last byte, we need to write it, and thus the
-		// last byte is 0
-		// else, last byte is the last byte of the vector
-		if (bitCount >= 8) { // if last byte was written
-			// change the last byte
-			lastByte = toOutput[toOutput.size() - 1];
-			if ((bitCount % 8) == 0) {
-				if (bitCount != 8) {
-					ofs << lastByte;
-					if (ofs.bad()) {
-						return false;
-					}
-				}
-				lastByte = 0;
-			}
-		}
-		// reset the bitsToShift
-		bitsToShift = bitCount % 8;
+	// Bitshift with overflow, so I won't overwrite the lastByte
+	for (int j = 0; j < bitsToShift; j++, bitCount++) {
+		bitshiftWithOverflow(toOutput);
 	}
-	if (lastByte > 0) {
+
+	// or the lastByte with the first byte of toOutput
+	lastByte |= toOutput[0];
+
+	// write the last byte (if it's finished)
+	if (bitCount >= 8) {
 		ofs << lastByte;
 	}
+
+	// write the remaining except for the last one
+	for (size_t j = 1; j < toOutput.size() - 1; j++) {
+		ofs << toOutput[j];
+		if (ofs.bad()) {
+			return false;
+		}
+	}
+
+	// if the last byte was written,
+	// we need to change what the last byte is now
+	// but if the last byte of the output vector is
+	// also full and it's not the last byte, we need to write it, and thus the
+	// last byte is 0
+	// else, last byte is the last byte of the vector
+	if (bitCount >= 8) { // if last byte was written
+		// change the last byte
+		lastByte = toOutput[toOutput.size() - 1];
+		if ((bitCount % 8) == 0) {
+			if (bitCount != 8) {
+				ofs << lastByte;
+				if (ofs.bad()) {
+					return false;
+				}
+			}
+			lastByte = 0;
+		}
+	}
+	// reset the bitsToShift
+	bitsToShift = bitCount % 8;
 	if (ofs.bad()) {
 		return false;
 	}
 	return true;
 }
 
-CFileOutput::CFileOutput(const char *file, fileMode mod) : ofs(file, std::ios::binary) {
-	mode = mod;
+CConvertWriter::CConvertWriter(const char *fileOutput, fileMode modeOutput) : ofs(fileOutput, std::ios::binary) {
+	mode = modeOutput;
+	bitsToShift = 0;
+	lastByte = 0;
 }
 
-bool CFileOutput::write(vector<uint32_t> &numbers) {
+bool CConvertWriter::write(uint32_t number) {
 	if (!ofs.is_open()) {
 		return false;
 	}
 
 	switch (mode) {
 		case fileMode::UTF8: {
-			return writeUTF8(numbers);
+			return writeUTF8(number);
 		}
 		case fileMode::FIB: {
-			return writeFIB(numbers);
+			return writeFIB(number);
 		}
 	}
 
 	return false;
 }
 
-bool writeFile(const char *outFile, fileMode mode, vector<uint32_t> &numbers) {
-	CFileOutput output(outFile, mode);
-	return output.write(numbers);
+bool CConvertWriter::handleLastByte() {
+	if(lastByte != 0) {
+		ofs << lastByte;
+		return !(ofs.bad());
+	}
+	return true;
 }
 
+/*
+===========================================================
+					Progtest methods
+===========================================================
+*/
+
 bool utf8ToFibonacci(const char *inFile, const char *outFile) {
-	vector<uint32_t> numbers;
-	if (!readFile(inFile, fileMode::UTF8, numbers)) {
-		return false;
-	}
+	CConvertReader converter(inFile, fileMode::UTF8, outFile, fileMode::FIB);
 
-	if (!writeFile(outFile, fileMode::FIB, numbers)) {
-		return false;
-	}
-
-	return true;
+	return converter.convertNumbers();
 }
 
 bool fibonacciToUtf8(const char *inFile, const char *outFile) {
-	vector<uint32_t> numbers;
-	if (!readFile(inFile, fileMode::FIB, numbers)) {
-		return false;
-	}
+	CConvertReader converter(inFile, fileMode::FIB, outFile, fileMode::UTF8);
 
-	if (!writeFile(outFile, fileMode::UTF8, numbers)) {
-		return false;
-	}
-
-	return true;
+	return converter.convertNumbers();
 }
 
 #ifndef __PROGTEST__
@@ -469,6 +467,11 @@ int main(void) {
 	assert(utf8ToFibonacci("example/myTests/src_0.utf8", "output.fib") && identicalFiles("output.fib", "example/myTests/src_1.fib"));	// max utf8
 	assert(fibonacciToUtf8("example/myTests/src_1.fib", "output.utf8") && identicalFiles("output.utf8", "example/myTests/src_0.utf8")); // max utf8
 	assert(!fibonacciToUtf8("example/myTests/src_2.fib", "output.utf8"));																// max utf8 + 1
+
+	//TODO: fix something idk
+
+	assert(!fibonacciToUtf8("example/hints/in_5026545.bin", "output.utf8")); //number beyond 32 bits
+	assert(!fibonacciToUtf8("example/hints/in_5027360.bin", "output.utf8"));
 	return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
