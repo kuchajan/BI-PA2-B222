@@ -110,8 +110,7 @@ const uint32_t fibonacciSeq[] = {
 	    144,     233,     377,     610,     987,
 	   1597,    2584,    4181,    6765,
 	  10946,   17711,   28657,   46368,   75025,
-	 121393,  196418,  317811,  514229,  832040,
-	1346269
+	 121393,  196418,  317811,  514229,  832040
 };
 
 bool CFileInput::readFIB(vector<uint32_t> &numbers) {
@@ -124,7 +123,7 @@ bool CFileInput::readFIB(vector<uint32_t> &numbers) {
 		for (uint8_t bit = 0; bit < 8; bit++) {
 			bool isSet = ((ch >> bit) & 1) == 1;
 			if (isSet && previousWasOne) {
-				if (val - 1 > 2097151) {
+				if (val - 1 > 1114111) {
 					return false; // normally, I would put this into the writeUTF8 function, but we only use these two encodings
 				}
 				numbers.push_back(val - 1);
@@ -209,7 +208,7 @@ int CFileOutput::getNumType(uint32_t number) {
 	if (number <= 65537) {
 		return 2; // 3 bytes - 1 header, 2 leading
 	}
-	if (number <= 2097151) {
+	if (number <= 1114111) {
 		return 3; // 4 bytes - 1 header, 3 leading
 	}
 	return -1; // number too large
