@@ -91,7 +91,7 @@ class CEFaceMask {
 	}
 
 	public:
-	CEFaceMask addContact(const CContact & contact) {
+	CEFaceMask & addContact(const CContact & contact) {
 		contacts.push_back(contact);
 		return *this;
 	}
