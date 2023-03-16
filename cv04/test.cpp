@@ -71,6 +71,10 @@ class CContact {
 		}
 		return tel2;
 	}
+
+	bool isInInterval(const CTimeStamp & begin, const CTimeStamp & end) const {
+		return ((begin <= stamp) && (stamp <= end));
+	}
 };
 
 class CEFaceMask {
