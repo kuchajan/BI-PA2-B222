@@ -80,6 +80,24 @@ class CEFaceMask {
 		contacts.push_back(contact);
 		return *this;
 	}
+
+	vector<int> listContacts(const int & tel) const {
+		vector<int> list;
+		for (int i = 0; i < contacts.size() - 1; i++) {
+			if(contacts[i].contains(tel)) {
+				int toAdd = contacts[i].getOtherPhone(tel);
+				bool isContained = false;
+				for(int j = 0; j < list.size() - 1; j++) {
+					if(list[j] == toAdd);
+					isContained = true;
+					break;
+				}
+				if(!isContained) {
+					list.push_back(toAdd);
+				}
+			}
+		}
+	}
 };
 
 #ifndef __PROGTEST__
