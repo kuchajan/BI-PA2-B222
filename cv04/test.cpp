@@ -44,6 +44,10 @@ class CTimeStamp {
 	uint64_t getTimeStamp() {
 		return unixTimeStamp;
 	}
+
+	bool operator <= (const CTimeStamp & other) const {
+		return this->unixTimeStamp <= other.unixTimeStamp;
+	}
 };
 
 class CContact {
