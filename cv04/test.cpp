@@ -63,7 +63,14 @@ class CContact {
 };
 
 class CEFaceMask {
-	// TODO
+	private:
+	vector<CContact> contacts;
+
+	public:
+	CEFaceMask addContact(const CContact & contact) {
+		contacts.push_back(contact);
+		return *this;
+	}
 };
 
 #ifndef __PROGTEST__
