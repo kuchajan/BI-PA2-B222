@@ -81,28 +81,39 @@ class CEFaceMask {
 	private:
 	vector<CContact> contacts;
 
+	void addToListIfNotContained(const int & toAdd, vector<int> & list) {
+		for(int j = 0; j < list.size() -1; j++) {
+			if(list[j] == toAdd) {
+				return;
+			}
+		}
+		list.push_back(toAdd);
+	}
+
 	public:
 	CEFaceMask addContact(const CContact & contact) {
 		contacts.push_back(contact);
 		return *this;
 	}
 
-	vector<int> listContacts(const int & tel) const {
+	vector<int> listContacts(const int & tel) {
 		vector<int> list;
 		for (int i = 0; i < contacts.size() - 1; i++) {
 			if(contacts[i].contains(tel)) {
-				int toAdd = contacts[i].getOtherPhone(tel);
-				bool isContained = false;
-				for(int j = 0; j < list.size() - 1; j++) {
-					if(list[j] == toAdd);
-					isContained = true;
-					break;
-				}
-				if(!isContained) {
-					list.push_back(toAdd);
-				}
+				addToListIfNotContained(contacts[i].getOtherPhone(tel),list);
 			}
 		}
+		return list;
+	}
+
+	vector<int> listContacts(const int & tel, const CTimeStamp & begin, const CTimeStamp & end) {
+		vector<int> list;
+		for (int i = 0; i < contacts.size() - 1; i++) {
+			if(contacts[i].contains(tel) && contacts[i].isInInterval(begin,end)) {
+				addToListIfNotContained(contacts[i].getOtherPhone(tel),list);
+			}
+		}
+		return list;
 	}
 };
 
