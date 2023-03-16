@@ -60,6 +60,15 @@ class CContact {
 		tel1 = telephone1;
 		tel2 = telephone2;
 	}
+	inline bool contains(const int & tel) const {
+		return (tel1 != tel2) && ((tel == tel1) || (tel == tel2));
+	}
+	int getOtherPhone(const int & tel) const {
+		if (tel != tel1) {
+			return tel1;
+		}
+		return tel2;
+	}
 };
 
 class CEFaceMask {
