@@ -49,7 +49,17 @@ class CTimeStamp {
 };
 
 class CContact {
-	// TODO
+	private:
+	CTimeStamp stamp;
+	int tel1;
+	int tel2;
+
+	public:
+	CContact(const CTimeStamp & timeStamp, const int & telephone1, const int & telephone2)
+	:stamp(timeStamp) {
+		tel1 = telephone1;
+		tel2 = telephone2;
+	}
 };
 
 class CEFaceMask {
