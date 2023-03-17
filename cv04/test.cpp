@@ -14,39 +14,40 @@ using namespace std;
 
 class CTimeStamp {
 	private:
-	uint64_t unixTimeStamp;
-	bool isLeapYear(const int & year) {
-		if ( year %  400 == 0) { return  true; }
-		if ( year %  100 == 0) { return false; }
-		if ( year %    4 == 0) { return  true; }
-		return false;
-	}
-
-	int daysInMonth(int month, const int & year){
-		if (month == 2) { return 28 + (isLeapYear(year) ? 1 : 0); }
-		if (month > 7) { month -= 7; }
-		if (month % 2 == 0) { return 30; }
-		return 31;
-	}
-
-	int getYearDay(const int & day, const int & month, const int & year) {
-		int yearDay = day - 1;
-		for(int i = 1; i < month; i++) {
-			yearDay += daysInMonth(month,year);
-		}
-		return yearDay;
-	}
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
+	int second;
+	
 	public:
-	CTimeStamp(const int & year, const int & month, const int & day, const int & hour, const int & minute, const int & second) {
-		unixTimeStamp = second + minute*60 + hour*3600 + getYearDay(day,month,year)*86400 + (year-70)*31536000 + ((year-69)/4)*86400 - ((year-1)/100)*86400 + ((year+299)/400)*86400;
-	}
-
-	uint64_t getTimeStamp() {
-		return unixTimeStamp;
+	CTimeStamp(const int & y, const int & mon, const int & d, const int & h, const int & min, const int & s) {
+		year = y;
+		month = mon;
+		day = d;
+		hour = h;
+		minute = min;
+		second = s;
 	}
 
 	bool operator <= (const CTimeStamp & other) const {
-		return this->unixTimeStamp <= other.unixTimeStamp;
+		if (this->year != other.year) {
+			return (this->year < other.year);
+		}
+		if (this->month != other.month) {
+			return (this->month < other.month);
+		}
+		if (this->day != other.day) {
+			return (this->day < other.day);
+		}
+		if (this->hour != other.hour) {
+			return (this->hour < other.hour);
+		}
+		if (this->minute != other.minute) {
+			return (this->minute < other.minute);
+		}
+		return (this->second <= other.second); 
 	}
 };
 
