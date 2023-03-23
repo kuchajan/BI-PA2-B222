@@ -172,6 +172,53 @@ bool CPersonalAgenda::add(const string &name, const string &surname, const strin
 	return true;
 }
 
+bool CPersonalAgenda::del(const string &name, const string &surname) {
+	return false;
+}
+
+bool CPersonalAgenda::del(const string &email) {
+	return false;
+}
+
+bool CPersonalAgenda::changeName(const string &email, const string &newName, const string &newSurname) {
+	return false;
+}
+
+bool CPersonalAgenda::changeEmail(const string &name, const string &surname, const string &newEmail) {
+	return false;
+}
+
+bool CPersonalAgenda::setSalary(const string &name, const string &surname, unsigned int salary) {
+	return false;
+}
+
+bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
+	return false;
+}
+
+unsigned int CPersonalAgenda::getSalary(const string &name, const string &surname) const {
+	return 0;
+}
+
+unsigned int CPersonalAgenda::getSalary(const string &email) const {
+	return 0;
+}
+
+bool CPersonalAgenda::getRank(const string &name, const string &surname, int &rankMin, int &rankMax) const {
+	return false;
+}
+
+bool CPersonalAgenda::getRank(const string &email, int &rankMin, int &rankMax) const {
+	return false;
+}
+
+bool CPersonalAgenda::getFirst(string &outName, string &outSurname) const {
+	return false;
+}
+
+bool CPersonalAgenda::getNext(const string &name, const string &surname, string &outName, string &outSurname) const {
+	return false;
+}
 
 #ifndef __PROGTEST__
 int main(void) {
