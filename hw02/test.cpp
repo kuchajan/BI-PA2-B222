@@ -16,6 +16,12 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
+/*
+===============================================================================
+				Declarations of classes, structures, and methods
+===============================================================================
+*/
+
 struct SPerson {
 	struct SName
 	{
@@ -93,6 +99,12 @@ public:
 				 string &outSurname) const;
 };
 
+/*
+===============================================================================
+						Constructors and destructors
+===============================================================================
+*/
+
 CPersonalAgenda::CPersonalAgenda(void) { } //nothing
 
 CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
@@ -100,6 +112,12 @@ CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
 	byEmail.clear();
 	bySalary.clear();
 }
+
+/*
+===============================================================================
+								Find methods
+===============================================================================
+*/
 
 ssize_t CPersonalAgenda::findName(const string & name, const string & surname) const {
 	//change to binary search
@@ -120,6 +138,12 @@ ssize_t CPersonalAgenda::findEmail(const string & email) const {
 	}
 	return -1;
 }
+
+/*
+===============================================================================
+							Adding methods
+===============================================================================
+*/
 
 void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	//todo: something like binary search where to add? This is T(3n) at worst!
@@ -172,6 +196,12 @@ bool CPersonalAgenda::add(const string &name, const string &surname, const strin
 	return true;
 }
 
+/*
+===============================================================================
+							Deleting methods
+===============================================================================
+*/
+
 bool CPersonalAgenda::del(const string &name, const string &surname) {
 	return false;
 }
@@ -179,6 +209,12 @@ bool CPersonalAgenda::del(const string &name, const string &surname) {
 bool CPersonalAgenda::del(const string &email) {
 	return false;
 }
+
+/*
+===============================================================================
+								Setters
+===============================================================================
+*/
 
 bool CPersonalAgenda::changeName(const string &email, const string &newName, const string &newSurname) {
 	return false;
@@ -195,6 +231,12 @@ bool CPersonalAgenda::setSalary(const string &name, const string &surname, unsig
 bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
 	return false;
 }
+
+/*
+===============================================================================
+								Getters
+===============================================================================
+*/
 
 unsigned int CPersonalAgenda::getSalary(const string &name, const string &surname) const {
 	return 0;
@@ -219,6 +261,12 @@ bool CPersonalAgenda::getFirst(string &outName, string &outSurname) const {
 bool CPersonalAgenda::getNext(const string &name, const string &surname, string &outName, string &outSurname) const {
 	return false;
 }
+
+/*
+===============================================================================
+								Tests
+===============================================================================
+*/
 
 #ifndef __PROGTEST__
 int main(void) {
