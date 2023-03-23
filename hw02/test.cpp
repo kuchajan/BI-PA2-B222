@@ -16,6 +16,35 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
+struct SPerson {
+	struct SName
+	{
+		string name;
+		string surname;
+		SName(const string & nm, const string & srnm) {
+			name = nm;
+			surname = srnm;
+		}
+		friend bool operator== (const SName & first, const SName & other) {
+			return (first.name == other.name) && (first.surname == other.surname); 
+		}
+		friend bool operator< (const SName & first, const SName & other) {
+			if(first.surname != other.surname) {
+				return first.surname.compare(other.surname) < 0;
+			}
+			return first.name.compare(other.name) < 0;
+		}
+	};
+	SName fullname;
+	string email;
+	unsigned int salary;
+	SPerson(const string & nm, const string & srnm, const string & em, const unsigned int & sal)
+		: fullname(nm,srnm) {
+		email = em;
+		salary = sal;
+	}
+};
+
 class CPersonalAgenda {
 public:
 	CPersonalAgenda(void);
