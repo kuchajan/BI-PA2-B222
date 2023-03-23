@@ -46,6 +46,14 @@ struct SPerson {
 };
 
 class CPersonalAgenda {
+private:
+	vector<shared_ptr<SPerson>> byName;
+	vector<shared_ptr<SPerson>> byEmail;
+	vector<shared_ptr<SPerson>> bySalary;
+
+	ssize_t findName(const string &name, const string &surname) const;
+	ssize_t findEmail(const string &email) const;
+	void addToVectors(const shared_ptr<SPerson> & newPerson);
 public:
 	CPersonalAgenda(void);
 	~CPersonalAgenda(void);
@@ -83,9 +91,6 @@ public:
 				 const string &surname,
 				 string &outName,
 				 string &outSurname) const;
-
-private:
-	// todo
 };
 
 #ifndef __PROGTEST__
