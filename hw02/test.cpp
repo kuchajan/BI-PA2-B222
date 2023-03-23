@@ -192,4 +192,4 @@ int main(void) {
 
 	return EXIT_SUCCESS;
 }
-#endif /* __PROGTEST__ */ s
+#endif /* __PROGTEST__ */
