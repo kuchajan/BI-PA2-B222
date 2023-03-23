@@ -101,6 +101,77 @@ CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
 	bySalary.clear();
 }
 
+ssize_t CPersonalAgenda::findName(const string & name, const string & surname) const {
+	//change to binary search
+	SPerson::SName finding = SPerson::SName(name, surname);
+	for(auto iter = byName.begin(); iter != byName.end(); iter++) {
+		if((*iter)->fullname == finding) {
+			return byName.begin() - iter;
+		}
+	}
+	return -1;
+}
+
+ssize_t CPersonalAgenda::findEmail(const string & email) const {
+	for(auto iter = byEmail.begin(); iter != byEmail.end(); iter++) {
+		if((*iter)->email == email) {
+			return byEmail.begin() - iter;
+		}
+	}
+	return -1;
+}
+
+void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
+	//todo: something like binary search where to add? This is T(3n) at worst!
+	//todo: AND I'M REPEATING MYSELF!!! accept pointer to comparator and the vector to add to?
+	//first add to names
+	bool inserted = false;
+	for(auto iter = byName.begin(); iter != byName.end(); iter++) {
+		//compare the two names;
+		if(!(newPerson->fullname < (*iter)->fullname)) {
+			byName.insert(iter,newPerson);
+			inserted = true;
+		}
+	}
+	if(!inserted) {
+		byName.push_back(newPerson);
+	}
+	inserted = false;
+	//then add to emails
+	for(auto iter = byEmail.begin(); iter != byEmail.end(); iter++) {
+		//compare the two names;
+		if(!(newPerson->email.compare((*iter)->email) < 0)) {
+			byEmail.insert(iter,newPerson);
+			inserted = true;
+		}
+	}
+	if(!inserted) {
+		byEmail.push_back(newPerson);
+	}
+	inserted = false;
+	//then add to salaries
+	for(auto iter = bySalary.begin(); iter != bySalary.end(); iter++) {
+		//compare the two names;
+		if(!(newPerson->salary < (*iter)->salary)) {
+			bySalary.insert(iter,newPerson);
+			inserted = true;
+		}
+	}
+	if(!inserted) {
+		bySalary.push_back(newPerson);
+	}
+}
+
+bool CPersonalAgenda::add(const string &name, const string &surname, const string &email, unsigned int salary) {
+	//todo: use shared ptr
+	shared_ptr<SPerson> newPerson = make_shared<SPerson>(name, surname, email, salary);
+	if(findEmail(email) != -1) {
+		return false;
+	}
+	addToVectors(newPerson);
+	return true;
+}
+
 
 #ifndef __PROGTEST__
 int main(void) {
