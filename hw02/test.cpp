@@ -93,6 +93,15 @@ public:
 				 string &outSurname) const;
 };
 
+CPersonalAgenda::CPersonalAgenda(void) { } //nothing
+
+CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
+	byName.clear();
+	byEmail.clear();
+	bySalary.clear();
+}
+
+
 #ifndef __PROGTEST__
 int main(void) {
 	string outName, outSurname;
