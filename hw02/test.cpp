@@ -228,11 +228,21 @@ bool CPersonalAgenda::changeEmail(const string &name, const string &surname, con
 }
 
 bool CPersonalAgenda::setSalary(const string &name, const string &surname, unsigned int salary) {
-	return false;
+	size_t idx;
+	if(!findName(name,surname,idx)) {
+		return false;
+	}
+	byName[idx]->salary = salary;
+	return true;
 }
 
 bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
-	return false;
+	size_t idx;
+	if(!findEmail(email,idx)) {
+		return false;
+	}
+	byEmail[idx]->salary = salary;
+	return true;
 }
 
 /*
