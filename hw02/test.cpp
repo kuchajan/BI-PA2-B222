@@ -57,8 +57,8 @@ private:
 	vector<shared_ptr<SPerson>> byEmail;
 	vector<shared_ptr<SPerson>> bySalary;
 
-	ssize_t findName(const string &name, const string &surname) const;
-	ssize_t findEmail(const string &email) const;
+	bool findName(const string &name, const string &surname, size_t & idx) const;
+	bool findEmail(const string &email, size_t & idx) const;
 	void addToVectors(const shared_ptr<SPerson> & newPerson);
 public:
 	CPersonalAgenda(void);
@@ -119,24 +119,26 @@ CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
 ===============================================================================
 */
 
-ssize_t CPersonalAgenda::findName(const string & name, const string & surname) const {
+bool CPersonalAgenda::findName(const string & name, const string & surname, size_t & idx) const {
 	//change to binary search
 	SPerson::SName finding = SPerson::SName(name, surname);
 	for(auto iter = byName.begin(); iter != byName.end(); iter++) {
 		if((*iter)->fullname == finding) {
-			return iter - byName.begin();
+			idx = iter - byName.begin();
+			return true;
 		}
 	}
-	return -1;
+	return false;
 }
 
-ssize_t CPersonalAgenda::findEmail(const string & email) const {
+bool CPersonalAgenda::findEmail(const string & email, size_t & idx) const {
 	for(auto iter = byEmail.begin(); iter != byEmail.end(); iter++) {
 		if((*iter)->email == email) {
-			return iter - byEmail.begin();
+			idx = iter - byEmail.begin();
+			return true;
 		}
 	}
-	return -1;
+	return false;
 }
 
 /*
@@ -152,7 +154,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	bool inserted = false;
 	for(auto iter = byName.begin(); iter != byName.end() && !inserted; iter++) {
 		//compare the two names;
-		if(!(newPerson->fullname < (*iter)->fullname)) {
+		if((newPerson->fullname < (*iter)->fullname)) {
 			byName.insert(iter,newPerson);
 			inserted = true;
 		}
@@ -164,7 +166,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	//then add to emails
 	for(auto iter = byEmail.begin(); iter != byEmail.end() && !inserted; iter++) {
 		//compare the two names;
-		if(!(newPerson->email.compare((*iter)->email) < 0)) {
+		if((newPerson->email.compare((*iter)->email) < 0)) {
 			byEmail.insert(iter,newPerson);
 			inserted = true;
 		}
@@ -176,7 +178,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	//then add to salaries
 	for(auto iter = bySalary.begin(); iter != bySalary.end() && !inserted; iter++) {
 		//compare the two names;
-		if(!(newPerson->salary < (*iter)->salary)) {
+		if((newPerson->salary < (*iter)->salary)) {
 			bySalary.insert(iter,newPerson);
 			inserted = true;
 		}
@@ -189,7 +191,8 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 bool CPersonalAgenda::add(const string &name, const string &surname, const string &email, unsigned int salary) {
 	//todo: use shared ptr
 	shared_ptr<SPerson> newPerson = make_shared<SPerson>(name, surname, email, salary);
-	if(findEmail(email) != -1) {
+	size_t temp;
+	if(!findEmail(email, temp)) {
 		return false;
 	}
 	addToVectors(newPerson);
@@ -255,11 +258,22 @@ bool CPersonalAgenda::getRank(const string &email, int &rankMin, int &rankMax) c
 }
 
 bool CPersonalAgenda::getFirst(string &outName, string &outSurname) const {
-	return false;
+	if(byName.empty()) {
+		return false;
+	}
+	outName = byName[0]->fullname.name;
+	outSurname = byName[0]->fullname.surname;
+	return true;
 }
 
 bool CPersonalAgenda::getNext(const string &name, const string &surname, string &outName, string &outSurname) const {
-	return false;
+	size_t idx;
+	if(!findName(name,surname,idx) || byName.size() == ++idx) {
+		return false;
+	}
+	outName = byName[idx]->fullname.name;
+	outSurname = byName[idx]->fullname.surname;
+	return true;
 }
 
 /*
