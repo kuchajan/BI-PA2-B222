@@ -192,7 +192,7 @@ bool CPersonalAgenda::add(const string &name, const string &surname, const strin
 	//todo: use shared ptr
 	shared_ptr<SPerson> newPerson = make_shared<SPerson>(name, surname, email, salary);
 	size_t temp;
-	if(!findEmail(email, temp)) {
+	if(findEmail(email, temp)) {
 		return false;
 	}
 	addToVectors(newPerson);
