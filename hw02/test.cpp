@@ -233,11 +233,42 @@ bool CPersonalAgenda::del(const string &email) {
 */
 
 bool CPersonalAgenda::changeName(const string &email, const string &newName, const string &newSurname) {
-	return false;
+	//note to self: this is getting repetitive, am I doing this right?
+	size_t idxEmail;
+	if(!findEmail(email,idxEmail)) {
+		return false;
+	}
+
+	size_t idxName;
+	findName(byEmail[idxEmail]->fullname.name, byEmail[idxEmail]->fullname.surname, idxName);
+
+	byName.erase(byName.begin()+idxName);
+
+	byEmail[idxEmail]->fullname = SPerson::SName(newName,newSurname);
+
+	addToVector(byEmail[idxEmail],byName,cmpName);
+	return true;
 }
 
 bool CPersonalAgenda::changeEmail(const string &name, const string &surname, const string &newEmail) {
-	return false;
+	size_t idxName;
+	if(!findName(name, surname, idxName)) {
+		return false;
+	}
+
+	size_t idxEmail;
+	findEmail(byName[idxName]->email,idxEmail);
+
+	byEmail.erase(byEmail.begin()+idxEmail);
+
+	size_t idxSalary = findSalary(byName[idxName]->email,byName[idxName]->salary);
+	bySalary.erase(bySalary.begin()+idxSalary);
+
+	byName[idxName]->email = newEmail;
+
+	addToVector(byName[idxName], byEmail, cmpEmail);
+	addToVector(byName[idxName], bySalary, cmpSalaryEmail);
+	return true;
 }
 
 void CPersonalAgenda::setSalary(const shared_ptr<SPerson> &person, const unsigned int &salary) {
