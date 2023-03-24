@@ -190,16 +190,13 @@ size_t CPersonalAgenda::findSalary(const string &email, const unsigned int &sala
 void CPersonalAgenda::addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, bool (*comparator)(const SPerson &, const SPerson &)) {
 	//! This is T(n) at worst!
 	//todo: something like binary search where to add?
-	bool inserted = false;
-	for(auto iter = vec.begin(); iter != vec.end() && !inserted; iter++) {
+	for(auto iter = vec.begin(); iter != vec.end(); iter++) {
 		if(comparator((*newPerson),(**iter))) {
 			vec.insert(iter,newPerson);
-			inserted = true;
+			return;
 		}
 	}
-	if(!inserted) {
-		vec.push_back(newPerson);
-	}
+	vec.push_back(newPerson);
 }
 
 bool CPersonalAgenda::add(const string &name, const string &surname, const string &email, unsigned int salary) {
