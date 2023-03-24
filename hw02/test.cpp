@@ -124,7 +124,7 @@ ssize_t CPersonalAgenda::findName(const string & name, const string & surname) c
 	SPerson::SName finding = SPerson::SName(name, surname);
 	for(auto iter = byName.begin(); iter != byName.end(); iter++) {
 		if((*iter)->fullname == finding) {
-			return byName.begin() - iter;
+			return iter - byName.begin();
 		}
 	}
 	return -1;
@@ -133,7 +133,7 @@ ssize_t CPersonalAgenda::findName(const string & name, const string & surname) c
 ssize_t CPersonalAgenda::findEmail(const string & email) const {
 	for(auto iter = byEmail.begin(); iter != byEmail.end(); iter++) {
 		if((*iter)->email == email) {
-			return byEmail.begin() - iter;
+			return iter - byEmail.begin();
 		}
 	}
 	return -1;
