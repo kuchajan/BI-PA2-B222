@@ -264,12 +264,12 @@ bool CPersonalAgenda::del(const string &email) {
 
 bool CPersonalAgenda::changeName(const string &email, const string &newName, const string &newSurname) {
 	//note to self: this is getting repetitive, am I doing this right?
-	size_t idxEmail;
-	if(!findEmail(email,idxEmail)) {
+	size_t idxEmail, idxName;
+	//email not included or name is duplicite
+	if(!findEmail(email,idxEmail) || findName(newName,newSurname, idxName)) {
 		return false;
 	}
-
-	size_t idxName;
+	
 	findName(byEmail[idxEmail]->fullname.name, byEmail[idxEmail]->fullname.surname, idxName);
 
 	byName.erase(byName.begin()+idxName);
@@ -281,12 +281,12 @@ bool CPersonalAgenda::changeName(const string &email, const string &newName, con
 }
 
 bool CPersonalAgenda::changeEmail(const string &name, const string &surname, const string &newEmail) {
-	size_t idxName;
-	if(!findName(name, surname, idxName)) {
+	size_t idxName, idxEmail;
+	//name not included or email is duplicite
+	if(!findName(name, surname, idxName) || findEmail(newEmail, idxEmail)) {
 		return false;
 	}
 
-	size_t idxEmail;
 	findEmail(byName[idxName]->email,idxEmail);
 
 	byEmail.erase(byEmail.begin()+idxEmail);
