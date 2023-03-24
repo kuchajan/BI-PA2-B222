@@ -252,11 +252,19 @@ bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
 */
 
 unsigned int CPersonalAgenda::getSalary(const string &name, const string &surname) const {
-	return 0;
+	size_t idx;
+	if(!findName(name,surname,idx)) {
+		return 0;
+	}
+	return byName[idx]->salary;
 }
 
 unsigned int CPersonalAgenda::getSalary(const string &email) const {
-	return 0;
+	size_t idx;
+	if(!findEmail(email,idx)) {
+		return 0;
+	}
+	return byEmail[idx]->salary;
 }
 
 bool CPersonalAgenda::getRank(const string &name, const string &surname, int &rankMin, int &rankMax) const {
