@@ -59,6 +59,8 @@ private:
 
 	bool findName(const string &name, const string &surname, size_t & idx) const;
 	bool findEmail(const string &email, size_t & idx) const;
+	size_t findSalary(const string &email, const unsigned int & salary) const;
+
 	void addToVectors(const shared_ptr<SPerson> & newPerson);
 public:
 	CPersonalAgenda(void);
@@ -119,6 +121,8 @@ CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
 ===============================================================================
 */
 
+//todo: binary search
+
 bool CPersonalAgenda::findName(const string & name, const string & surname, size_t & idx) const {
 	//change to binary search
 	SPerson::SName finding = SPerson::SName(name, surname);
@@ -139,6 +143,15 @@ bool CPersonalAgenda::findEmail(const string & email, size_t & idx) const {
 		}
 	}
 	return false;
+}
+
+size_t CPersonalAgenda::findSalary(const string &email, const unsigned int &salary) const {
+	for(auto iter = bySalary.begin(); iter != bySalary.end(); iter++) {
+		if((*iter)->email == email) {
+			return iter - bySalary.begin();
+		}
+	}
+	throw logic_error ("CPersonalAgenda::findSalary: email " + email + " not found (even though it should be contained in the DB)");
 }
 
 /*
@@ -165,7 +178,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	inserted = false;
 	//then add to emails
 	for(auto iter = byEmail.begin(); iter != byEmail.end() && !inserted; iter++) {
-		//compare the two names;
+		//compare the two emails
 		if((newPerson->email.compare((*iter)->email) < 0)) {
 			byEmail.insert(iter,newPerson);
 			inserted = true;
@@ -177,8 +190,8 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	inserted = false;
 	//then add to salaries
 	for(auto iter = bySalary.begin(); iter != bySalary.end() && !inserted; iter++) {
-		//compare the two names;
-		if((newPerson->salary < (*iter)->salary)) {
+		//compare the salaries and then compare email
+		if(((newPerson->salary == (*iter)->salary) && (newPerson->email.compare((*iter)->email) < 0)) || (newPerson->salary > (*iter)->salary)) {
 			bySalary.insert(iter,newPerson);
 			inserted = true;
 		}
