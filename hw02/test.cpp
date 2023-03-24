@@ -134,8 +134,8 @@ bool cmpEmail(const SPerson & lhs, const SPerson & rhs) {
 }
 
 bool cmpSalaryEmail(const SPerson & lhs, const SPerson & rhs) {
-	//((newPerson->salary == (*iter)->salary) && (newPerson->email.compare((*iter)->email) < 0)) || (newPerson->salary > (*iter)->salary)
-	return ((lhs.salary == rhs.salary) && cmpEmail(lhs,rhs)) || (lhs.salary > rhs.salary);
+	//((newPerson->salary == (*iter)->salary) && (newPerson->email.compare((*iter)->email) < 0)) || (newPerson->salary < (*iter)->salary)
+	return ((lhs.salary == rhs.salary) && cmpEmail(lhs,rhs)) || (lhs.salary < rhs.salary);
 }
 
 /*
