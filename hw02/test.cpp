@@ -62,6 +62,8 @@ private:
 	size_t findSalary(const string &email, const unsigned int & salary) const;
 
 	void addToVector(const shared_ptr<SPerson> & newPerson, vector<shared_ptr<SPerson>> & vec, bool (*comparator)(const SPerson &, const SPerson &));
+
+	void setSalary(const shared_ptr<SPerson> & person, const unsigned int & salary);
 public:
 	CPersonalAgenda(void);
 	~CPersonalAgenda(void);
@@ -236,12 +238,18 @@ bool CPersonalAgenda::changeEmail(const string &name, const string &surname, con
 	return false;
 }
 
+void CPersonalAgenda::setSalary(const shared_ptr<SPerson> &person, const unsigned int &salary) {
+	bySalary.erase(bySalary.begin() + findSalary(person->email,person->salary));
+	person->salary = salary;
+	addToVector(person,bySalary,cmpSalaryEmail);
+}
+
 bool CPersonalAgenda::setSalary(const string &name, const string &surname, unsigned int salary) {
 	size_t idx;
 	if(!findName(name,surname,idx)) {
 		return false;
 	}
-	byName[idx]->salary = salary;
+	setSalary(byName[idx],salary);
 	return true;
 }
 
@@ -250,7 +258,7 @@ bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
 	if(!findEmail(email,idx)) {
 		return false;
 	}
-	byEmail[idx]->salary = salary;
+	setSalary(byEmail[idx],salary);
 	return true;
 }
 
