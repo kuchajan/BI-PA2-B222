@@ -174,7 +174,7 @@ bool CPersonalAgenda::findEmail(const string & email, size_t & idx) const {
 
 size_t CPersonalAgenda::findSalary(const string &email, const unsigned int &salary) const {
 	for(auto iter = bySalary.begin(); iter != bySalary.end(); iter++) {
-		if((*iter)->email == email) {
+		if((*iter)->salary == salary && (*iter)->email == email) {
 			return iter - bySalary.begin();
 		}
 	}
