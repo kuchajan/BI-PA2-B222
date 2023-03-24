@@ -150,7 +150,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	//todo: AND I'M REPEATING MYSELF!!! accept pointer to comparator and the vector to add to?
 	//first add to names
 	bool inserted = false;
-	for(auto iter = byName.begin(); iter != byName.end(); iter++) {
+	for(auto iter = byName.begin(); iter != byName.end() && !inserted; iter++) {
 		//compare the two names;
 		if(!(newPerson->fullname < (*iter)->fullname)) {
 			byName.insert(iter,newPerson);
@@ -162,7 +162,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	}
 	inserted = false;
 	//then add to emails
-	for(auto iter = byEmail.begin(); iter != byEmail.end(); iter++) {
+	for(auto iter = byEmail.begin(); iter != byEmail.end() && !inserted; iter++) {
 		//compare the two names;
 		if(!(newPerson->email.compare((*iter)->email) < 0)) {
 			byEmail.insert(iter,newPerson);
@@ -174,7 +174,7 @@ void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
 	}
 	inserted = false;
 	//then add to salaries
-	for(auto iter = bySalary.begin(); iter != bySalary.end(); iter++) {
+	for(auto iter = bySalary.begin(); iter != bySalary.end() && !inserted; iter++) {
 		//compare the two names;
 		if(!(newPerson->salary < (*iter)->salary)) {
 			bySalary.insert(iter,newPerson);
