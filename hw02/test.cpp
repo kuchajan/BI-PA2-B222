@@ -61,7 +61,7 @@ private:
 	bool findEmail(const string &email, size_t & idx) const;
 	size_t findSalary(const string &email, const unsigned int & salary) const;
 
-	void addToVectors(const shared_ptr<SPerson> & newPerson);
+	void addToVector(const shared_ptr<SPerson> & newPerson, vector<shared_ptr<SPerson>> & vec, bool (*comparator)(const SPerson &, const SPerson &));
 public:
 	CPersonalAgenda(void);
 	~CPersonalAgenda(void);
@@ -117,6 +117,27 @@ CPersonalAgenda::~CPersonalAgenda(void) { //I guess I could empty the vectors
 
 /*
 ===============================================================================
+								Comparators
+===============================================================================
+*/
+
+bool cmpName(const SPerson & lhs, const SPerson & rhs) {
+	//(newPerson->fullname < (*iter)->fullname)
+	return (lhs.fullname < rhs.fullname);
+}
+
+bool cmpEmail(const SPerson & lhs, const SPerson & rhs) {
+	//newPerson->email.compare((*iter)->email) < 0
+	return (lhs.email.compare(rhs.email) < 0);
+}
+
+bool cmpSalaryEmail(const SPerson & lhs, const SPerson & rhs) {
+	//((newPerson->salary == (*iter)->salary) && (newPerson->email.compare((*iter)->email) < 0)) || (newPerson->salary > (*iter)->salary)
+	return ((lhs.salary == rhs.salary) && cmpEmail(lhs,rhs)) || (lhs.salary > rhs.salary);
+}
+
+/*
+===============================================================================
 								Find methods
 ===============================================================================
 */
@@ -160,55 +181,30 @@ size_t CPersonalAgenda::findSalary(const string &email, const unsigned int &sala
 ===============================================================================
 */
 
-void CPersonalAgenda::addToVectors(const shared_ptr<SPerson> & newPerson) {
-	//todo: something like binary search where to add? This is T(3n) at worst!
-	//todo: AND I'M REPEATING MYSELF!!! accept pointer to comparator and the vector to add to?
-	//first add to names
+void CPersonalAgenda::addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, bool (*comparator)(const SPerson &, const SPerson &)) {
+	//! This is T(n) at worst!
+	//todo: something like binary search where to add?
 	bool inserted = false;
-	for(auto iter = byName.begin(); iter != byName.end() && !inserted; iter++) {
-		//compare the two names;
-		if((newPerson->fullname < (*iter)->fullname)) {
-			byName.insert(iter,newPerson);
+	for(auto iter = vec.begin(); iter != vec.end() && !inserted; iter++) {
+		if(comparator((*newPerson),(**iter))) {
+			vec.insert(iter,newPerson);
 			inserted = true;
 		}
 	}
 	if(!inserted) {
-		byName.push_back(newPerson);
-	}
-	inserted = false;
-	//then add to emails
-	for(auto iter = byEmail.begin(); iter != byEmail.end() && !inserted; iter++) {
-		//compare the two emails
-		if((newPerson->email.compare((*iter)->email) < 0)) {
-			byEmail.insert(iter,newPerson);
-			inserted = true;
-		}
-	}
-	if(!inserted) {
-		byEmail.push_back(newPerson);
-	}
-	inserted = false;
-	//then add to salaries
-	for(auto iter = bySalary.begin(); iter != bySalary.end() && !inserted; iter++) {
-		//compare the salaries and then compare email
-		if(((newPerson->salary == (*iter)->salary) && (newPerson->email.compare((*iter)->email) < 0)) || (newPerson->salary > (*iter)->salary)) {
-			bySalary.insert(iter,newPerson);
-			inserted = true;
-		}
-	}
-	if(!inserted) {
-		bySalary.push_back(newPerson);
+		vec.push_back(newPerson);
 	}
 }
 
 bool CPersonalAgenda::add(const string &name, const string &surname, const string &email, unsigned int salary) {
-	//todo: use shared ptr
 	shared_ptr<SPerson> newPerson = make_shared<SPerson>(name, surname, email, salary);
 	size_t temp;
 	if(findEmail(email, temp)) {
 		return false;
 	}
-	addToVectors(newPerson);
+	addToVector(newPerson,byName,cmpName);
+	addToVector(newPerson,byEmail,cmpEmail);
+	addToVector(newPerson,bySalary,cmpSalaryEmail);
 	return true;
 }
 
