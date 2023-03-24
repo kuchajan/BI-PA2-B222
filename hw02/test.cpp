@@ -64,6 +64,8 @@ private:
 	void addToVector(const shared_ptr<SPerson> & newPerson, vector<shared_ptr<SPerson>> & vec, bool (*comparator)(const SPerson &, const SPerson &));
 
 	void setSalary(const shared_ptr<SPerson> & person, const unsigned int & salary);
+
+	void getRank(const shared_ptr<SPerson> & person, int &rankMin, int &rankMax) const;
 public:
 	CPersonalAgenda(void);
 	~CPersonalAgenda(void);
@@ -284,12 +286,30 @@ unsigned int CPersonalAgenda::getSalary(const string &email) const {
 	return byEmail[idx]->salary;
 }
 
+void CPersonalAgenda::getRank(const shared_ptr<SPerson> & person, int &rankMin, int &rankMax) const {
+	size_t idx = findSalary(person->email,person->salary);
+	
+	//todo: binary search
+	for(rankMin = idx; rankMin != 0 && bySalary[rankMin-1]->salary == person->salary; rankMin--) { }
+	for(rankMax = idx; rankMax+1 != (int) bySalary.size() && bySalary[rankMax+1]->salary == person->salary; rankMax++) { }
+}
+
 bool CPersonalAgenda::getRank(const string &name, const string &surname, int &rankMin, int &rankMax) const {
-	return false;
+	size_t idx;
+	if(!findName(name,surname,idx)) {
+		return false;
+	}
+	getRank(byName[idx],rankMin,rankMax);
+	return true;
 }
 
 bool CPersonalAgenda::getRank(const string &email, int &rankMin, int &rankMax) const {
-	return false;
+	size_t idx;
+	if(!findEmail(email,idx)) {
+		return false;
+	}
+	getRank(byEmail[idx],rankMin,rankMax);
+	return true;
 }
 
 bool CPersonalAgenda::getFirst(string &outName, string &outSurname) const {
