@@ -66,6 +66,8 @@ private:
 	void setSalary(const shared_ptr<SPerson> & person, const unsigned int & salary);
 
 	void getRank(const shared_ptr<SPerson> & person, int &rankMin, int &rankMax) const;
+
+	void del(const size_t & idxName, const size_t & idxEmail);
 public:
 	CPersonalAgenda(void);
 	~CPersonalAgenda(void);
@@ -217,13 +219,38 @@ bool CPersonalAgenda::add(const string &name, const string &surname, const strin
 							Deleting methods
 ===============================================================================
 */
+void CPersonalAgenda::del(const size_t & idxName, const size_t & idxEmail) {
+	size_t idxSalary = findSalary(byName[idxName]->email,byName[idxName]->salary);
+
+	byName.erase(byName.begin()+idxName);
+	byEmail.erase(byEmail.begin()+idxEmail);
+	bySalary.erase(bySalary.begin()+idxSalary);
+}
 
 bool CPersonalAgenda::del(const string &name, const string &surname) {
-	return false;
+	size_t idxName;
+	if(!findName(name,surname,idxName)) {
+		return false;
+	}
+
+	size_t idxEmail;
+	findEmail(byName[idxName]->email,idxEmail);
+
+	del(idxName,idxEmail);
+	return true;
 }
 
 bool CPersonalAgenda::del(const string &email) {
-	return false;
+	size_t idxEmail;
+	if(!findEmail(email,idxEmail)) {
+		return false;
+	}
+
+	size_t idxName;
+	findName(byEmail[idxEmail]->fullname.name,byEmail[idxEmail]->fullname.surname,idxName);
+
+	del(idxName,idxEmail);
+	return true;
 }
 
 /*
