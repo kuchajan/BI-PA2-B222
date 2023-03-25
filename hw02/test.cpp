@@ -238,7 +238,8 @@ bool CPersonalAgenda::add(const string &name, const string &surname, const strin
 void CPersonalAgenda::del(const size_t &idxName, const size_t &idxEmail) {
 	size_t idxSalary;
 	if(!find(*(byName[idxName]),bySalary,idxSalary,cmpSalaryEmail)) {
-		throw logic_error("void CPersonalAgenda::del: parsed in someone who isn't in bySalary vector");
+		//throw logic_error("void CPersonalAgenda::del: parsed in someone who isn't in bySalary vector");
+		return;
 	}
 
 	byName.erase(byName.begin() + idxName);
@@ -255,7 +256,8 @@ bool CPersonalAgenda::del(const string &name, const string &surname) {
 
 	size_t idxEmail;
 	if(!find(*(byName[idxName]),byEmail,idxEmail,cmpEmail)) {
-		throw logic_error("bool CPersonalAgenda::del: parsed in someone who isn't in byEmail");
+		//throw logic_error("bool CPersonalAgenda::del: parsed in someone who isn't in byEmail");
+		return false;
 	}
 
 	del(idxName, idxEmail);
@@ -271,7 +273,8 @@ bool CPersonalAgenda::del(const string &email) {
 
 	size_t idxName;
 	if(!find(*(byEmail[idxEmail]),byName,idxName,cmpName)) {
-		throw logic_error("bool CPersonalAgenda::del: parsed in someone who isn't in byName");
+		//throw logic_error("bool CPersonalAgenda::del: parsed in someone who isn't in byName");
+		return false;
 	}
 
 	del(idxName, idxEmail);
@@ -294,7 +297,8 @@ bool CPersonalAgenda::changeName(const string &email, const string &newName, con
 	}
 
 	if (!find(*(byEmail[idxEmail]),byName,idxName,cmpName)) {
-		throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in byName");
+		//throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in byName");
+		return false;
 	}
 
 	byName.erase(byName.begin() + idxName);
@@ -314,14 +318,16 @@ bool CPersonalAgenda::changeEmail(const string &name, const string &surname, con
 	}
 
 	if(!find(*(byName[idxName]),byEmail,idxEmail,cmpEmail)) {
-		throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in byEmail");
+		//throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in byEmail");
+		return false;
 	}
 
 	byEmail.erase(byEmail.begin() + idxEmail);
 
 	size_t idxSalary;
 	if(!find(*(byName[idxName]),bySalary,idxSalary,cmpSalaryEmail)) {
-		throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in bySalary");
+		//throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in bySalary");
+		return false;
 	}
 
 	bySalary.erase(bySalary.begin() + idxSalary);
@@ -336,7 +342,8 @@ bool CPersonalAgenda::changeEmail(const string &name, const string &surname, con
 void CPersonalAgenda::setSalary(const shared_ptr<SPerson> &person, const unsigned int &salary) {
 	size_t idxSalary;
 	if(!find(*person,bySalary,idxSalary,cmpSalaryEmail)) {
-		throw logic_error("void CPersonalAgenda::setSalary: parsed in someone who isn't in bySalary");
+		//throw logic_error("void CPersonalAgenda::setSalary: parsed in someone who isn't in bySalary");
+		return;
 	}
 	bySalary.erase(bySalary.begin() + idxSalary);
 	person->salary = salary;
@@ -390,7 +397,8 @@ unsigned int CPersonalAgenda::getSalary(const string &email) const {
 void CPersonalAgenda::getRank(const shared_ptr<SPerson> &person, int &rankMin, int &rankMax) const {
 	size_t idx;
 	if(!find(*person,bySalary,idx,cmpSalary)) {
-		throw logic_error("void CPersonalAgenda::getRank: parsed in someone who hasn't got the same salary in bySalary");
+		//throw logic_error("void CPersonalAgenda::getRank: parsed in someone who hasn't got the same salary in bySalary");
+		return;
 	}
 
 	//get lower bound
