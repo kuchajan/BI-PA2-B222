@@ -81,7 +81,25 @@ public:
 	}
 
     // comparison operators
-
+	bool operator<(CTime & other) {
+		return toSeconds() < other.toSeconds();
+	}
+	bool operator>(CTime & other) {
+		return toSeconds() > other.toSeconds();
+	}
+	bool operator==(CTime & other) {
+		return toSeconds() == other.toSeconds();
+	}
+	bool operator<=(CTime & other) {
+		return (*this).operator==(other) || (*this).operator<(other);
+	}
+	bool operator>=(CTime & other) {
+		return (*this).operator==(other) || (*this).operator>(other);
+	}
+	bool operator!=(CTime & other) {
+		return !((*this).operator==(other));
+	}
+	
     // output operator
 
     friend class ::CTimeTester;
