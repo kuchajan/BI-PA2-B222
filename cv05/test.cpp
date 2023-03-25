@@ -20,9 +20,18 @@ private:
 	}
 
 	void normalize() {
-		m_Hour = (m_Hour + ((m_Minute + (m_Second/60)) / 60)) % 24;
-		m_Minute = (m_Minute + (m_Second/60)) % 60;
-		m_Second = m_Second % 60;
+		m_Minute += m_Second / 60;
+		
+		m_Second %= 60;
+		m_Second = m_Second < 0 ? --m_Minute, m_Second + 60 : m_Second;
+		
+		m_Hour += m_Minute / 60;
+		
+		m_Minute %= 60;
+		m_Minute = m_Minute < 0 ? --m_Hour, m_Minute + 60 : m_Minute;
+
+		m_Hour %= 24;
+		m_Hour = m_Hour < 0 ? m_Hour + 24 : m_Hour;
 	}
 
 	int toSeconds() const {
