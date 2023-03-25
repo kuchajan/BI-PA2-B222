@@ -56,9 +56,7 @@ private:
 	vector<shared_ptr<SPerson>> byEmail;
 	vector<shared_ptr<SPerson>> bySalary;
 
-	bool findName(const string &name, const string &surname, size_t &idx) const;
-	bool findEmail(const string &email, size_t &idx) const;
-	size_t findSalary(const string &email, const unsigned int &salary) const;
+	bool find(const SPerson & toFind, const vector<shared_ptr<SPerson>> & vec, size_t &idx, int (*comparator)(const SPerson &, const SPerson &)) const;
 
 	void addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, int (*comparator)(const SPerson &, const SPerson &));
 
@@ -176,37 +174,30 @@ int cmpSalaryEmail(const SPerson &lhs, const SPerson &rhs) {
 ===============================================================================
 */
 
-// todo: binary search
-
-bool CPersonalAgenda::findName(const string &name, const string &surname, size_t &idx) const {
-	// change to binary search
-	SPerson::SName finding = SPerson::SName(name, surname);
-	for (auto iter = byName.begin(); iter != byName.end(); iter++) {
-		if ((*iter)->fullname == finding) {
-			idx = iter - byName.begin();
+bool CPersonalAgenda::find(const SPerson & toFind, const vector<shared_ptr<SPerson>> & vec, size_t &idx, int (*comparator)(const SPerson &, const SPerson &)) const {
+	if(vec.size() == 0) {
+		return false;
+	}
+	size_t low = 0, high = vec.size() - 1;
+	while (high - low > 0) {
+		size_t middle = (high + low) / 2;
+		int result = comparator(*(vec[middle]),toFind);
+		if (result == 0) {
+			idx = middle;
 			return true;
 		}
-	}
-	return false;
-}
-
-bool CPersonalAgenda::findEmail(const string &email, size_t &idx) const {
-	for (auto iter = byEmail.begin(); iter != byEmail.end(); iter++) {
-		if ((*iter)->email == email) {
-			idx = iter - byEmail.begin();
-			return true;
+		if(result < 0) {
+			low = middle + 1;
+		}
+		else {
+			high = middle;
 		}
 	}
-	return false;
-}
-
-size_t CPersonalAgenda::findSalary(const string &email, const unsigned int &salary) const {
-	for (auto iter = bySalary.begin(); iter != bySalary.end(); iter++) {
-		if ((*iter)->salary == salary && (*iter)->email == email) {
-			return iter - bySalary.begin();
-		}
+	if(comparator(*(vec[low]), toFind) == 0) {
+		idx = low;
+		return true;
 	}
-	throw logic_error("CPersonalAgenda::findSalary: email " + email + " not found (even though it should be contained in the DB)");
+	return false;
 }
 
 /*
@@ -215,11 +206,11 @@ size_t CPersonalAgenda::findSalary(const string &email, const unsigned int &sala
 ===============================================================================
 */
 
-void CPersonalAgenda::addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, bool (*comparator)(const SPerson &, const SPerson &)) {
+void CPersonalAgenda::addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, int (*comparator)(const SPerson &, const SPerson &)) {
 	//! This is T(n) at worst!
 	// todo: something like binary search where to add?
 	for (auto iter = vec.begin(); iter != vec.end(); iter++) {
-		if (comparator((*newPerson), (**iter))) {
+		if (comparator((*newPerson), (**iter)) < 0) {
 			vec.insert(iter, newPerson);
 			return;
 		}
@@ -230,10 +221,7 @@ void CPersonalAgenda::addToVector(const shared_ptr<SPerson> &newPerson, vector<s
 bool CPersonalAgenda::add(const string &name, const string &surname, const string &email, unsigned int salary) {
 	shared_ptr<SPerson> newPerson = make_shared<SPerson>(name, surname, email, salary);
 	size_t temp;
-	if (findName(name, surname, temp)) {
-		return false;
-	}
-	if (findEmail(email, temp)) {
+	if (find(*newPerson, byName, temp, cmpName) || find(*newPerson, byEmail, temp, cmpEmail)) {
 		return false;
 	}
 	addToVector(newPerson, byName, cmpName);
@@ -248,7 +236,10 @@ bool CPersonalAgenda::add(const string &name, const string &surname, const strin
 ===============================================================================
 */
 void CPersonalAgenda::del(const size_t &idxName, const size_t &idxEmail) {
-	size_t idxSalary = findSalary(byName[idxName]->email, byName[idxName]->salary);
+	size_t idxSalary;
+	if(!find(*(byName[idxName]),bySalary,idxSalary,cmpSalaryEmail)) {
+		throw logic_error("void CPersonalAgenda::del: parsed in someone who isn't in bySalary vector");
+	}
 
 	byName.erase(byName.begin() + idxName);
 	byEmail.erase(byEmail.begin() + idxEmail);
@@ -257,12 +248,15 @@ void CPersonalAgenda::del(const size_t &idxName, const size_t &idxEmail) {
 
 bool CPersonalAgenda::del(const string &name, const string &surname) {
 	size_t idxName;
-	if (!findName(name, surname, idxName)) {
+	SPerson toFind(name,surname,"",0);
+	if(!find(toFind,byName,idxName,cmpName)) {
 		return false;
 	}
 
 	size_t idxEmail;
-	findEmail(byName[idxName]->email, idxEmail);
+	if(!find(*(byName[idxName]),byEmail,idxEmail,cmpEmail)) {
+		throw logic_error("bool CPersonalAgenda::del: parsed in someone who isn't in byEmail");
+	}
 
 	del(idxName, idxEmail);
 	return true;
@@ -270,12 +264,15 @@ bool CPersonalAgenda::del(const string &name, const string &surname) {
 
 bool CPersonalAgenda::del(const string &email) {
 	size_t idxEmail;
-	if (!findEmail(email, idxEmail)) {
+	SPerson toFind("","",email,0);
+	if (!find(toFind,byEmail,idxEmail,cmpEmail)) {
 		return false;
 	}
 
 	size_t idxName;
-	findName(byEmail[idxEmail]->fullname.name, byEmail[idxEmail]->fullname.surname, idxName);
+	if(!find(*(byEmail[idxEmail]),byName,idxName,cmpName)) {
+		throw logic_error("bool CPersonalAgenda::del: parsed in someone who isn't in byName");
+	}
 
 	del(idxName, idxEmail);
 	return true;
@@ -290,12 +287,15 @@ bool CPersonalAgenda::del(const string &email) {
 bool CPersonalAgenda::changeName(const string &email, const string &newName, const string &newSurname) {
 	// note to self: this is getting repetitive, am I doing this right?
 	size_t idxEmail, idxName;
+	SPerson toFind(newName,newSurname,email,0);
 	// email not included or name is duplicite
-	if (!findEmail(email, idxEmail) || findName(newName, newSurname, idxName)) {
+	if (!find(toFind,byEmail,idxEmail,cmpEmail) || find(toFind,byName,idxName,cmpName)) {
 		return false;
 	}
 
-	findName(byEmail[idxEmail]->fullname.name, byEmail[idxEmail]->fullname.surname, idxName);
+	if (!find(*(byEmail[idxEmail]),byName,idxName,cmpName)) {
+		throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in byName");
+	}
 
 	byName.erase(byName.begin() + idxName);
 
@@ -307,16 +307,23 @@ bool CPersonalAgenda::changeName(const string &email, const string &newName, con
 
 bool CPersonalAgenda::changeEmail(const string &name, const string &surname, const string &newEmail) {
 	size_t idxName, idxEmail;
+	SPerson toFind(name,surname,newEmail,0);
 	// name not included or email is duplicite
-	if (!findName(name, surname, idxName) || findEmail(newEmail, idxEmail)) {
+	if(!find(toFind,byName,idxName,cmpName) || find(toFind,byEmail,idxEmail,cmpEmail)) {
 		return false;
 	}
 
-	findEmail(byName[idxName]->email, idxEmail);
+	if(!find(*(byName[idxName]),byEmail,idxEmail,cmpEmail)) {
+		throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in byEmail");
+	}
 
 	byEmail.erase(byEmail.begin() + idxEmail);
 
-	size_t idxSalary = findSalary(byName[idxName]->email, byName[idxName]->salary);
+	size_t idxSalary;
+	if(!find(*(byName[idxName]),bySalary,idxSalary,cmpSalaryEmail)) {
+		throw logic_error("bool CPersonalAgenda::find: parsed in someone who isn't in bySalary");
+	}
+
 	bySalary.erase(bySalary.begin() + idxSalary);
 
 	byName[idxName]->email = newEmail;
@@ -327,14 +334,19 @@ bool CPersonalAgenda::changeEmail(const string &name, const string &surname, con
 }
 
 void CPersonalAgenda::setSalary(const shared_ptr<SPerson> &person, const unsigned int &salary) {
-	bySalary.erase(bySalary.begin() + findSalary(person->email, person->salary));
+	size_t idxSalary;
+	if(!find(*person,bySalary,idxSalary,cmpSalaryEmail)) {
+		throw logic_error("void CPersonalAgenda::setSalary: parsed in someone who isn't in bySalary");
+	}
+	bySalary.erase(bySalary.begin() + idxSalary);
 	person->salary = salary;
 	addToVector(person, bySalary, cmpSalaryEmail);
 }
 
 bool CPersonalAgenda::setSalary(const string &name, const string &surname, unsigned int salary) {
 	size_t idx;
-	if (!findName(name, surname, idx)) {
+	SPerson toFind(name,surname,"",0);
+	if (!find(toFind,byName,idx,cmpName)) {
 		return false;
 	}
 	setSalary(byName[idx], salary);
@@ -343,7 +355,8 @@ bool CPersonalAgenda::setSalary(const string &name, const string &surname, unsig
 
 bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
 	size_t idx;
-	if (!findEmail(email, idx)) {
+	SPerson toFind("","",email,0);
+	if (!find(toFind,byEmail,idx,cmpEmail)) {
 		return false;
 	}
 	setSalary(byEmail[idx], salary);
@@ -358,7 +371,8 @@ bool CPersonalAgenda::setSalary(const string &email, unsigned int salary) {
 
 unsigned int CPersonalAgenda::getSalary(const string &name, const string &surname) const {
 	size_t idx;
-	if (!findName(name, surname, idx)) {
+	SPerson toFind(name,surname,"",0);
+	if (!find(toFind,byName,idx,cmpName)) {
 		return 0;
 	}
 	return byName[idx]->salary;
@@ -366,14 +380,18 @@ unsigned int CPersonalAgenda::getSalary(const string &name, const string &surnam
 
 unsigned int CPersonalAgenda::getSalary(const string &email) const {
 	size_t idx;
-	if (!findEmail(email, idx)) {
+	SPerson toFind("","",email,0);
+	if (!find(toFind,byEmail,idx,cmpEmail)) {
 		return 0;
 	}
 	return byEmail[idx]->salary;
 }
 
 void CPersonalAgenda::getRank(const shared_ptr<SPerson> &person, int &rankMin, int &rankMax) const {
-	size_t idx = findSalary(person->email, person->salary);
+	size_t idx;
+	if(!find(*person,bySalary,idx,cmpSalaryEmail)) {
+		throw logic_error("void CPersonalAgenda::getRank: parsed in someone who isn't in bySalary");
+	}
 
 	// todo: binary search
 	for (rankMin = idx; rankMin != 0 && bySalary[rankMin - 1]->salary == person->salary; rankMin--) {
@@ -384,7 +402,8 @@ void CPersonalAgenda::getRank(const shared_ptr<SPerson> &person, int &rankMin, i
 
 bool CPersonalAgenda::getRank(const string &name, const string &surname, int &rankMin, int &rankMax) const {
 	size_t idx;
-	if (!findName(name, surname, idx)) {
+	SPerson toFind(name,surname,"",0);
+	if(!find(toFind,byName,idx,cmpName)) {
 		return false;
 	}
 	getRank(byName[idx], rankMin, rankMax);
@@ -393,7 +412,8 @@ bool CPersonalAgenda::getRank(const string &name, const string &surname, int &ra
 
 bool CPersonalAgenda::getRank(const string &email, int &rankMin, int &rankMax) const {
 	size_t idx;
-	if (!findEmail(email, idx)) {
+	SPerson toFind("","",email,0);
+	if (!find(toFind,byEmail,idx,cmpEmail)) {
 		return false;
 	}
 	getRank(byEmail[idx], rankMin, rankMax);
@@ -411,7 +431,8 @@ bool CPersonalAgenda::getFirst(string &outName, string &outSurname) const {
 
 bool CPersonalAgenda::getNext(const string &name, const string &surname, string &outName, string &outSurname) const {
 	size_t idx;
-	if (!findName(name, surname, idx) || byName.size() == ++idx) {
+	SPerson toFind(name,surname,"",0);
+	if (!find(toFind,byName,idx,cmpName) || byName.size() == ++idx) {
 		return false;
 	}
 	outName = byName[idx]->fullname.name;
