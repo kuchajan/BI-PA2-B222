@@ -15,9 +15,33 @@ private:
     int m_Minute;
     int m_Second;
 
+	inline bool argsValid(int hour, int minute, int second) {
+		return hour >= 0 && hour < 24 && minute >= 0 && minute < 60 && second >= 0 && second < 60;
+	}
+
 public:
     // constructor, destructor
-
+	CTime() {
+		m_Hour = 0;
+		m_Minute = 0;
+		m_Second = 0;
+	}
+	CTime(int hour, int minute) {
+		if(!argsValid(hour,minute,0)) {
+			throw std::invalid_argument("CTime(int,int): invalid arguments");
+		}
+		m_Hour = hour;
+		m_Minute = minute;
+		m_Second = 0;
+	}
+	CTime(int hour, int minute, int second) {
+		if(!argsValid(hour,minute,second)) {
+			throw std::invalid_argument("CTime(int,int,int): invalid arguments");
+		}
+		m_Hour = hour;
+		m_Minute = minute;
+		m_Second = second;
+	}
     // arithmetic operators
 
     // comparison operators
