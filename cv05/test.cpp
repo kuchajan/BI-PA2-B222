@@ -103,22 +103,22 @@ public:
 	}
 
     // comparison operators
-	bool operator<(CTime & other) {
+	bool operator<(const CTime & other) const {
 		return toSeconds() < other.toSeconds();
 	}
-	bool operator>(CTime & other) {
+	bool operator>(const CTime & other) const {
 		return toSeconds() > other.toSeconds();
 	}
-	bool operator==(CTime & other) {
+	bool operator==(const CTime & other) const {
 		return toSeconds() == other.toSeconds();
 	}
-	bool operator<=(CTime & other) {
+	bool operator<=(const CTime & other) const {
 		return (*this).operator==(other) || (*this).operator<(other);
 	}
-	bool operator>=(CTime & other) {
+	bool operator>=(const CTime & other) const {
 		return (*this).operator==(other) || (*this).operator>(other);
 	}
-	bool operator!=(CTime & other) {
+	bool operator!=(const CTime & other) const {
 		return !((*this).operator==(other));
 	}
 	
