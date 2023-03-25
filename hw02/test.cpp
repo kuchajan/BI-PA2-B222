@@ -512,6 +512,126 @@ int main(void) {
 	assert(b2.add("Peter", "Smith", "peter", 40000));
 	assert(b2.getSalary("peter") == 40000);
 
+	// # My tests #
+	CPersonalAgenda b3;
+	string tempName = outName, tempSurname = outSurname;
+
+	assert(!b3.getFirst(outName, outSurname) && tempName == outName && tempSurname == outSurname);
+
+	// 50 people
+	assert(b3.add("John", "Cook", "cookjohn", 100'000));
+	assert(b3.add("Caroline", "Holmes", "holmecar", 80'000));
+	assert(b3.add("Peter", "Smith", "smithpet", 20'000));
+	assert(b3.add("David", "Reed", "reeddavi", 39'000));
+	assert(b3.add("Ashley", "Hunt", "huntashl", 42'000));
+	assert(b3.add("Sarah", "Hardy", "hardysar", 20'000));
+	assert(b3.add("James", "Bowen", "bowenjam", 74'000));
+	assert(b3.add("Theresa", "Gallagher", "gallathe", 80'000));
+	assert(b3.add("Oliver", "Hart", "hartoliv", 20'000));
+	assert(b3.add("Andrew", "Tate", "colorofurlambo", 1));
+	assert(b3.add("Michael", "Baird", "bairdmic", 20'000));
+	assert(b3.add("Adam", "Robertson", "roberada", 39'000));
+	assert(b3.add("Simon", "Singh", "singhsim", 100'000));
+	assert(b3.add("Alice", "Gardiner", "gardiali", 25'000));
+	assert(b3.add("Elizabeth", "Nelson", "nelsoeli", 25'000));
+	assert(b3.add("Steve", "Miner", "minerste", 280'000));
+	assert(b3.add("Alyx", "Crafter", "craftaly", 180'000));
+	assert(b3.add("Stanley", "Hanson", "hansosta", 1'000'000));
+	assert(b3.add("Samuel", "Rice", "ricesamu", 39'000));
+	assert(b3.add("Max", "Payne", "paynemax", 28'000));
+	assert(b3.add("Gordon", "Freeman", "freemgor", 950'000));
+	assert(b3.add("Alyx", "Vance", "vancealy", 10));
+	assert(b3.add("Sylvanas", "Windrunner", "windrsyl", 20));
+	assert(b3.add("Arthas", "Menethil", "menetart", 1'000'000));
+	assert(b3.add("Leon S", "Kennedy", "kenneleo", 25'000));
+	assert(b3.add("Geralt", "Rivia", "riviager", 39'000));
+	assert(b3.add("Solid", "Snake", "snakesol", 69'000));
+	assert(b3.add("Lara", "Croft", "croftlar", 69'000));
+	assert(b3.add("Donkey", "Kong", "kongdonk", 69'000));
+	assert(b3.add("Duke", "Nukem", "chewasskickbubblegum", 69'000));
+	assert(b3.add("Kazuma", "Kiryu", "kiryukaz", 550'000));
+	assert(b3.add("William", "Afton", "aftonwil", 200'000));
+	assert(b3.add("William", "Blazkowicz", "blazkwil", 39'000));
+	assert(b3.add("Ladislav", "Vagner", "xvagner", UINT32_MAX));
+	assert(b3.add("Deckard", "Cain", "caindeck", 200'000));
+	assert(b3.add("Hajime", "Hinata", "hinathaj", 1'000));
+	assert(b3.add("Cave", "Jonhson", "johnscav", 1'000'000));
+	assert(b3.add("Tom", "Nook", "nooktom", 950'000));
+	assert(b3.add("Junko", "Enoshima", "despairlover", 2'000));
+	assert(b3.add("Tommy", "Angelo", "angeltom", 95'000));
+	assert(b3.add("Vito", "Scaletta", "scalevit", 95'000));
+	assert(b3.add("Sam Porter", "Bridges", "bridgsam", 38'000));
+	assert(b3.add("Harry", "Potter", "pottehar", 950'000));
+	assert(b3.add("JJ", "Maybank", "maybajj", 20));
+	assert(b3.add("Daphne", "Bridgerton", "bridgdap", 450'000));
+	assert(b3.add("Draco", "Malfoy", "malfodra", 700'000));
+	assert(b3.add("Sirius", "Black", "blacksir", 100'000));
+	assert(b3.add("Elizabeth", "Cooper", "coopeeli", 35'000));
+	assert(b3.add("Melinda", "Springcloud", "sprinmel", 400));
+	assert(b3.add("Five", "Hargreeves", "hargrfiv", 350'000));
+
+	// add
+	assert(!b3.add("John", "Cook", "cookjohn", 100'000));
+	assert(!b3.add("John", "Cook", "whatisemail", 100'000));
+	assert(!b3.add("Johnny", "Cook", "cookjohn", 100'000));
+
+	assert(b3.add("Temp", "Cook", "cooktemp", 100'000));
+	assert(b3.add("John", "Temp", "tempjohn", 100'000));
+
+	// del
+	assert(!b3.del("Nonexistant", "Cook"));
+	assert(!b3.del("Nonexistant"));
+
+	assert(b3.del("Temp", "Cook"));
+	assert(b3.del("tempjohn"));
+
+	// change
+	assert(!b3.changeName("nonexistant", "Jan", "Novak"));
+	assert(!b3.changeEmail("Non", "Existant", "coolemail"));
+
+	assert(!b3.changeName("holmecar", "John", "Cook"));
+	assert(!b3.changeEmail("John", "Cook", "colorofurlambo"));
+
+	assert(b3.changeName("holmecar", "Caroline", "Cook"));
+	assert(b3.changeEmail("Caroline", "Cook", "cookcaro"));
+
+	// set salary
+	assert(!b3.setSalary("nonexistant", 100));
+	assert(!b3.setSalary("non", "existant", 100));
+
+	assert(b3.setSalary("cookcaro", 1'000'000));
+	assert(b3.setSalary("David", "Reed", 20'000));
+
+	// get salary
+	assert(b3.getSalary("nonexistant") == 0);
+	assert(b3.getSalary("Non", "Existant") == 0);
+
+	assert(b3.getSalary("cookcaro") == 1'000'000);
+	assert(b3.getSalary("David", "Reed") == 20'000);
+
+	// get rank
+	assert(b3.getRank("xvagner", lo, hi) && lo == 49 && hi == 49);
+	assert(b3.getRank("Andrew", "Tate", lo, hi) && lo == 0 && hi == 0);
+
+	assert(!b3.getRank("nonexistant", lo, hi) && lo == 0 && hi == 0);
+	assert(!b3.getRank("Non", "Existant", lo, hi) && lo == 0 && hi == 0);
+
+	// get first
+	assert(b3.getFirst(outName, outSurname) && outName == "William" && outSurname == "Afton");
+
+	// get next
+	assert(!b3.getNext("Non", "Existant", outName, outSurname) && outName == "William" && outSurname == "Afton");
+	assert(!b3.getNext("Sylvanas", "Windrunner", outName, outSurname) && outName == "William" && outSurname == "Afton");
+
+	cout << "By name:" << endl;
+	b3.printName();
+
+	cout << "\nBy email:" << endl;
+	b3.printEmail();
+
+	cout << "\nBySalary:" << endl;
+	b3.printSalary();
+
 	return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
