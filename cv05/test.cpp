@@ -80,6 +80,28 @@ public:
 		return seconds;
 	}
 
+	CTime & operator++(int) {
+		CTime time(*this);
+		*this += 1;
+		return time;
+	}
+
+	CTime & operator++() {
+		*this += 1;
+		return *this;
+	}
+
+	CTime & operator--(int) {
+		CTime time(*this);
+		*this -= 1;
+		return time;
+	}
+
+	CTime & operator--() {
+		*this -= 1;
+		return *this;
+	}
+
     // comparison operators
 	bool operator<(CTime & other) {
 		return toSeconds() < other.toSeconds();
