@@ -181,6 +181,13 @@ int main ()
     assert( a-- == b-- );
     assert( a == b );
 
-    return 0;
+	CTime c;
+	assert( CTimeTester::test(c,0,0,0));
+	c = c + 1;
+	assert( CTimeTester::test(c,0,0,1));
+	c -= 2;
+	assert( CTimeTester::test(c,23,59,59));
+
+	return 0;
 }
 #endif /* __PROGTEST__ */
