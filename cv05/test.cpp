@@ -19,6 +19,11 @@ private:
 		return hour >= 0 && hour < 24 && minute >= 0 && minute < 60 && second >= 0 && second < 60;
 	}
 
+	void normalize() {
+		m_Hour = (m_Hour + ((m_Minute + (m_Second/60)) / 60)) % 24;
+		m_Minute = (m_Minute + (m_Second/60)) % 60;
+		m_Second = m_Second % 60;
+	}
 public:
     // constructor, destructor
 	CTime() {
@@ -43,6 +48,27 @@ public:
 		m_Second = second;
 	}
     // arithmetic operators
+	CTime & operator+=(int toAdd) {
+		m_Second += toAdd;
+		normalize();
+		return *this;
+	}
+	CTime & operator+(int toAdd) const {
+		CTime time(*this);
+		time += toAdd;
+		return time;
+	}
+
+	CTime & operator-=(int toSub) {
+		m_Second -= toSub;
+		normalize();
+		return *this;
+	}
+	CTime & operator-(int toSub) const {
+		CTime time(*this);
+		time -= toSub;
+		return time;
+	}
 
     // comparison operators
 
