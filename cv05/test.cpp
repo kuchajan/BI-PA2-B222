@@ -24,6 +24,10 @@ private:
 		m_Minute = (m_Minute + (m_Second/60)) % 60;
 		m_Second = m_Second % 60;
 	}
+
+	int toSeconds() const {
+		return (((m_Hour * 24) + m_Minute) * 60) + m_Second;
+	}
 public:
     // constructor, destructor
 	CTime() {
@@ -68,6 +72,12 @@ public:
 		CTime time(*this);
 		time -= toSub;
 		return time;
+	}
+
+	int operator-(CTime & other) const {
+		int seconds = abs((*this).toSeconds() - other.toSeconds());
+		seconds = seconds > 12*60*60 ? 24*60*60 - seconds : seconds;
+		return seconds;
 	}
 
     // comparison operators
