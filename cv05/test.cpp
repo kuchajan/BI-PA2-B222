@@ -123,6 +123,10 @@ public:
 	}
 	
     // output operator
+	friend ostream & operator<<(ostream & os, const CTime & time) {
+		os << setw(2) << setfill('0') << time.m_Hour << ":" << time.m_Minute << ":" << time.m_Second;
+		return os;
+	}
 
     friend class ::CTimeTester;
 };
