@@ -133,7 +133,7 @@ public:
 	
     // output operator
 	friend ostream & operator<<(ostream & os, const CTime & time) {
-		os << setw(2) << setfill('0') << time.m_Hour << ":" << setw(2) << time.m_Minute << ":" << setw(2) << time.m_Second;
+		os << setw(2) << setfill(' ') << time.m_Hour << ":" << setw(2) << setfill('0') << time.m_Minute << ":" << setw(2) << time.m_Second;
 		return os;
 	}
 
