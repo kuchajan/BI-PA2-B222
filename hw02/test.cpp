@@ -33,12 +33,6 @@ struct SPerson {
 		friend bool operator==(const SName &first, const SName &other) {
 			return (first.name == other.name) && (first.surname == other.surname);
 		}
-		friend bool operator<(const SName &first, const SName &other) {
-			if (first.surname != other.surname) {
-				return first.surname.compare(other.surname) < 0;
-			}
-			return first.name.compare(other.name) < 0;
-		}
 	};
 	SName fullname;
 	string email;
@@ -66,7 +60,7 @@ private:
 	bool findEmail(const string &email, size_t &idx) const;
 	size_t findSalary(const string &email, const unsigned int &salary) const;
 
-	void addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, bool (*comparator)(const SPerson &, const SPerson &));
+	void addToVector(const shared_ptr<SPerson> &newPerson, vector<shared_ptr<SPerson>> &vec, int (*comparator)(const SPerson &, const SPerson &));
 
 	void setSalary(const shared_ptr<SPerson> &person, const unsigned int &salary);
 
@@ -154,19 +148,26 @@ CPersonalAgenda::~CPersonalAgenda(void) { // I guess I could empty the vectors
 ===============================================================================
 */
 
-bool cmpName(const SPerson &lhs, const SPerson &rhs) {
-	//(newPerson->fullname < (*iter)->fullname)
-	return (lhs.fullname < rhs.fullname);
+int cmpName(const SPerson &lhs, const SPerson &rhs) {
+	if (lhs.fullname.surname == rhs.fullname.surname) {
+		return lhs.fullname.name.compare(rhs.fullname.name);
+	}
+	return lhs.fullname.surname.compare(rhs.fullname.surname);
 }
 
-bool cmpEmail(const SPerson &lhs, const SPerson &rhs) {
-	// newPerson->email.compare((*iter)->email) < 0
-	return (lhs.email.compare(rhs.email) < 0);
+int cmpEmail(const SPerson &lhs, const SPerson &rhs) {
+	return lhs.email.compare(rhs.email);
 }
 
-bool cmpSalaryEmail(const SPerson &lhs, const SPerson &rhs) {
-	//((newPerson->salary == (*iter)->salary) && (newPerson->email.compare((*iter)->email) < 0)) || (newPerson->salary < (*iter)->salary)
-	return ((lhs.salary == rhs.salary) && cmpEmail(lhs, rhs)) || (lhs.salary < rhs.salary);
+int cmpSalary(const SPerson &lhs, const SPerson &rhs) {
+	return (lhs.salary > rhs.salary) - (lhs.salary < rhs.salary);
+}
+
+int cmpSalaryEmail(const SPerson &lhs, const SPerson &rhs) {
+	if(lhs.salary == rhs.salary) {
+		return cmpEmail(lhs,rhs);
+	}
+	return cmpSalary(lhs,rhs);
 }
 
 /*
