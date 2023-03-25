@@ -57,7 +57,7 @@ public:
 		normalize();
 		return *this;
 	}
-	CTime & operator+(int toAdd) const {
+	CTime operator+(int toAdd) const {
 		CTime time(*this);
 		time += toAdd;
 		return time;
@@ -68,7 +68,7 @@ public:
 		normalize();
 		return *this;
 	}
-	CTime & operator-(int toSub) const {
+	CTime operator-(int toSub) const {
 		CTime time(*this);
 		time -= toSub;
 		return time;
@@ -80,7 +80,7 @@ public:
 		return seconds;
 	}
 
-	CTime & operator++(int) {
+	CTime operator++(int) {
 		CTime time(*this);
 		*this += 1;
 		return time;
@@ -91,7 +91,7 @@ public:
 		return *this;
 	}
 
-	CTime & operator--(int) {
+	CTime operator--(int) {
 		CTime time(*this);
 		*this -= 1;
 		return time;
