@@ -48,6 +48,12 @@ struct SPerson {
 		email = em;
 		salary = sal;
 	}
+#ifndef __PROGTEST__
+	friend ostream &operator<<(ostream &os, SPerson person) {
+		os << person.fullname.surname << ", " << person.fullname.name << "; " << person.email << "; " << person.salary;
+		return os;
+	}
+#endif
 };
 
 class CPersonalAgenda {
@@ -105,6 +111,27 @@ public:
 				 const string &surname,
 				 string &outName,
 				 string &outSurname) const;
+#ifndef __PROGTEST__
+
+	void printName() const {
+		for (auto person : byName) {
+			cout << *person << endl;
+		}
+	}
+
+	void printEmail() const {
+		for (auto person : byEmail) {
+			cout << *person << endl;
+		}
+	}
+
+	void printSalary() const {
+		for (auto person : bySalary) {
+			cout << *person << endl;
+		}
+	}
+
+#endif
 };
 
 /*
