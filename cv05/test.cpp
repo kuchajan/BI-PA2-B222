@@ -197,6 +197,41 @@ int main ()
 	c -= 2;
 	assert( CTimeTester::test(c,23,59,59));
 
+	CTime d(1,2,3);
+	assert(CTimeTester::test(d,1,2,3));
+
+	bool passed = true;
+	try {
+		CTime e(24,0,0);
+	} catch (std::exception &e) {
+		passed = false;
+	}
+	assert(!passed);
+
+	passed = true;
+	try {
+		CTime e(24,0);
+	} catch (std::exception &e) {
+		passed = false;
+	}
+	assert(!passed);
+
+	passed = true;
+	try {
+		CTime e(-1,0,0);
+	} catch (std::exception &e) {
+		passed = false;
+	}
+	assert(!passed);
+
+	passed = true;
+	try {
+		CTime e(0,-1);
+	} catch (std::exception &e) {
+		passed = false;
+	}
+	assert(!passed);
+
 	return 0;
 }
 #endif /* __PROGTEST__ */
