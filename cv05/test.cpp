@@ -26,7 +26,7 @@ private:
 	}
 
 	int toSeconds() const {
-		return (((m_Hour * 24) + m_Minute) * 60) + m_Second;
+		return (((m_Hour * 60) + m_Minute) * 60) + m_Second;
 	}
 public:
     // constructor, destructor
