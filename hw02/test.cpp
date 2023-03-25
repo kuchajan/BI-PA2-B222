@@ -389,14 +389,46 @@ unsigned int CPersonalAgenda::getSalary(const string &email) const {
 
 void CPersonalAgenda::getRank(const shared_ptr<SPerson> &person, int &rankMin, int &rankMax) const {
 	size_t idx;
-	if(!find(*person,bySalary,idx,cmpSalaryEmail)) {
-		throw logic_error("void CPersonalAgenda::getRank: parsed in someone who isn't in bySalary");
+	if(!find(*person,bySalary,idx,cmpSalary)) {
+		throw logic_error("void CPersonalAgenda::getRank: parsed in someone who hasn't got the same salary in bySalary");
 	}
 
-	// todo: binary search
-	for (rankMin = idx; rankMin != 0 && bySalary[rankMin - 1]->salary == person->salary; rankMin--) {
+	//get lower bound
+	size_t low = 0, high = idx;
+	while(high - low > 0) {
+		size_t middle = (high + low) / 2;
+		int result = cmpSalary(*(bySalary[middle]),*person);
+		if(result == 0) {
+			rankMin = middle;
+		}
+		if(result < 0) {
+			low = middle + 1;
+		}
+		else {
+			high = middle;
+		}
 	}
-	for (rankMax = idx; rankMax + 1 != (int)bySalary.size() && bySalary[rankMax + 1]->salary == person->salary; rankMax++) {
+	if(cmpSalary(*(bySalary[low]),*person) == 0) {
+		rankMin = low;
+	}
+
+	//get upper bound
+	low = idx, high = bySalary.size() - 1;
+	while(high - low > 0) {
+		size_t middle = (high + low) / 2;
+		int result = cmpSalary(*(bySalary[middle]),*person);
+		if(result == 0) {
+			rankMax = middle;
+		}
+		if(result > 0) {
+			high = middle;
+		}
+		else {
+			low = middle + 1;
+		}
+	}
+	if(cmpSalary(*(bySalary[low]),*person) == 0) {
+		rankMax = low;
 	}
 }
 
