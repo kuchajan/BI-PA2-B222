@@ -36,6 +36,10 @@ private:
 	inline bool isValid();
 };
 
+/// @brief: Constructs a CRange with a given lower and upper bound. Throws an exception if low > high
+/// @param[in] low: Lower bound of the range 
+/// @param[in] high: Upper bound of the range
+/// @exception: low > high
 CRange::CRange(const long long &low, const long long &high) {
 	m_Low = low;
 	m_High = high;
@@ -44,6 +48,8 @@ CRange::CRange(const long long &low, const long long &high) {
 	}
 }
 
+/// @brief: Checks if parent is a valid range
+/// @return: true, when valid. false, when invalid
 inline bool CRange::isValid() {
 	return m_Low <= m_High;
 }
