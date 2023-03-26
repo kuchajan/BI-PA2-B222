@@ -24,16 +24,15 @@ using namespace std;
 // #define EXTENDED_SYNTAX
 
 class CRange {
-public:
-	// constructor
-	CRange(const long long &low, const long long &high);
-
 private:
 	// todo
 	long long m_Low;
 	long long m_High;
 
 	inline bool isValid();
+public:
+	// constructor
+	CRange(const long long &low, const long long &high);
 };
 
 /// @brief: Constructs a CRange with a given lower and upper bound. Throws an exception if low > high
@@ -55,6 +54,8 @@ inline bool CRange::isValid() {
 }
 
 class CRangeList {
+private:
+	// todo
 public:
 	// constructor
 	// includes long long / range
@@ -64,8 +65,6 @@ public:
 	// operator ==
 	// operator !=
 	// operator <<
-private:
-	// todo
 };
 
 #ifndef __PROGTEST__
