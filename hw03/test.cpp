@@ -56,8 +56,11 @@ inline bool CRange::isValid() {
 class CRangeList {
 private:
 	// todo
+	vector<CRange> m_Ranges;
 public:
 	// constructor
+	CRangeList();
+
 	// includes long long / range
 	// += range / range list
 	// -= range / range list
@@ -66,6 +69,9 @@ public:
 	// operator !=
 	// operator <<
 };
+
+/// @brief: Implicit empty constructor
+CRangeList::CRangeList() { }
 
 #ifndef __PROGTEST__
 string toString(const CRangeList &x) {
