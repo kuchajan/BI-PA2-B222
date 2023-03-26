@@ -72,6 +72,7 @@ public:
 		return time;
 	}
 
+
 	CTime & operator-=(int toSub) {
 		m_Second -= toSub;
 		normalize();
@@ -139,6 +140,18 @@ public:
 
     friend class ::CTimeTester;
 };
+
+CTime operator+(int toAdd, CTime & other) {
+	CTime time(other);
+	time += toAdd;
+	return time;
+}
+
+CTime operator-(int toSub, CTime & other) {
+	CTime time(other);
+	time -= toSub;
+	return time;
+}
 
 #ifndef __PROGTEST__
 struct CTimeTester
