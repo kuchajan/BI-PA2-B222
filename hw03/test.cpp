@@ -60,11 +60,17 @@ private:
 public:
 	// constructor
 	CRangeList();
+	// destructor
+	~CRangeList();
+	// copy constructor
+	CRangeList(const CRangeList &);
 
 	// includes long long / range
 	// += range / range list
 	// -= range / range list
 	// = range / range list
+	CRangeList & operator=(const CRange &);
+	CRangeList & operator=(CRangeList);
 	// operator ==
 	// operator !=
 	// operator <<
@@ -72,6 +78,34 @@ public:
 
 /// @brief: Implicit empty constructor
 CRangeList::CRangeList() { }
+
+/// @brief: Destructor that empties the vector m_Ranges
+CRangeList::~CRangeList() {
+	m_Ranges.clear();
+}
+
+/// @brief: copies values from the other CRangeList
+/// @param other range list to copy from
+CRangeList::CRangeList(const CRangeList & other) {
+	(*this) = other;
+}
+
+/// @brief Empties the current range list and adds given range
+/// @param range The range to add to the list
+/// @return this object
+CRangeList &CRangeList::operator=(const CRange & range) {
+	m_Ranges.clear();
+	m_Ranges.push_back(range);
+	return (*this);
+}
+
+/// @brief: copies values from the other CRangeList and throws away ranges from this object
+/// @param other: range list to copy from
+/// @return this object
+CRangeList &CRangeList::operator=(CRangeList other) {
+	swap((*this).m_Ranges,other.m_Ranges);
+	return (*this);
+}
 
 #ifndef __PROGTEST__
 string toString(const CRangeList &x) {
