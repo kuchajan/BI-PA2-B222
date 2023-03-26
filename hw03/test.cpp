@@ -33,6 +33,10 @@ private:
 public:
 	// constructor
 	CRange(const long long &low, const long long &high);
+	
+	inline bool includes(const long long & value);
+	inline bool includes(const CRange & range);
+	inline bool overlays(const CRange & range);
 };
 
 /// @brief: Constructs a CRange with a given lower and upper bound. Throws an exception if low > high
@@ -51,6 +55,27 @@ CRange::CRange(const long long &low, const long long &high) {
 /// @return: true, when valid. false, when invalid
 inline bool CRange::isValid() {
 	return m_Low <= m_High;
+}
+
+/// @brief Checks, if the given value is included in this range
+/// @param value The value to check
+/// @return true, if it's included, otherwise false
+inline bool CRange::includes(const long long &value) {
+	return (m_Low <= value) && (value <= m_High);
+}
+
+/// @brief Checks, if the whole given range is included in this range
+/// @param range The other range to check
+/// @return true, if it incldues the whole range, otherwise false
+inline bool CRange::includes(const CRange &range) {
+	return ((*this).m_Low <= range.m_Low) && (range.m_High <= (*this).m_High);
+}
+
+/// @brief Checks, if this range is partly overlaying the other range
+/// @param range The other range to check
+/// @return true, if it is overlaying, otherwise false
+inline bool CRange::overlays(const CRange &range) {
+	return ((*this).m_High <= range.m_Low) || ((*this).m_Low <= range.m_High);
 }
 
 class CRangeList {
