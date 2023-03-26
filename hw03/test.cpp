@@ -26,9 +26,28 @@ using namespace std;
 class CRange {
 public:
 	// constructor
+	CRange(const long long &low, const long long &high);
+
 private:
 	// todo
+	long long m_Low;
+	long long m_High;
+
+	inline bool isValid();
 };
+
+CRange::CRange(const long long &low, const long long &high) {
+	m_Low = low;
+	m_High = high;
+	if (!isValid()) {
+		throw std::logic_error("CRange constructor: lower bound of range is bigger than upper bound");
+	}
+}
+
+inline bool CRange::isValid() {
+	return m_Low <= m_High;
+}
+
 class CRangeList {
 public:
 	// constructor
