@@ -23,8 +23,11 @@ using namespace std;
 // uncomment if your code implements initializer lists
 // #define EXTENDED_SYNTAX
 
+class CRangeList;
+
 class CRange {
 private:
+	friend CRangeList;
 	// todo
 	long long m_Low;
 	long long m_High;
