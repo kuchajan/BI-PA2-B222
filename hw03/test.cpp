@@ -112,6 +112,8 @@ public:
 	// operator !=
 	// operator <<
 	friend ostream & operator << (ostream & os, const CRangeList & crl);
+	// + range
+	CRangeList & operator+(const CRange &);
 };
 
 /// @brief: Implicit empty constructor
@@ -199,6 +201,19 @@ ostream &operator<<(ostream &os, const CRangeList &crl) {
 
 	os << "}";
 	return os;
+}
+
+CRangeList &CRangeList::operator+(const CRange & range) {
+	*this += range;
+	return *this;
+}
+
+CRangeList operator+(const CRange & left, const CRange & right) {
+	CRangeList crl;
+	crl += left;
+	crl += right;
+
+	return crl;
 }
 
 #ifndef __PROGTEST__
