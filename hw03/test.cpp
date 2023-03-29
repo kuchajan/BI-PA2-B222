@@ -102,6 +102,8 @@ public:
 
 	// includes long long / range
 	// += range / range list
+	CRangeList & operator+=(const CRange &);
+	CRangeList & operator+=(const CRangeList &);
 	// -= range / range list
 	// = range / range list
 	CRangeList & operator=(const CRange &);
@@ -124,6 +126,42 @@ CRangeList::~CRangeList() {
 /// @param other range list to copy from
 CRangeList::CRangeList(const CRangeList & other) {
 	(*this) = other;
+}
+
+CRangeList &CRangeList::operator+=(const CRange &otherRange) {
+	auto iterator = m_Ranges.begin();
+	for(;iterator != m_Ranges.end(); iterator++) {
+		if((*iterator).includes(otherRange)) {
+			return *this;
+		}
+		if((*iterator).overlays(otherRange) || otherRange.overlays(*iterator)) {
+			//union of the two ranges
+			(*iterator).unite(otherRange);
+
+			//union of all the subsequent ranges
+			auto iterator2 = iterator+1;
+			for(;(*iterator).overlays(*(iterator2));iterator2++) {
+				(*iterator).unite(*(iterator2));
+				if(iterator2 == m_Ranges.end()) {
+					break;
+				}
+			}
+			m_Ranges.erase(iterator+1,iterator2);
+			return *this;
+		}
+		if((*iterator).m_Low > otherRange.m_Low) {
+			break;
+		}
+	}
+	m_Ranges.insert(iterator,otherRange);
+	return *this;
+}
+
+CRangeList &CRangeList::operator+=(const CRangeList &otherList) {
+	for(auto range : otherList.m_Ranges) {
+		*this += range;
+	}
+	return *this;
 }
 
 /// @brief Empties the current range list and adds given range
