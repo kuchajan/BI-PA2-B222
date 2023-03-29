@@ -38,6 +38,8 @@ public:
 	inline bool includes(const CRange & range) const;
 	inline bool overlays(const CRange & range) const;
 	
+	CRange & unite(const CRange & other);
+
 	friend ostream & operator<<(ostream & os, const CRange & cr);
 };
 
@@ -78,6 +80,12 @@ inline bool CRange::includes(const CRange &range) const {
 /// @return true, if it is overlaying, otherwise false
 inline bool CRange::overlays(const CRange &range) const {
 	return this->includes(range.m_High+1) || this->includes(range.m_Low-1);
+}
+
+CRange & CRange::unite(const CRange &other) {
+	m_Low = m_Low <= other.m_Low ? m_Low : other.m_Low;
+	m_High = m_High >= other.m_High ? m_High : other.m_High;
+	return *this;
 }
 
 class CRangeList {
