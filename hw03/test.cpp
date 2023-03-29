@@ -75,7 +75,7 @@ inline bool CRange::includes(const CRange &range) {
 /// @param range The other range to check
 /// @return true, if it is overlaying, otherwise false
 inline bool CRange::overlays(const CRange &range) {
-	return ((*this).m_High <= range.m_Low) || ((*this).m_Low <= range.m_High);
+	return this->includes(range.m_High+1) || this->includes(range.m_Low-1);
 }
 
 class CRangeList {
