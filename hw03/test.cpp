@@ -37,6 +37,8 @@ public:
 	inline bool includes(const long long & value) const;
 	inline bool includes(const CRange & range) const;
 	inline bool overlays(const CRange & range) const;
+	
+	friend ostream & operator<<(ostream & os, const CRange & cr);
 };
 
 /// @brief: Constructs a CRange with a given lower and upper bound. Throws an exception if low > high
@@ -99,6 +101,7 @@ public:
 	// operator ==
 	// operator !=
 	// operator <<
+	friend ostream & operator << (ostream & os, const CRangeList & crl);
 };
 
 /// @brief: Implicit empty constructor
@@ -130,6 +133,26 @@ CRangeList &CRangeList::operator=(const CRange & range) {
 CRangeList &CRangeList::operator=(CRangeList other) {
 	swap((*this).m_Ranges,other.m_Ranges);
 	return (*this);
+}
+
+ostream &operator<<(ostream &os, const CRange &cr) {
+	os << "<" << cr.m_Low << ".." << cr.m_High << ">";
+	return os;
+}
+
+ostream &operator<<(ostream &os, const CRangeList &crl) {
+	os << "{";
+	bool isFirst = true;
+	for(auto range : crl.m_Ranges) {
+		if(!isFirst) {
+			os << ",";
+		}
+		os << range;
+		isFirst = false;
+	}
+
+	os << "}";
+	return os;
 }
 
 #ifndef __PROGTEST__
