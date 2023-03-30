@@ -109,8 +109,9 @@ public:
 	// = range / range list
 	CRangeList & operator=(const CRange &);
 	// CRangeList & operator=(const CRange &); //*Implicit
-	// operator ==
-	// operator !=
+	// operator ==, !=
+	bool operator==(const CRangeList &) const;
+	bool operator!=(const CRangeList &) const;
 	// operator <<
 	friend ostream & operator << (ostream & os, const CRangeList & crl);
 	// + range
@@ -222,6 +223,26 @@ CRangeList &CRangeList::operator=(const CRange & range) {
 	m_Ranges.clear();
 	m_Ranges.push_back(range);
 	return (*this);
+}
+
+bool CRangeList::operator==(const CRangeList & otherList) const {
+	auto thisIter = this->m_Ranges.cbegin();
+	auto otherIter = otherList.m_Ranges.cbegin();
+
+	while(thisIter != this->m_Ranges.cend() && otherIter != otherList.m_Ranges.cend()) {
+		if((*thisIter).m_Low != (*otherIter).m_Low || (*thisIter).m_High != (*otherIter).m_High) {
+			return false;
+		}
+		thisIter++;
+		otherIter++;
+	}
+
+	return !((thisIter == this->m_Ranges.cend() && otherIter != otherList.m_Ranges.cend())
+	      || (otherIter == otherList.m_Ranges.cend() && thisIter != this->m_Ranges.cend()));
+}
+
+bool CRangeList::operator!=(const CRangeList & otherList) const {
+	return !(*this == otherList);
 }
 
 ostream &operator<<(ostream &os, const CRange &cr) {
