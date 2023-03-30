@@ -357,6 +357,11 @@ string toString(const CRangeList &x) {
 }
 
 int main(void) {
+	CRange range{1,2};
+
+	CRangeList asd{{1,2},{3,4}};
+	//cout << range << endl;
+	
 	CRangeList a, b;
 
 	assert(sizeof(CRange) <= 2 * sizeof(long long));
