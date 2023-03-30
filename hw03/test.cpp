@@ -182,12 +182,14 @@ CRangeList &CRangeList::operator-=(const CRange & otherRange) {
 			//split to two
 			long long lowTemp = (*iterator).m_Low;
 			long long highTemp = (*iterator).m_High;
+
+			//remove this one
+			m_Ranges.erase(iterator);
+
 			//first the right hand side
 			m_Ranges.insert(iterator,CRange(otherRange.m_High+1,highTemp));
 			//then the left hand side
 			m_Ranges.insert(iterator,CRange(lowTemp,otherRange.m_Low-1));
-			//then remove the last one
-			m_Ranges.erase(iterator+2);
 			
 			break; //i am sure it can't continue
 		}
