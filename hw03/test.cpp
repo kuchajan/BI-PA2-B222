@@ -284,7 +284,19 @@ bool CRangeList::includes(const CRange & toFind) const {
 }
 
 ostream &operator<<(ostream &os, const CRange &cr) {
-	os << "<" << cr.m_Low << ".." << cr.m_High << ">";
+	ios_base::fmtflags formatFlags = os.flags();
+
+	os << dec;
+
+	if(cr.m_Low == cr.m_High) {
+		os << cr.m_Low;
+	} else {
+		os << "<" << cr.m_Low << ".." << cr.m_High << ">";
+	
+	}
+
+	os.flags(formatFlags);
+
 	return os;
 }
 
