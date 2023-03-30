@@ -104,6 +104,8 @@ public:
 	CRangeList & operator+=(const CRange &);
 	CRangeList & operator+=(const CRangeList &);
 	// -= range / range list
+	CRangeList & operator-=(const CRange &);
+	CRangeList & operator-=(const CRangeList &);
 	// = range / range list
 	CRangeList & operator=(const CRange &);
 	// CRangeList & operator=(const CRange &); //*Implicit
@@ -155,6 +157,60 @@ CRangeList &CRangeList::operator+=(const CRange &otherRange) {
 CRangeList &CRangeList::operator+=(const CRangeList &otherList) {
 	for(auto range : otherList.m_Ranges) {
 		*this += range;
+	}
+	return *this;
+}
+
+CRangeList &CRangeList::operator-=(const CRange & otherRange) {
+	for(auto iterator = m_Ranges.begin(); iterator != m_Ranges.end() && !(otherRange.m_High < (*iterator).m_Low); iterator++) {
+		if(otherRange.m_Low > (*iterator).m_High) {
+			//too low to do any op
+			continue;
+		}
+		if(otherRange.includes(*iterator)) {
+			//delete
+			m_Ranges.erase(iterator);
+			continue; //it could be equal, but let's still see
+		}
+
+		if((*iterator).includes(otherRange)) {
+			//split to two
+			long long lowTemp = (*iterator).m_Low;
+			long long highTemp = (*iterator).m_High;
+			//first the right hand side
+			m_Ranges.insert(iterator,CRange(otherRange.m_High+1,highTemp));
+			//then the left hand side
+			m_Ranges.insert(iterator,CRange(lowTemp,otherRange.m_Low-1));
+			//then remove the last one
+			m_Ranges.erase(iterator+2);
+			
+			break; //i am sure it can't continue
+		}
+
+		//I have (5, 10) and I wanna subtract (1,7)
+		//my result should be (8,10)
+		if(otherRange.m_High < (*iterator).m_High) {
+			(*iterator).m_Low = otherRange.m_High+1;
+			continue;
+		}
+
+		//I have (5,10) and I wanna subtract (8,12)
+		//my result should be (5,7)
+		if(otherRange.m_Low < (*iterator).m_High) {
+			(*iterator).m_High = otherRange.m_Low-1;
+			continue;
+		}
+
+		//Maybe I forgot to implement some situation
+		cerr << (*iterator) << " \\ " << otherRange << endl;
+		throw logic_error("Unhandled situation, check cerr");
+	}
+	return *this;
+}
+
+CRangeList &CRangeList::operator-=(const CRangeList & otherList) {
+	for(auto range : otherList.m_Ranges) {
+		*this -= range;
 	}
 	return *this;
 }
@@ -212,6 +268,16 @@ int main(void) {
 	CRangeList a, b;
 
 	assert(sizeof(CRange) <= 2 * sizeof(long long));
+
+	//my tests
+	a = CRange(5,10);
+	a -= CRange(1,7);
+	assert(toString(a) == "{<8..10>}");
+
+	a = CRange(5,10);
+	a -= CRange(8,20);
+	assert(toString(a) == "{<5..7>}");
+
 	a = CRange(5, 10);
 	a += CRange(25, 100);
 	assert(toString(a) == "{<5..10>,<25..100>}");
