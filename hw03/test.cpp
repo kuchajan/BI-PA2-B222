@@ -117,8 +117,9 @@ public:
 	bool includes(const CRange &) const;
 	// operator <<
 	friend ostream & operator << (ostream & os, const CRangeList & crl);
-	// + range
+	// +/- range
 	CRangeList & operator+(const CRange &);
+	CRangeList & operator-(const CRange &);
 };
 
 /// @brief: Implicit empty constructor
@@ -293,10 +294,23 @@ CRangeList &CRangeList::operator+(const CRange & range) {
 	return *this;
 }
 
+CRangeList &CRangeList::operator-(const CRange & range) {
+	*this -= range;
+	return *this;
+}
+
 CRangeList operator+(const CRange & left, const CRange & right) {
 	CRangeList crl;
 	crl += left;
 	crl += right;
+
+	return crl;
+}
+
+CRangeList operator-(const CRange & left, const CRange & right) {
+	CRangeList crl;
+	crl += left;
+	crl -= right;
 
 	return crl;
 }
