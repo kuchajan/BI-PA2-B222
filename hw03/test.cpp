@@ -178,7 +178,7 @@ CRangeList &CRangeList::operator-=(const CRange & otherRange) {
 			continue; //it could be equal, but let's still see
 		}
 
-		if((*iterator).includes(otherRange)) {
+		if((*iterator).includes(otherRange) && (*iterator).includes(otherRange.m_High+1) && (*iterator).includes(otherRange.m_Low-1)) {
 			//split to two
 			long long lowTemp = (*iterator).m_Low;
 			long long highTemp = (*iterator).m_High;
