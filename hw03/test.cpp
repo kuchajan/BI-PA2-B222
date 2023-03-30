@@ -21,7 +21,7 @@ using namespace std;
 #endif /* __PROGTEST__ */
 
 // uncomment if your code implements initializer lists
-// #define EXTENDED_SYNTAX
+#define EXTENDED_SYNTAX
 
 class CRangeList;
 
