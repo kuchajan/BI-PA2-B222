@@ -112,6 +112,9 @@ public:
 	// operator ==, !=
 	bool operator==(const CRangeList &) const;
 	bool operator!=(const CRangeList &) const;
+	// includes long long / CRange
+	bool includes(const long long &) const;
+	bool includes(const CRange &) const;
 	// operator <<
 	friend ostream & operator << (ostream & os, const CRangeList & crl);
 	// + range
@@ -243,6 +246,26 @@ bool CRangeList::operator==(const CRangeList & otherList) const {
 
 bool CRangeList::operator!=(const CRangeList & otherList) const {
 	return !(*this == otherList);
+}
+
+bool CRangeList::includes(const long long & toFind) const {
+	for(auto range : this->m_Ranges) {
+		if(range.includes(toFind)) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+bool CRangeList::includes(const CRange & toFind) const {
+	for(auto range : this->m_Ranges) {
+		if(range.includes(toFind)) {
+			return true;
+		}
+	}
+	
+	return false;
 }
 
 ostream &operator<<(ostream &os, const CRange &cr) {
