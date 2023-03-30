@@ -166,7 +166,7 @@ CRangeList &CRangeList::operator+=(const CRangeList &otherList) {
 }
 
 CRangeList &CRangeList::operator-=(const CRange & otherRange) {
-	for(auto iterator = m_Ranges.begin(); iterator != m_Ranges.end() && !(otherRange.m_High < (*iterator).m_Low); iterator++) {
+	for(auto iterator = m_Ranges.begin(); iterator != m_Ranges.end() && !(otherRange.m_High < (*iterator).m_Low) && m_Ranges.size() != 0; iterator++) {
 		if(otherRange.m_Low > (*iterator).m_High) {
 			//too low to do any op
 			continue;
