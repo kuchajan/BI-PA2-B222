@@ -98,6 +98,8 @@ private:
 public:
 	// constructor
 	CRangeList();
+	// constructor with c++ array literal
+	CRangeList(initializer_list<CRange> arr);
 	
 	// includes long long / range
 	// += range / range list
@@ -124,6 +126,12 @@ public:
 
 /// @brief: Implicit empty constructor
 CRangeList::CRangeList() { }
+
+CRangeList::CRangeList(initializer_list<CRange> arr) {
+	for(auto range : arr) {
+		*this += range;
+	}
+}
 
 /// @brief: Destructor that empties the vector m_Ranges
 /*CRangeList::~CRangeList() {
