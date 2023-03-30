@@ -121,9 +121,9 @@ public:
 CRangeList::CRangeList() { }
 
 /// @brief: Destructor that empties the vector m_Ranges
-CRangeList::~CRangeList() {
+/*CRangeList::~CRangeList() {
 	m_Ranges.clear();
-}
+}*/
 
 CRangeList &CRangeList::operator+=(const CRange &otherRange) {
 	auto iterator = m_Ranges.begin();
