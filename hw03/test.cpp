@@ -122,6 +122,10 @@ public:
 	// +/- range
 	CRangeList & operator+(const CRange &);
 	CRangeList & operator-(const CRange &);
+
+	//iterators
+	vector<CRange>::iterator begin();
+	vector<CRange>::iterator end();
 };
 
 /// @brief: Implicit empty constructor
@@ -307,6 +311,14 @@ CRangeList &CRangeList::operator+(const CRange & range) {
 CRangeList &CRangeList::operator-(const CRange & range) {
 	*this -= range;
 	return *this;
+}
+
+vector<CRange>::iterator CRangeList::begin() {
+	return m_Ranges.begin();
+}
+
+vector<CRange>::iterator CRangeList::end() {
+	return m_Ranges.end();
 }
 
 CRangeList operator+(const CRange & left, const CRange & right) {
