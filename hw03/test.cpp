@@ -357,8 +357,10 @@ bool CRangeList::includes(const CRange & toFind) const {
 
 ostream &operator<<(ostream &os, const CRange &cr) {
 	ios_base::fmtflags formatFlags = os.flags();
+	streamsize width = os.width();
 
 	os.unsetf(formatFlags);
+	os << setw(0);
 
 	if(cr.m_Low == cr.m_High) {
 		os << cr.m_Low;
@@ -368,7 +370,7 @@ ostream &operator<<(ostream &os, const CRange &cr) {
 	}
 
 	os.flags(formatFlags);
-
+	os << setw(width);
 	return os;
 }
 
@@ -508,10 +510,11 @@ int main(void) {
 	CRangeList x{{5, 20}, {150, 200}, {-9, 12}, {48, 93}};
 	assert(toString(x) == "{<-9..20>,<48..93>,<150..200>}");
 	ostringstream oss;
-	oss << setfill('=') << hex << left;
+	oss << setfill('=') << hex << left << setw(10) ;
 	for (const auto &v : x + CRange(-100, -100))
 		oss << v << endl;
-	oss << setw(10) << 1024;
+	oss << 1024;
+	cout << oss.str();
 	assert(oss.str() == "-100\n<-9..20>\n<48..93>\n<150..200>\n400=======");
 #endif /* EXTENDED_SYNTAX */
 
