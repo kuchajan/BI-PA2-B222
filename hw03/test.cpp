@@ -87,7 +87,11 @@ inline bool CRange::strictIncludes(const CRange &range) const {
 /// @param range The other range to check
 /// @return true, if it is overlaying, otherwise false
 inline bool CRange::overlays(const CRange &range) const {
-	return this->includes(range.m_High+1) || this->includes(range.m_Low-1);
+	//for some odd reason, putting (range.m_High+1 > range.m_High) directly into the condition is true, even with overflow
+	//same with (range.m_Low-1 < range.m_Low) with underflow
+	long long temp1 = (range.m_High+1);
+	long long temp2 = (range.m_Low-1);
+	return ((temp1 > range.m_High) && this->includes(range.m_High+1)) || ((temp2 < range.m_Low) && this->includes(range.m_Low-1));
 }
 
 CRange & CRange::unite(const CRange &other) {
@@ -447,6 +451,12 @@ int main(void) {
 	oss << setw(10) << 1024;
 	assert(oss.str() == "-100\n<-9..20>\n<48..93>\n<150..200>\n400=======");
 #endif /* EXTENDED_SYNTAX */
+
+	//extreme values
+	//-9223372036854775808..-9223372036854775807
+	CRangeList c{{-9223372036854775808,-9223372036854775807}};
+	c += CRange(9223372036854775807,9223372036854775807);
+	assert(toString(c) == "{<-9223372036854775808..-9223372036854775807>,9223372036854775807}");
 	return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
