@@ -39,6 +39,7 @@ public:
 	
 	inline bool includes(const long long & value) const;
 	inline bool includes(const CRange & range) const;
+	inline bool strictIncludes(const CRange & range) const;
 	inline bool overlays(const CRange & range) const;
 	
 	CRange & unite(const CRange & other);
@@ -76,6 +77,10 @@ inline bool CRange::includes(const long long &value) const {
 /// @return true, if it incldues the whole range, otherwise false
 inline bool CRange::includes(const CRange &range) const {
 	return ((*this).m_Low <= range.m_Low) && (range.m_High <= (*this).m_High);
+}
+
+inline bool CRange::strictIncludes(const CRange &range) const {
+	return ((*this).m_Low < range.m_Low) && (range.m_High < (*this).m_High);;
 }
 
 /// @brief Checks, if this range is partly overlaying the other range
@@ -190,7 +195,7 @@ CRangeList &CRangeList::operator-=(const CRange & otherRange) {
 			continue; //it could be equal, but let's still see
 		}
 
-		if((*iterator).includes(otherRange) && (*iterator).includes(otherRange.m_High+1) && (*iterator).includes(otherRange.m_Low-1)) {
+		if((*iterator).strictIncludes(otherRange)) {
 			//split to two
 			long long lowTemp = (*iterator).m_Low;
 			long long highTemp = (*iterator).m_High;
