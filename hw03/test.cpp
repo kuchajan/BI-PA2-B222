@@ -357,10 +357,10 @@ bool CRangeList::includes(const CRange & toFind) const {
 
 ostream &operator<<(ostream &os, const CRange &cr) {
 	ios_base::fmtflags formatFlags = os.flags();
-	streamsize width = os.width();
+	//streamsize width = os.width();
 
 	os << dec;
-	os << setw(0);
+	//os << setw(0);
 
 	if(cr.m_Low == cr.m_High) {
 		os << cr.m_Low;
@@ -370,7 +370,7 @@ ostream &operator<<(ostream &os, const CRange &cr) {
 	}
 
 	os.flags(formatFlags);
-	os << setw(width);
+	//os << setw(width);
 	return os;
 }
 
