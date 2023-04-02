@@ -312,23 +312,47 @@ bool CRangeList::operator!=(const CRangeList & otherList) const {
 }
 
 bool CRangeList::includes(const long long & toFind) const {
-	for(auto range : this->m_Ranges) {
-		if(range.includes(toFind)) {
+	if(m_Ranges.size() == 0) {
+		return false;
+	}
+
+	size_t low = 0, high = m_Ranges.size() - 1;
+	while(high - low > 0) {
+		size_t middle = (high + low) / 2;
+		if(m_Ranges[middle].includes(toFind)) {
 			return true;
+		}
+		if(m_Ranges[middle].m_Low > toFind) {
+			high = middle;
+		}
+		else {
+			low = middle + 1;
 		}
 	}
 	
-	return false;
+	return m_Ranges[low].includes(toFind);
 }
 
 bool CRangeList::includes(const CRange & toFind) const {
-	for(auto range : this->m_Ranges) {
-		if(range.includes(toFind)) {
+	if(m_Ranges.size() == 0) {
+		return false;
+	}
+
+	size_t low = 0, high = m_Ranges.size() - 1;
+	while(high - low > 0) {
+		size_t middle = (high + low) / 2;
+		if(m_Ranges[middle].includes(toFind)) {
 			return true;
+		}
+		if(m_Ranges[middle].m_Low > toFind.m_Low) {
+			high = middle;
+		}
+		else {
+			low = middle + 1;
 		}
 	}
 	
-	return false;
+	return m_Ranges[low].includes(toFind);
 }
 
 ostream &operator<<(ostream &os, const CRange &cr) {
