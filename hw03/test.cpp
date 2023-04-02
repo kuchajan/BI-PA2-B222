@@ -41,6 +41,9 @@ public:
 	inline bool includes(const long long & value) const;
 	inline bool includes(const CRange & range) const;
 	inline bool strictIncludes(const CRange & range) const;
+	bool hasLeftNeighbour(const CRange & range) const;
+	bool hasRightNeighbour(const CRange & range) const;
+	inline bool hasNeighbour(const CRange & range) const;
 	inline bool overlays(const CRange & range) const;
 	
 	CRange & unite(const CRange & other);
@@ -88,15 +91,45 @@ inline bool CRange::strictIncludes(const CRange &range) const {
 	return ((*this).m_Low < range.m_Low) && (range.m_High < (*this).m_High);;
 }
 
+bool CRange::hasLeftNeighbour(const CRange &range) const {
+	if(m_Low >= 0) {
+		if(LLONG_MAX - m_Low < -1) {
+			//will overflow
+			return false;
+		}
+	} else {
+		if(-1 < LLONG_MIN - m_Low) {
+			//will overflow
+			return false;
+		}
+	}
+	return (range.m_High == m_Low-1);
+}
+
+bool CRange::hasRightNeighbour(const CRange &range) const {
+	if(m_High >= 0) {
+		if(LLONG_MAX - m_High < 1) {
+			//will overflow
+			return false;
+		}
+	} else {
+		if(1 < LLONG_MIN - m_High) {
+			//will overflow
+			return false;
+		}
+	}
+	return (range.m_Low == m_High+1);
+}
+
+bool CRange::hasNeighbour(const CRange &range) const {
+	return hasLeftNeighbour(range) || hasRightNeighbour(range);
+}
+
 /// @brief Checks, if this range is partly overlaying the other range
 /// @param range The other range to check
 /// @return true, if it is overlaying, otherwise false
 inline bool CRange::overlays(const CRange &range) const {
-	//for some odd reason, putting (range.m_High+1 > range.m_High) directly into the condition is true, even with overflow
-	//same with (range.m_Low-1 < range.m_Low) with underflow
-	long long temp1 = (range.m_High+1);
-	long long temp2 = (range.m_Low-1);
-	return ((temp1 > range.m_High) && this->includes(range.m_High+1)) || ((temp2 < range.m_Low) && this->includes(range.m_Low-1));
+	return (m_Low <= range.m_High) && (range.m_Low <= m_High);
 }
 
 CRange & CRange::unite(const CRange &other) {
@@ -162,14 +195,14 @@ CRangeList &CRangeList::operator+=(const CRange &otherRange) {
 		if((*iterator).includes(otherRange)) {
 			return *this;
 		}
-		if((*iterator).overlays(otherRange) || otherRange.overlays(*iterator)) {
+		if((*iterator).overlays(otherRange) || (*iterator).hasNeighbour(otherRange)) {
 			//union of the two ranges
 			(*iterator).unite(otherRange);
 
 			//union of all the subsequent ranges
 			if(iterator+1 != m_Ranges.end()) {
 				auto iterator2 = iterator+1;
-				for(;iterator2 != m_Ranges.end() && (*iterator).overlays(*(iterator2));iterator2++) {
+				for(;iterator2 != m_Ranges.end() && ((*iterator).overlays(*(iterator2)) || (*iterator2).hasNeighbour(otherRange));iterator2++) {
 					(*iterator).unite(*(iterator2));
 				}
 				m_Ranges.erase(iterator+1,iterator2);
