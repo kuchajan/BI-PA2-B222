@@ -162,11 +162,13 @@ CRangeList &CRangeList::operator+=(const CRange &otherRange) {
 			(*iterator).unite(otherRange);
 
 			//union of all the subsequent ranges
-			auto iterator2 = iterator+1;
-			for(;iterator2 != m_Ranges.end() && (*iterator).overlays(*(iterator2));iterator2++) {
-				(*iterator).unite(*(iterator2));
+			if(iterator+1 != m_Ranges.end()) {
+				auto iterator2 = iterator+1;
+				for(;iterator2 != m_Ranges.end() && (*iterator).overlays(*(iterator2));iterator2++) {
+					(*iterator).unite(*(iterator2));
+				}
+				m_Ranges.erase(iterator+1,iterator2);
 			}
-			m_Ranges.erase(iterator+1,iterator2);
 			return *this;
 		}
 		if((*iterator).m_Low > otherRange.m_Low) {
