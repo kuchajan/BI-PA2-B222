@@ -359,7 +359,7 @@ ostream &operator<<(ostream &os, const CRange &cr) {
 	ios_base::fmtflags formatFlags = os.flags();
 	streamsize width = os.width();
 
-	os.unsetf(formatFlags);
+	os << dec;
 	os << setw(0);
 
 	if(cr.m_Low == cr.m_High) {
