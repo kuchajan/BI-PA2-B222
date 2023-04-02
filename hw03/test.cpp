@@ -230,8 +230,8 @@ CRangeList &CRangeList::operator-=(const CRange & otherRange) {
 		}
 
 		//Maybe I forgot to implement some situation
-		cerr << (*iterator) << " \\ " << otherRange << endl;
-		throw logic_error("Unhandled situation, check cerr");
+		//cerr << (*iterator) << " \\ " << otherRange << endl;
+		//throw logic_error("Unhandled situation, check cerr");
 	}
 	return *this;
 }
