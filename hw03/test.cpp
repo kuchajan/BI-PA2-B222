@@ -167,8 +167,8 @@ public:
 	// operator <<
 	friend ostream & operator << (ostream & os, const CRangeList & crl);
 	// +/- range
-	CRangeList & operator+(const CRange &);
-	CRangeList & operator-(const CRange &);
+	CRangeList operator+(const CRange &);
+	CRangeList operator-(const CRange &);
 
 	//iterators
 	vector<CRange>::iterator begin();
@@ -389,12 +389,12 @@ ostream &operator<<(ostream &os, const CRangeList &crl) {
 	return os;
 }
 
-CRangeList &CRangeList::operator+(const CRange & range) {
+CRangeList CRangeList::operator+(const CRange & range) {
 	*this += range;
 	return *this;
 }
 
-CRangeList &CRangeList::operator-(const CRange & range) {
+CRangeList CRangeList::operator-(const CRange & range) {
 	*this -= range;
 	return *this;
 }
