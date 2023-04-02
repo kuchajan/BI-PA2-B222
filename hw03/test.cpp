@@ -224,7 +224,7 @@ CRangeList &CRangeList::operator-=(const CRange & otherRange) {
 
 		//I have (5,10) and I wanna subtract (8,12)
 		//my result should be (5,7)
-		if(otherRange.m_Low < (*iterator).m_High) {
+		if(otherRange.m_Low > (*iterator).m_Low) {
 			(*iterator).m_High = otherRange.m_Low-1;
 			continue;
 		}
