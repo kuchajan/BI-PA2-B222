@@ -195,6 +195,8 @@ CRangeList &CRangeList::operator-=(const CRange & otherRange) {
 		if(otherRange.includes(*iterator)) {
 			//delete
 			m_Ranges.erase(iterator);
+			//don't increase the iterator
+			iterator--;
 			continue; //it could be equal, but let's still see
 		}
 
