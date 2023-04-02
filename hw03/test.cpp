@@ -35,6 +35,7 @@ private:
 	inline bool isValid() const;
 public:
 	// constructor
+	CRange(const long long &val);
 	CRange(const long long &low, const long long &high);
 	
 	inline bool includes(const long long & value) const;
@@ -46,6 +47,10 @@ public:
 
 	friend ostream & operator<<(ostream & os, const CRange & cr);
 };
+
+CRange::CRange(const long long &val) {
+	m_Low = m_High = val;
+}
 
 /// @brief: Constructs a CRange with a given lower and upper bound. Throws an exception if low > high
 /// @param[in] low: Lower bound of the range 
