@@ -12,6 +12,8 @@ using namespace std;
 #endif /* __PROGTEST__ */
 
 class CMail {
+private:
+	// todo
 public:
 	CMail(const char *from,
 		  const char *to,
@@ -19,9 +21,6 @@ public:
 	bool operator==(const CMail &x) const;
 	friend ostream &operator<<(ostream &os,
 							   const CMail &m);
-
-private:
-	// todo
 };
 
 
@@ -39,17 +38,18 @@ ostream &operator<<(ostream &os, const CMail &m) {
 
 
 class CMailIterator {
+private:
+	// todo
 public:
 	explicit operator bool(void) const;
 	bool operator!(void) const;
 	const CMail &operator*(void) const;
 	CMailIterator &operator++(void);
-
-private:
-	// todo
 };
 
 class CMailServer {
+private:
+	// todo
 public:
 	CMailServer(void);
 	CMailServer(const CMailServer &src);
@@ -58,9 +58,6 @@ public:
 	void sendMail(const CMail &m);
 	CMailIterator outbox(const char *email) const;
 	CMailIterator inbox(const char *email) const;
-
-private:
-	// todo
 };
 
 #ifndef __PROGTEST__
