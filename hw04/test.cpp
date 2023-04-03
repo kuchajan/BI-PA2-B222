@@ -11,6 +11,44 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
+template <class T>
+class CShared_ptr {
+private:
+	T *m_val;
+	size_t *m_occurences;
+
+public:
+	CShared_ptr(T &);			// constructor
+	CShared_ptr(CShared_ptr &); // copy-constructor
+	~CShared_ptr();				// destructor
+	T &operator*();				// getter
+	T &operator->();
+};
+
+template <class T>
+CShared_ptr<T>::CShared_ptr(T &value) {
+	m_occurences = new size_t(1);
+	m_val = new T();
+}
+
+template <class T>
+CShared_ptr<T>::CShared_ptr(CShared_ptr &copyFrom) : m_val(copyFrom.m_val), m_occurences(copyFrom.m_occurences) {
+	(*m_occurences)++;
+}
+
+template <class T>
+CShared_ptr<T>::~CShared_ptr() {
+	if (--(*m_occurences) == 0) {
+		delete m_val;
+		delete m_occurences;
+	}
+}
+
+template <class T>
+T &CShared_ptr<T>::operator*() {
+	return *m_val;
+}
+
 class CMail {
 private:
 	string m_From;
