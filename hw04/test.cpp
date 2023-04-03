@@ -24,6 +24,20 @@ private:
 	// todo
 };
 
+
+CMail::CMail(const char *from, const char *to, const char *body) {
+
+}
+
+bool CMail::operator==(const CMail &x) const {
+	return false;
+}
+
+ostream &operator<<(ostream &os, const CMail &m) {
+	// TODO: insert return statement here
+}
+
+
 class CMailIterator {
 public:
 	explicit operator bool(void) const;
