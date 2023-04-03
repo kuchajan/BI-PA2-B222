@@ -166,9 +166,6 @@ public:
 	bool includes(const CRange &) const;
 	// operator <<
 	friend ostream & operator << (ostream & os, const CRangeList & crl);
-	// +/- range
-	CRangeList operator+(const CRange &);
-	CRangeList operator-(const CRange &);
 
 	//iterators
 	vector<CRange>::iterator begin();
@@ -389,14 +386,16 @@ ostream &operator<<(ostream &os, const CRangeList &crl) {
 	return os;
 }
 
-CRangeList CRangeList::operator+(const CRange & range) {
-	*this += range;
-	return *this;
+//In nomine patri Vagner, et filli Bernhauer, et spiritus sancti Katedra Teoreticke Informatiky
+
+CRangeList operator+(CRangeList lhs, const CRange & range) {
+	lhs += range;
+	return lhs;
 }
 
-CRangeList CRangeList::operator-(const CRange & range) {
-	*this -= range;
-	return *this;
+CRangeList operator-(CRangeList lhs, const CRange & range) {
+	lhs -= range;
+	return lhs;
 }
 
 vector<CRange>::iterator CRangeList::begin() {
@@ -510,11 +509,11 @@ int main(void) {
 	CRangeList x{{5, 20}, {150, 200}, {-9, 12}, {48, 93}};
 	assert(toString(x) == "{<-9..20>,<48..93>,<150..200>}");
 	ostringstream oss;
-	oss << setfill('=') << hex << left << setw(10) ;
+	oss << setfill('=') << hex << left ;
 	for (const auto &v : x + CRange(-100, -100))
 		oss << v << endl;
-	oss << 1024;
-	cout << oss.str();
+	oss << setw(10) << 1024;
+	//cout << oss.str();
 	assert(oss.str() == "-100\n<-9..20>\n<48..93>\n<150..200>\n400=======");
 #endif /* EXTENDED_SYNTAX */
 
