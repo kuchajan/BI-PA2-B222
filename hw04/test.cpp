@@ -30,7 +30,7 @@ CMail::CMail(const char *from, const char *to, const char *body)
 	: m_From(from), m_To(to), m_Body(body) {}
 
 bool CMail::operator==(const CMail &x) const {
-	return false;
+	return (m_From.compare(x.m_From) == 0) && (m_To.compare(x.m_To) == 0) && (m_Body.compare(x.m_Body) == 0);
 }
 
 ostream &operator<<(ostream &os, const CMail &m) {
