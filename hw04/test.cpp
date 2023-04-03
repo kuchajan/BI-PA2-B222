@@ -34,7 +34,8 @@ bool CMail::operator==(const CMail &x) const {
 }
 
 ostream &operator<<(ostream &os, const CMail &m) {
-	// TODO: insert return statement here
+	os << "From:" << m.m_From << ", To: " << m.m_To << ", Body: " << m.m_Body;
+	return os;
 }
 
 
