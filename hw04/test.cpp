@@ -13,7 +13,9 @@ using namespace std;
 
 class CMail {
 private:
-	// todo
+	string m_From;
+	string m_To;
+	string m_Body;
 public:
 	CMail(const char *from,
 		  const char *to,
@@ -24,9 +26,8 @@ public:
 };
 
 
-CMail::CMail(const char *from, const char *to, const char *body) {
-
-}
+CMail::CMail(const char *from, const char *to, const char *body)
+	: m_From(from), m_To(to), m_Body(body) {}
 
 bool CMail::operator==(const CMail &x) const {
 	return false;
