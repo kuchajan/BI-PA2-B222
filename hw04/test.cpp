@@ -153,6 +153,75 @@ ostream &operator<<(ostream &os, const CMail &m) {
 	return os;
 }
 
+class CLinkList {
+private:
+	struct SLLNode {
+		CShared_ptr<CMail> m_val;
+		SLLNode *m_next;
+		SLLNode(CShared_ptr<CMail> &newVal);
+	};
+	SLLNode *m_head;
+	SLLNode *m_tail;
+
+public:
+	CLinkList();			// constructor
+	CLinkList(CLinkList &); // copy constructor
+	~CLinkList();			// destructor
+
+	void pushback(CShared_ptr<CMail> &toPushBack);
+	void popfront();
+	CShared_ptr<CMail> getfront();
+};
+
+CLinkList::SLLNode::SLLNode(CShared_ptr<CMail> &newVal)
+	: m_val(newVal) {
+	m_next = nullptr;
+}
+
+CLinkList::CLinkList() {
+	m_head = nullptr;
+	m_tail = nullptr;
+}
+
+CLinkList::CLinkList(CLinkList &copyFrom) {
+	SLLNode *current = copyFrom.m_head;
+	while (current != nullptr) {
+		pushback(current->m_val);
+		current = current->m_next;
+	}
+}
+
+CLinkList::~CLinkList() {
+	while (m_head != nullptr) {
+		popfront();
+	}
+}
+
+void CLinkList::pushback(CShared_ptr<CMail> &toPushBack) {
+	SLLNode *newNode = new SLLNode(toPushBack);
+	if (m_head == nullptr) {
+		m_head = m_tail = newNode;
+		return;
+	}
+
+	m_tail->m_next = newNode;
+	m_tail = newNode;
+}
+
+void CLinkList::popfront() {
+	if (m_head != nullptr) {
+		SLLNode *oldHead = m_head;
+		m_head = m_head->m_next;
+		delete oldHead;
+	}
+	if (m_head == nullptr) {
+		m_tail = nullptr;
+	}
+}
+
+CShared_ptr<CMail> CLinkList::getfront() {
+	return m_head->m_val;
+}
 
 class CMailIterator {
 private:
