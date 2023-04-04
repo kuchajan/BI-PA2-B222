@@ -75,12 +75,7 @@ bool MyString::operator==(const MyString &other) const {
 	if (m_used != other.m_used) {
 		return false;
 	}
-	for (size_t checking = 0; checking < m_used; checking++) {
-		if (m_val[checking] != other.m_val[checking]) {
-			return false;
-		}
-	}
-	return true;
+	return strcmp(m_val,other.m_val) == 0;
 }
 
 template <class T>
