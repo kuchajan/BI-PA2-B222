@@ -258,6 +258,41 @@ CMailIterator &CMailIterator::operator++() {
 	m_mailList.popfront();
 }
 
+class CPerson {
+private:
+	MyString m_address;
+
+	CLinkList m_inbox;
+	CLinkList m_outbox;
+
+public:
+	CPerson(const MyString &address);
+
+	CMailIterator inbox();
+	CMailIterator outbox();
+
+	void receive(CShared_ptr<CMail> &mail);
+	void send(CShared_ptr<CMail> &mail);
+};
+
+CPerson::CPerson(const MyString &address) : m_address(address) {}
+
+CMailIterator CPerson::inbox() {
+	return CMailIterator(m_inbox);
+}
+
+CMailIterator CPerson::outbox() {
+	return CMailIterator(m_outbox);
+}
+
+void CPerson::receive(CShared_ptr<CMail> &mail) {
+	m_inbox.pushback(mail);
+}
+
+void CPerson::send(CShared_ptr<CMail> &mail) {
+	m_outbox.pushback(mail);
+}
+
 class CMailServer {
 private:
 	// todo
