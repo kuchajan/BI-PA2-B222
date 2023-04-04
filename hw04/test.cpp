@@ -123,9 +123,10 @@ T &CShared_ptr<T>::operator*() {
 
 class CMail {
 private:
-	string m_From;
-	string m_To;
-	string m_Body;
+	MyString m_From;
+	MyString m_To;
+	MyString m_Body;
+
 public:
 	CMail(const char *from,
 		  const char *to,
@@ -135,12 +136,11 @@ public:
 							   const CMail &m);
 };
 
-
 CMail::CMail(const char *from, const char *to, const char *body)
 	: m_From(from), m_To(to), m_Body(body) {}
 
 bool CMail::operator==(const CMail &x) const {
-	return (m_From.compare(x.m_From) == 0) && (m_To.compare(x.m_To) == 0) && (m_Body.compare(x.m_Body) == 0);
+	return (m_From == x.m_From) && (m_To == x.m_To) && (m_Body == x.m_Body);
 }
 
 ostream &operator<<(ostream &os, const CMail &m) {
