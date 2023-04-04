@@ -21,7 +21,7 @@ private:
 public:
 	char *m_val;
 	MyString(const char *value); // constructor
-	MyString(MyString &);		 // copy constructor
+	MyString(const MyString &);	 // copy constructor
 	~MyString();				 // destructor
 	friend ostream &operator<<(ostream &os, const MyString &s);
 	bool operator==(const MyString &other) const;
@@ -56,7 +56,7 @@ MyString::MyString(const char *value) {
 	MyString::realloc(m_used);
 }
 
-MyString::MyString(MyString &other) {
+MyString::MyString(const MyString &other) {
 	m_allocSize = other.m_used;
 	m_used = 0;
 	while (m_used != other.m_used) {
@@ -98,8 +98,7 @@ public:
 	CShared_ptr(T &);			// constructor
 	CShared_ptr(CShared_ptr &); // copy-constructor
 	~CShared_ptr();				// destructor
-	T &operator*();				// getter
-	T &operator->();
+	const T &operator*() const; // getter
 };
 
 template <class T>
@@ -122,7 +121,7 @@ CShared_ptr<T>::~CShared_ptr() {
 }
 
 template <class T>
-T &CShared_ptr<T>::operator*() {
+const T &CShared_ptr<T>::operator*() const {
 	return *m_val;
 }
 
@@ -164,13 +163,14 @@ private:
 	SLLNode *m_tail;
 
 public:
-	CLinkList();			// constructor
-	CLinkList(CLinkList &); // copy constructor
-	~CLinkList();			// destructor
+	CLinkList();				  // constructor
+	CLinkList(const CLinkList &); // copy constructor
+	~CLinkList();				  // destructor
 
 	void pushback(CShared_ptr<CMail> &toPushBack);
 	void popfront();
-	CShared_ptr<CMail> getfront();
+	const CShared_ptr<CMail> getfront() const;
+	bool isHeadNull() const;
 };
 
 CLinkList::SLLNode::SLLNode(CShared_ptr<CMail> &newVal)
@@ -183,7 +183,7 @@ CLinkList::CLinkList() {
 	m_tail = nullptr;
 }
 
-CLinkList::CLinkList(CLinkList &copyFrom) {
+CLinkList::CLinkList(const CLinkList &copyFrom) {
 	SLLNode *current = copyFrom.m_head;
 	while (current != nullptr) {
 		pushback(current->m_val);
@@ -219,8 +219,12 @@ void CLinkList::popfront() {
 	}
 }
 
-CShared_ptr<CMail> CLinkList::getfront() {
+const CShared_ptr<CMail> CLinkList::getfront() const {
 	return m_head->m_val;
+}
+
+bool CLinkList::isHeadNull() const {
+	return m_head == nullptr;
 }
 
 class CMailIterator {
