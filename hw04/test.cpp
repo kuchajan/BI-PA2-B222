@@ -225,13 +225,34 @@ CShared_ptr<CMail> CLinkList::getfront() {
 
 class CMailIterator {
 private:
-	// todo
+	CLinkList m_mailList;
+
 public:
+	CMailIterator(const CLinkList &);
+
 	explicit operator bool(void) const;
 	bool operator!(void) const;
 	const CMail &operator*(void) const;
 	CMailIterator &operator++(void);
 };
+
+CMailIterator::CMailIterator(const CLinkList &mailList) : m_mailList(mailList) {}
+
+explicit CMailIterator::operator bool() const {
+	return !m_mailList.isHeadNull();
+}
+
+bool CMailIterator::operator!() const {
+	return m_mailList.isHeadNull();
+}
+
+const CMail &CMailIterator::operator*() const {
+	return m_mailList.getfront().operator*();
+}
+
+CMailIterator &CMailIterator::operator++() {
+	m_mailList.popfront();
+}
 
 class CMailServer {
 private:
