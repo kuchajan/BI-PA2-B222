@@ -11,6 +11,65 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
+struct MyString {
+private:
+	size_t m_allocSize;
+	size_t m_used;
+	void realloc(size_t newAllocSize);
+	void addVal(const char &toAdd);
+
+public:
+	char *m_val;
+	MyString(const char *value); // constructor
+	MyString(MyString &);		 // copy constructor
+	~MyString();				 // destructor
+	friend ostream &operator<<(ostream &os, const MyString &s);
+};
+
+void MyString::realloc(size_t newAllocSize) {
+	char *newVal = new char[newAllocSize];
+	memcpy(newVal, m_val, min(m_allocSize, newAllocSize));
+	delete[] m_val;
+	m_val = newVal;
+	m_allocSize = newAllocSize;
+}
+
+void MyString::addVal(const char &toAdd) {
+	if (m_used + 1 > m_allocSize) {
+		MyString::realloc(m_allocSize * 2);
+	}
+	m_val[m_used++] = toAdd;
+}
+
+MyString::MyString(const char *value) {
+	m_allocSize = 16;
+	m_used = 0;
+	m_val = new char[m_allocSize];
+	while (*value != '\0') {
+		addVal(*value);
+		value++;
+	}
+	addVal('\0');
+	MyString::realloc(m_used);
+}
+
+MyString::MyString(MyString &other) {
+	m_allocSize = other.m_used;
+	m_used = 0;
+	while (m_used != other.m_used) {
+		addVal(other.m_val[m_used]);
+	}
+}
+
+MyString::~MyString() {
+	delete m_val;
+}
+
+ostream &operator<<(ostream &os, const MyString &s) {
+	os << s.m_val;
+	return os;
+}
+
 template <class T>
 class CShared_ptr {
 private:
