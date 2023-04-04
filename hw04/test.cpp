@@ -24,6 +24,7 @@ public:
 	MyString(MyString &);		 // copy constructor
 	~MyString();				 // destructor
 	friend ostream &operator<<(ostream &os, const MyString &s);
+	bool operator==(const MyString &other) const;
 };
 
 void MyString::realloc(size_t newAllocSize) {
@@ -68,6 +69,18 @@ MyString::~MyString() {
 ostream &operator<<(ostream &os, const MyString &s) {
 	os << s.m_val;
 	return os;
+}
+
+bool MyString::operator==(const MyString &other) const {
+	if (m_used != other.m_used) {
+		return false;
+	}
+	for (size_t checking = 0; checking < m_used; checking++) {
+		if (m_val[checking] != other.m_val[checking]) {
+			return false;
+		}
+	}
+	return true;
 }
 
 template <class T>
