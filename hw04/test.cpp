@@ -265,6 +265,7 @@ const CMail &CMailIterator::operator*() const {
 
 CMailIterator &CMailIterator::operator++() {
 	m_mailList.popfront();
+	return *this;
 }
 
 class CPerson {
