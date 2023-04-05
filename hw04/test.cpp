@@ -96,16 +96,16 @@ private:
 	size_t *m_occurences;
 
 public:
-	CShared_ptr(T &);			// constructor
+	CShared_ptr(const T &);			// constructor
 	CShared_ptr(CShared_ptr &); // copy-constructor
 	~CShared_ptr();				// destructor
 	const T &operator*() const; // getter
 };
 
 template <class T>
-CShared_ptr<T>::CShared_ptr(T &value) {
+CShared_ptr<T>::CShared_ptr(const T &value) {
 	m_occurences = new size_t(1);
-	m_val = new T();
+	m_val = new T(value);
 }
 
 template <class T>
