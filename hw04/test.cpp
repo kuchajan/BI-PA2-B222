@@ -238,6 +238,7 @@ private:
 	CLinkList m_mailList;
 
 public:
+	CMailIterator();
 	CMailIterator(const CLinkList &);
 
 	explicit operator bool(void) const;
@@ -245,6 +246,8 @@ public:
 	const CMail &operator*(void) const;
 	CMailIterator &operator++(void);
 };
+
+CMailIterator::CMailIterator() : m_mailList() {}
 
 CMailIterator::CMailIterator(const CLinkList &mailList) : m_mailList(mailList) {}
 
