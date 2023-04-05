@@ -511,7 +511,8 @@ public:
 
 class CMailServer {
 private:
-	// todo
+	CAVLTree<CPerson> m_addresses;
+
 public:
 	CMailServer(void);
 	CMailServer(const CMailServer &src);
