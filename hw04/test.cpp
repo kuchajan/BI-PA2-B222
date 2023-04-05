@@ -284,7 +284,7 @@ public:
 	void send(CShared_ptr<CMail> &mail);
 };
 
-CPerson::CPerson(const MyString &address) : m_address(address) {}
+CPerson::CPerson(const MyString &address) : m_address(address), m_inbox(), m_outbox() {}
 
 CMailIterator CPerson::inbox() {
 	return CMailIterator(m_inbox);
