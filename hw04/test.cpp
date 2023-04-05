@@ -282,7 +282,28 @@ public:
 
 	void receive(CShared_ptr<CMail> &mail);
 	void send(CShared_ptr<CMail> &mail);
+
+	bool operator==(const CPerson &other) const;
+	bool operator!=(const CPerson &other) const;
+	bool operator<(const CPerson &other) const;
+	bool operator>(const CPerson &other) const;
 };
+
+bool CPerson::operator==(const CPerson & other) const {
+	return m_address == other.m_address;
+}
+
+bool CPerson::operator!=(const CPerson &other) const {
+	return !(m_address == other.m_address);
+}
+
+bool CPerson::operator<(const CPerson & other) const {
+	return m_address < other.m_address;
+}
+
+bool CPerson::operator>(const CPerson & other) const {
+	return m_address > other.m_address;
+}
 
 CPerson::CPerson(const MyString &address) : m_address(address), m_inbox(), m_outbox() {}
 
