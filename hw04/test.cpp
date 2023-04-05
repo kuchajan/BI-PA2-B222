@@ -96,7 +96,7 @@ private:
 	size_t *m_occurences;
 
 public:
-	CShared_ptr(const T &);			// constructor
+	CShared_ptr(const T &);		// constructor
 	CShared_ptr(CShared_ptr &); // copy-constructor
 	~CShared_ptr();				// destructor
 	const T &operator*() const; // getter
@@ -135,6 +135,7 @@ private:
 	MyString m_Body;
 
 	friend CMailServer;
+
 public:
 	CMail(const char *from,
 		  const char *to,
@@ -290,7 +291,7 @@ public:
 	bool operator>(const CPerson &other) const;
 };
 
-bool CPerson::operator==(const CPerson & other) const {
+bool CPerson::operator==(const CPerson &other) const {
 	return m_address == other.m_address;
 }
 
@@ -298,11 +299,11 @@ bool CPerson::operator!=(const CPerson &other) const {
 	return !(m_address == other.m_address);
 }
 
-bool CPerson::operator<(const CPerson & other) const {
+bool CPerson::operator<(const CPerson &other) const {
 	return m_address < other.m_address;
 }
 
-bool CPerson::operator>(const CPerson & other) const {
+bool CPerson::operator>(const CPerson &other) const {
 	return m_address > other.m_address;
 }
 
