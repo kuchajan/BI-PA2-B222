@@ -549,7 +549,7 @@ private:
 public:
 	CMailServer(void);
 	CMailServer(const CMailServer &src);
-	CMailServer &operator=(const CMailServer &src);
+	CMailServer &operator=(CMailServer src);
 	~CMailServer(void);
 	void sendMail(const CMail &m);
 	CMailIterator outbox(const char *email) const;
@@ -561,12 +561,11 @@ public:
 
 CMailServer::CMailServer() {}
 
-CMailServer::CMailServer(const CMailServer &src) {
-	// todo
-}
+CMailServer::CMailServer(const CMailServer &src) : m_addresses(src.m_addresses) {}
 
-CMailServer &CMailServer::operator=(const CMailServer &src) {
-	// todo
+CMailServer &CMailServer::operator=(CMailServer src) {
+	m_addresses.rootSwap(src.m_addresses);
+	return *this;
 }
 
 CMailServer::~CMailServer() {}
