@@ -521,6 +521,9 @@ public:
 	void sendMail(const CMail &m);
 	CMailIterator outbox(const char *email) const;
 	CMailIterator inbox(const char *email) const;
+
+	CAVLTree<CPerson>::CAVLIterator find(const char *mail) const;
+	CAVLTree<CPerson>::CAVLIterator findOrInsert(const MyString &email);
 };
 
 #ifndef __PROGTEST__
