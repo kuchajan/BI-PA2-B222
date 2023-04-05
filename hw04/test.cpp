@@ -59,13 +59,14 @@ MyString::MyString(const char *value) {
 MyString::MyString(const MyString &other) {
 	m_allocSize = other.m_used;
 	m_used = 0;
+	m_val = new char[other.m_used];
 	while (m_used != other.m_used) {
 		addVal(other.m_val[m_used]);
 	}
 }
 
 MyString::~MyString() {
-	delete m_val;
+	delete[] m_val;
 }
 
 ostream &operator<<(ostream &os, const MyString &s) {
