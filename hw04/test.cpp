@@ -325,6 +325,190 @@ void CPerson::send(CShared_ptr<CMail> &mail) {
 	m_outbox.pushback(mail);
 }
 
+template <class T>
+class CAVLTree {
+private:
+	struct SAVLNode {
+		// variables
+		SAVLNode *m_Parent;
+		SAVLNode *m_LeftChild;
+		SAVLNode *m_RightChild;
+		T *m_Value;
+
+		// methods
+		// constructor
+		SAVLNode(const T &value) {
+			m_Value = new T(value);
+			m_Parent = nullptr;
+			m_LeftChild = nullptr;
+			m_RightChild = nullptr;
+		}
+
+		// balance factor methods
+		ssize_t getNOfChildren() {
+			ssize_t cnt = 0;
+			if (m_LeftChild != nullptr) {
+				cnt += m_LeftChild->getNOfChildren() + 1;
+			}
+			if (m_RightChild != nullptr) {
+				cnt += m_RightChild->getNOfChildren() + 1;
+			}
+			return cnt;
+		}
+
+		ssize_t getBalanceFactor() {
+			ssize_t bal = 0;
+			if (m_LeftChild != nullptr) {
+				bal += m_LeftChild->getNOfChildren() + 1;
+			}
+			if (m_RightChild != nullptr) {
+				bal -= m_RightChild->getNOfChildren() + 1;
+			}
+			return bal;
+		}
+
+		// rotations
+		SAVLNode *rotate_Left() {
+			SAVLNode *newRoot = m_RightChild;
+			m_RightChild = newRoot->m_LeftChild;
+			if (newRoot->m_LeftChild != nullptr) {
+				newRoot->m_LeftChild->m_Parent = this;
+			}
+			newRoot->m_LeftChild = this;
+			newRoot->m_Parent = this->m_Parent;
+
+			m_Parent = newRoot;
+			return newRoot;
+		}
+
+		SAVLNode *rotate_Right() {
+			SAVLNode *newRoot = m_LeftChild;
+			m_LeftChild = newRoot->m_RightChild;
+			if (newRoot->m_RightChild != nullptr) {
+				newRoot->m_RightChild->m_Parent = this;
+			}
+			newRoot->m_RightChild = this;
+			newRoot->m_Parent = this->m_Parent;
+
+			m_Parent = newRoot;
+			return newRoot;
+		}
+
+		// insertion
+		SAVLNode *recursiveInsert(SAVLNode *toInsert) {
+			// binary insertion
+			if (*(toInsert->m_Value) < *(m_Value)) {
+				if (m_LeftChild != nullptr) {
+					m_LeftChild = m_LeftChild->recursiveInsert(toInsert);
+				} else {
+					m_LeftChild = toInsert;
+					m_LeftChild->m_Parent = this;
+				}
+			} else if (*(toInsert->m_Value) > *(m_Value)) {
+				if (m_RightChild != nullptr) {
+					m_RightChild = m_RightChild->recursiveInsert(toInsert);
+				} else {
+					m_RightChild = toInsert;
+					m_RightChild->m_Parent = this;
+				}
+			} else {
+				throw logic_error("Attempted to insert a duplicate value");
+			}
+
+			// rebalancing
+			ssize_t balanceFactor = getBalanceFactor();
+			if (balanceFactor > 1) {
+				// rotate left the left child if neccessary
+				if (m_LeftChild != nullptr && *(toInsert->m_Value) > *(m_LeftChild->m_Value)) {
+					m_LeftChild = m_LeftChild->rotate_Left();
+				}
+				return rotate_Right();
+			}
+			if (balanceFactor < -1) {
+				// rotate right the right child if neccessary
+				if (m_RightChild != nullptr && *(toInsert->m_Value) < *(m_RightChild->m_Value)) {
+					m_RightChild = m_RightChild->rotate_Right();
+				}
+				return rotate_Left();
+			}
+			return this;
+		}
+
+		/*// iterator helpers
+		SAVLNode *getLeftMost() {
+			if (m_LeftChild != nullptr) {
+				return m_LeftChild->getLeftMost();
+			}
+			return this;
+		}*/
+	};
+
+	void deconstructRecursive(SAVLNode *toDelete) {
+		if (toDelete->m_LeftChild != nullptr) {
+			deconstructRecursive(toDelete->m_LeftChild);
+		}
+		if (toDelete->m_RightChild != nullptr) {
+			deconstructRecursive(toDelete->m_RightChild);
+		}
+		delete toDelete->m_Value;
+		delete toDelete;
+	}
+	/*
+	=====================================================================================================
+	=====================================================================================================
+	=====================================================================================================
+	=====================================================================================================
+	=====================================================================================================
+	*/
+
+	typedef SAVLNode Node;
+	Node *m_Root;
+
+public:
+	CAVLTree() {
+		m_Root = nullptr;
+	}
+	// copy recursive
+	~CAVLTree() {
+		if (m_Root != nullptr) {
+			deconstructRecursive(m_Root);
+		}
+	}
+
+	class CAVLIterator {
+	private:
+		Node *m_Node;
+
+	public:
+		/*CAVLIterator() {
+			m_Node = m_Root->getLeftMost();
+		}*/
+
+		CAVLIterator(Node *node) : m_Node(node) {}
+
+		T *operator*() {
+			return m_Node == nullptr ? nullptr : m_Node->m_Value;
+		}
+	};
+
+	CAVLIterator find(const T *toFind) const {
+		Node *current = m_Root;
+		while (current != nullptr && (*current->m_Value) != *toFind) {
+			current = *toFind > (*current->m_Value) ? current->m_RightChild : current->m_LeftChild;
+		}
+		return CAVLIterator(current);
+	}
+
+	void insert(const T &toInsert) {
+		Node *newNode = new Node(toInsert);
+		if (m_Root == nullptr) {
+			m_Root = newNode;
+			return;
+		}
+		m_Root = m_Root->recursiveInsert(newNode);
+	}
+};
+
 class CMailServer {
 private:
 	// todo
