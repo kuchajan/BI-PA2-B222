@@ -251,7 +251,7 @@ CMailIterator::CMailIterator() : m_mailList() {}
 
 CMailIterator::CMailIterator(const CLinkList &mailList) : m_mailList(mailList) {}
 
-explicit CMailIterator::operator bool() const {
+CMailIterator::operator bool() const {
 	return !m_mailList.isHeadNull();
 }
 
