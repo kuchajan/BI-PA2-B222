@@ -152,7 +152,7 @@ bool CMail::operator==(const CMail &x) const {
 }
 
 ostream &operator<<(ostream &os, const CMail &m) {
-	os << "From:" << m.m_From << ", To: " << m.m_To << ", Body: " << m.m_Body;
+	os << "From: " << m.m_From << ", To: " << m.m_To << ", Body: " << m.m_Body;
 	return os;
 }
 
