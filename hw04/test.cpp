@@ -443,16 +443,6 @@ private:
 		}*/
 	};
 
-	void deconstructRecursive(SAVLNode *toDelete) {
-		if (toDelete->m_LeftChild != nullptr) {
-			deconstructRecursive(toDelete->m_LeftChild);
-		}
-		if (toDelete->m_RightChild != nullptr) {
-			deconstructRecursive(toDelete->m_RightChild);
-		}
-		delete toDelete->m_Value;
-		delete toDelete;
-	}
 	/*
 	=====================================================================================================
 	=====================================================================================================
@@ -464,9 +454,46 @@ private:
 	typedef SAVLNode Node;
 	Node *m_Root;
 
+	void deconstructRecursive(Node *toDelete) {
+		if (toDelete->m_LeftChild != nullptr) {
+			deconstructRecursive(toDelete->m_LeftChild);
+		}
+		if (toDelete->m_RightChild != nullptr) {
+			deconstructRecursive(toDelete->m_RightChild);
+		}
+		delete toDelete->m_Value;
+		delete toDelete;
+	}
+
+	Node *copyRecursive(Node *toCopyFrom) {
+		if (toCopyFrom == nullptr) {
+			return nullptr;
+		}
+
+		Node *newNode = new Node(*(toCopyFrom->m_Value)); // will this truly create a copy?
+
+		// left child
+		newNode->m_LeftChild = copyRecursive(toCopyFrom->m_LeftChild);
+		if (newNode->m_LeftChild != nullptr) {
+			newNode->m_LeftChild->m_Parent = newNode;
+		}
+
+		// right child
+		newNode->m_RightChild = copyRecursive(toCopyFrom->m_RightChild);
+		if (newNode->m_RightChild != nullptr) {
+			newNode->m_RightChild->m_Parent = newNode;
+		}
+
+		// done
+		return newNode;
+	}
+
 public:
 	CAVLTree() {
 		m_Root = nullptr;
+	}
+	CAVLTree(const CAVLTree &other) {
+		m_Root = copyRecursive(other.m_Root);
 	}
 	// copy recursive
 	~CAVLTree() {
