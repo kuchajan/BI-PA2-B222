@@ -188,6 +188,8 @@ CLinkList::CLinkList() {
 }
 
 CLinkList::CLinkList(const CLinkList &copyFrom) {
+	m_head = nullptr;
+	m_tail = nullptr;
 	SLLNode *current = copyFrom.m_head;
 	while (current != nullptr) {
 		pushback(current->m_val);
