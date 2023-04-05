@@ -534,6 +534,12 @@ public:
 		}
 		m_Root = m_Root->recursiveInsert(newNode);
 	}
+
+	void rootSwap(CAVLTree &other) {
+		Node *temp = m_Root;
+		m_Root = other.m_Root;
+		other.m_Root = temp;
+	}
 };
 
 class CMailServer {
