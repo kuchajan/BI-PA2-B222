@@ -526,6 +526,57 @@ public:
 	CAVLTree<CPerson>::CAVLIterator findOrInsert(const MyString &email);
 };
 
+CMailServer::CMailServer() {}
+
+CMailServer::CMailServer(const CMailServer &src) {
+	// todo
+}
+
+CMailServer &CMailServer::operator=(const CMailServer &src) {
+	// todo
+}
+
+CMailServer::~CMailServer() {}
+
+CAVLTree<CPerson>::CAVLIterator CMailServer::find(const char *mail) const {
+	MyString email(mail);
+	CPerson tempPerson(email);
+
+	return m_addresses.find(&tempPerson);
+}
+
+CAVLTree<CPerson>::CAVLIterator CMailServer::findOrInsert(const MyString &email) {
+	CPerson tempPerson(email);
+
+	auto toReturn = m_addresses.find(&tempPerson);
+	if (*toReturn != nullptr) {
+		return toReturn;
+	}
+
+	m_addresses.insert(tempPerson);
+	// todo: maybe i could return the iterator of where I saved it
+	toReturn = m_addresses.find(&tempPerson);
+	return toReturn;
+}
+
+void CMailServer::sendMail(const CMail &m) {
+	CShared_ptr<CMail> newMail(m);
+	auto sendFrom = findOrInsert(m.m_From);
+	auto sendTo = findOrInsert(m.m_To);
+	(*sendFrom)->send(newMail);
+	(*sendTo)->receive(newMail);
+}
+
+CMailIterator CMailServer::outbox(const char *email) const {
+	auto iter = find(email);
+	return *iter == nullptr ? CMailIterator() : (*iter)->outbox();
+}
+
+CMailIterator CMailServer::inbox(const char *email) const {
+	auto iter = find(email);
+	return *iter == nullptr ? CMailIterator() : (*iter)->inbox();
+}
+
 #ifndef __PROGTEST__
 bool matchOutput(const CMail &m,
 				 const char *str) {
