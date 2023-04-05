@@ -126,12 +126,15 @@ const T &CShared_ptr<T>::operator*() const {
 	return *m_val;
 }
 
+class CMailServer;
+
 class CMail {
 private:
 	MyString m_From;
 	MyString m_To;
 	MyString m_Body;
 
+	friend CMailServer;
 public:
 	CMail(const char *from,
 		  const char *to,
