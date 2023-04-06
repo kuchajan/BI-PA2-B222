@@ -482,6 +482,7 @@ private:
 		}
 
 		Node *newNode = new Node(*(toCopyFrom->m_Value)); // will this truly create a copy?
+		newNode->m_Height = toCopyFrom->m_Height;
 
 		// left child
 		newNode->m_LeftChild = copyRecursive(toCopyFrom->m_LeftChild);
