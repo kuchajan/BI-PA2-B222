@@ -623,6 +623,7 @@ CMailIterator CMailServer::inbox(const char *email) const {
 
 #ifndef __PROGTEST__
 #include "testLotsOfCopies.hpp"
+#include "testLotsOfCopiesSemiRandom.hpp"
 
 bool matchOutput(const CMail &m,
 				 const char *str) {
@@ -777,6 +778,7 @@ int main(void) {
 
 	testEmptyCopies();
 	testLotsOfData();
+	testLotsOfDataSemiRandom();
 	return EXIT_SUCCESS;
 }
 
