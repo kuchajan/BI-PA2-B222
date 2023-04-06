@@ -421,14 +421,20 @@ private:
 				// rotate left the left child if neccessary
 				if (m_LeftChild != nullptr && *(toInsert->m_Value) > *(m_LeftChild->m_Value)) {
 					m_LeftChild = m_LeftChild->rotate_Left();
-				}
+					// cout << "Left Right rotation" << endl;
+				} /*else {
+					cout << "Right rotation" << endl;
+				}*/
 				return rotate_Right();
 			}
 			if (balanceFactor < -1) {
 				// rotate right the right child if neccessary
 				if (m_RightChild != nullptr && *(toInsert->m_Value) < *(m_RightChild->m_Value)) {
 					m_RightChild = m_RightChild->rotate_Right();
-				}
+					// cout << "Right Left rotation" << endl;
+				} /*else {
+					cout << "Left rotation" << endl;
+				}*/
 				return rotate_Left();
 			}
 			return this;
@@ -619,8 +625,10 @@ bool matchOutput(const CMail &m,
 
 void test0();
 void test1();
+void testRotations();
 
 int main(void) {
+	testRotations();
 	char from[100], to[100], body[1024];
 
 	assert(CMail("john", "peter", "progtest deadline") == CMail("john", "peter", "progtest deadline"));
@@ -831,7 +839,7 @@ void test0() {
 
 void test1() {
 	CMailServer server;
-	
+
 	// comparing
 	CMail mail1("Ac", "aC", "My very special email to you");
 	CMail mail2("AC", "ac", "My very special email to you");
@@ -861,5 +869,40 @@ void test1() {
 	server.sendMail(mail6);
 	server.sendMail(mail7);
 	server.sendMail(mail8);
+}
+
+void testLeftRotate() {
+	CMailServer server;
+	cout << "Testing left rotate" << endl;
+	server.sendMail(CMail("w", "x", "mail"));
+	server.sendMail(CMail("y", "z", "mail"));
+}
+
+void testRightRotate() {
+	CMailServer server;
+	cout << "Testing right rotate" << endl;
+	server.sendMail(CMail("z", "y", "mail"));
+	server.sendMail(CMail("x", "w", "mail"));
+}
+
+void testLeftRightRotate() {
+	CMailServer server;
+	cout << "Testing left right rotate" << endl;
+	server.sendMail(CMail("z", "x", "mail"));
+	server.sendMail(CMail("y", "w", "mail"));
+}
+
+void testRightLeftRotate() {
+	CMailServer server;
+	cout << "Testing right left rotate" << endl;
+	server.sendMail(CMail("w", "y", "mail"));
+	server.sendMail(CMail("x", "z", "mail"));
+}
+
+void testRotations() {
+	testLeftRotate();
+	testRightRotate();
+	testLeftRightRotate();
+	testRightLeftRotate();
 }
 #endif /* __PROGTEST__ */
