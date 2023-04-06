@@ -334,6 +334,7 @@ private:
 		SAVLNode *m_LeftChild;
 		SAVLNode *m_RightChild;
 		T *m_Value;
+		size_t m_Height;
 
 		// methods
 		// constructor
@@ -342,29 +343,22 @@ private:
 			m_Parent = nullptr;
 			m_LeftChild = nullptr;
 			m_RightChild = nullptr;
-		}
-
-		// balance factor methods
-		ssize_t getNOfChildren() {
-			ssize_t cnt = 0;
-			if (m_LeftChild != nullptr) {
-				cnt += m_LeftChild->getNOfChildren() + 1;
-			}
-			if (m_RightChild != nullptr) {
-				cnt += m_RightChild->getNOfChildren() + 1;
-			}
-			return cnt;
+			m_Height = 1;
 		}
 
 		ssize_t getBalanceFactor() {
 			ssize_t bal = 0;
 			if (m_LeftChild != nullptr) {
-				bal += m_LeftChild->getNOfChildren() + 1;
+				bal += m_LeftChild->m_Height;
 			}
 			if (m_RightChild != nullptr) {
-				bal -= m_RightChild->getNOfChildren() + 1;
+				bal -= m_RightChild->m_Height;
 			}
 			return bal;
+		}
+
+		void updateHeight() {
+			m_Height = max(m_LeftChild == nullptr ? 0 : m_LeftChild->m_Height, (m_RightChild == nullptr ? 0 : m_RightChild->m_Height)) + 1;
 		}
 
 		// rotations
@@ -378,6 +372,11 @@ private:
 			newRoot->m_Parent = this->m_Parent;
 
 			m_Parent = newRoot;
+
+			//update heights
+			updateHeight();
+			newRoot->updateHeight();
+
 			return newRoot;
 		}
 
@@ -391,6 +390,11 @@ private:
 			newRoot->m_Parent = this->m_Parent;
 
 			m_Parent = newRoot;
+
+			//update heights
+			updateHeight();
+			newRoot->updateHeight();
+
 			return newRoot;
 		}
 
@@ -416,6 +420,7 @@ private:
 			}
 
 			// rebalancing
+			updateHeight();
 			ssize_t balanceFactor = getBalanceFactor();
 			if (balanceFactor > 1) {
 				// rotate left the left child if neccessary
