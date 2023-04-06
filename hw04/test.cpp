@@ -617,6 +617,9 @@ bool matchOutput(const CMail &m,
 	return oss.str() == str;
 }
 
+void test0();
+void test1();
+
 int main(void) {
 	char from[100], to[100], body[1024];
 
@@ -752,6 +755,111 @@ int main(void) {
 	assert(matchOutput(*i13, "From: paul, To: alice, Body: invalid invoice"));
 	assert(!++i13);
 
+	test0();
+	test1();
+
 	return EXIT_SUCCESS;
+}
+
+void testSpecificIterator(CMailIterator &iter, const bool &check) {
+	for (int i = 0; i < 2 && check; i++) {
+		assert(!iter == false);
+		assert((bool)iter == true);
+		// cout << *iter << endl;
+		++iter;
+	}
+	assert(!iter == true);
+	assert((bool)iter == false);
+}
+
+void testIterators(const CMailServer &server, const char *email, const bool &checkIn, const bool &checkOut) {
+	// cout << "Checking: " << email << endl;
+
+	CMailIterator iterIn = server.inbox(email);
+	CMailIterator iterOut = server.outbox(email);
+	testSpecificIterator(iterIn, checkIn);
+	testSpecificIterator(iterOut, checkOut);
+}
+
+void test0() {
+	CMailServer server;
+	// comparing
+	server.sendMail(CMail("Ac", "aC", "My very special email to you"));
+	server.sendMail(CMail("AC", "ac", "My very special email to you"));
+	server.sendMail(CMail("BB", "bb", "My very special email to you"));
+	server.sendMail(CMail("Bb", "bB", "My very special email to you"));
+	// length
+	server.sendMail(CMail("A", "a", "My very special email to you"));
+	server.sendMail(CMail("B", "b", "My very special email to you"));
+	server.sendMail(CMail("C", "c", "My very special email to you"));
+
+	// null byte
+	server.sendMail(CMail("", "", "Making first years go insane 101"));
+
+	// repeat
+	// comparing
+	server.sendMail(CMail("Ac", "aC", "My very special email to you"));
+	server.sendMail(CMail("AC", "ac", "My very special email to you"));
+	server.sendMail(CMail("BB", "bb", "My very special email to you"));
+	server.sendMail(CMail("Bb", "bB", "My very special email to you"));
+	// length
+	server.sendMail(CMail("A", "a", "My very special email to you"));
+	server.sendMail(CMail("B", "b", "My very special email to you"));
+	server.sendMail(CMail("C", "c", "My very special email to you"));
+
+	// null byte
+	server.sendMail(CMail("", "", "Making first years go insane 101"));
+
+	testIterators(server, "Ac", false, true);
+	testIterators(server, "aC", true, false);
+	testIterators(server, "AC", false, true);
+	testIterators(server, "ac", true, false);
+	testIterators(server, "BB", false, true);
+	testIterators(server, "bb", true, false);
+	testIterators(server, "Bb", false, true);
+	testIterators(server, "bB", true, false);
+	testIterators(server, "A", false, true);
+	testIterators(server, "a", true, false);
+	testIterators(server, "B", false, true);
+	testIterators(server, "b", true, false);
+	testIterators(server, "C", false, true);
+	testIterators(server, "c", true, false);
+	testIterators(server, "", true, true);
+
+	testIterators(server, "nonexistant", false, false);
+}
+
+void test1() {
+	CMailServer server;
+	
+	// comparing
+	CMail mail1("Ac", "aC", "My very special email to you");
+	CMail mail2("AC", "ac", "My very special email to you");
+	CMail mail3("BB", "bb", "My very special email to you");
+	CMail mail4("Bb", "bB", "My very special email to you");
+	// length
+	CMail mail5("A", "a", "My very special email to you");
+	CMail mail6("B", "b", "My very special email to you");
+	CMail mail7("C", "c", "My very special email to you");
+	CMail mail8("", "", "Making first years go insane 101");
+
+	// send them
+	server.sendMail(mail1);
+	server.sendMail(mail2);
+	server.sendMail(mail3);
+	server.sendMail(mail4);
+	server.sendMail(mail5);
+	server.sendMail(mail6);
+	server.sendMail(mail7);
+	server.sendMail(mail8);
+	// repeat
+	server.sendMail(mail1);
+	server.sendMail(mail2);
+	server.sendMail(mail3);
+	server.sendMail(mail4);
+	server.sendMail(mail5);
+	server.sendMail(mail6);
+	server.sendMail(mail7);
+	server.sendMail(mail8);
 }
 #endif /* __PROGTEST__ */
