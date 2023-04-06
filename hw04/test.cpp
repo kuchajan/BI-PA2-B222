@@ -616,6 +616,8 @@ CMailIterator CMailServer::inbox(const char *email) const {
 }
 
 #ifndef __PROGTEST__
+#include "testLotsOfCopies.hpp"
+
 bool matchOutput(const CMail &m,
 				 const char *str) {
 	ostringstream oss;
@@ -626,6 +628,7 @@ bool matchOutput(const CMail &m,
 void test0();
 void test1();
 void testRotations();
+void testEmptyCopies();
 
 int main(void) {
 	testRotations();
@@ -766,6 +769,8 @@ int main(void) {
 	test0();
 	test1();
 
+	testEmptyCopies();
+	testLotsOfData();
 	return EXIT_SUCCESS;
 }
 
@@ -904,5 +909,11 @@ void testRotations() {
 	testRightRotate();
 	testLeftRightRotate();
 	testRightLeftRotate();
+}
+
+void testEmptyCopies() {
+	CMailServer server;
+	CMailServer copy1 = server;
+	CMailServer copy2(server);
 }
 #endif /* __PROGTEST__ */
