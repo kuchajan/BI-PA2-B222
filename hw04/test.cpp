@@ -58,11 +58,9 @@ MyString::MyString(const char *value) {
 
 MyString::MyString(const MyString &other) {
 	m_allocSize = other.m_used;
-	m_used = 0;
+	m_used = other.m_used;
 	m_val = new char[other.m_used];
-	while (m_used != other.m_used) {
-		addVal(other.m_val[m_used]);
-	}
+	memcpy(m_val,other.m_val,other.m_used);
 }
 
 MyString::~MyString() {
@@ -96,11 +94,19 @@ private:
 	size_t *m_occurences;
 
 public:
+	CShared_ptr();
 	CShared_ptr(const T &);		// constructor
-	CShared_ptr(CShared_ptr &); // copy-constructor
+	CShared_ptr(const CShared_ptr &); // copy-constructor
+	CShared_ptr operator=(CShared_ptr);
 	~CShared_ptr();				// destructor
 	const T &operator*() const; // getter
 };
+
+template <class T>
+CShared_ptr<T>::CShared_ptr() {
+	m_val = nullptr;
+	m_occurences = nullptr;
+}
 
 template <class T>
 CShared_ptr<T>::CShared_ptr(const T &value) {
@@ -109,13 +115,20 @@ CShared_ptr<T>::CShared_ptr(const T &value) {
 }
 
 template <class T>
-CShared_ptr<T>::CShared_ptr(CShared_ptr &copyFrom) : m_val(copyFrom.m_val), m_occurences(copyFrom.m_occurences) {
+CShared_ptr<T>::CShared_ptr(const CShared_ptr &copyFrom) : m_val(copyFrom.m_val), m_occurences(copyFrom.m_occurences) {
 	(*m_occurences)++;
 }
 
 template <class T>
+CShared_ptr<T> CShared_ptr<T>::operator=(CShared_ptr src) {
+	swap(m_val, src.m_val);
+	swap(m_occurences, src.m_occurences);
+	return *this;
+}
+
+template <class T>
 CShared_ptr<T>::~CShared_ptr() {
-	if (--(*m_occurences) == 0) {
+	if (m_occurences != nullptr && --(*m_occurences) == 0) {
 		delete m_val;
 		delete m_occurences;
 	}
@@ -157,90 +170,69 @@ ostream &operator<<(ostream &os, const CMail &m) {
 	return os;
 }
 
-class CLinkList {
+template <class T>
+struct CVector {
 private:
-	struct SLLNode {
-		CShared_ptr<CMail> m_val;
-		SLLNode *m_next;
-		SLLNode(CShared_ptr<CMail> &newVal);
-	};
-	SLLNode *m_head;
-	SLLNode *m_tail;
+	T *m_val;
+	size_t m_allocSize;
+	size_t m_used;
+	void realloc(size_t newAllocSize) {
+		T *newVal = new T[newAllocSize];
+		size_t toCopy = min(m_allocSize,newAllocSize);
+		for (size_t i = 0; i < toCopy; i++) {
+			newVal[i] = m_val[i];
+		}
+		
+		delete[] m_val;
+		m_val = newVal;
+		m_allocSize = newAllocSize;
+	}
 
 public:
-	CLinkList();				  // constructor
-	CLinkList(const CLinkList &); // copy constructor
-	~CLinkList();				  // destructor
+	CVector() { //constructor
+		m_used = 0;
+		m_allocSize = 8;
+		m_val = new T[8];
+	}
 
-	void pushback(CShared_ptr<CMail> &toPushBack);
-	void popfront();
-	const CShared_ptr<CMail> getfront() const;
-	bool isHeadNull() const;
+	CVector(const CVector & src) { // copy constructor
+		m_used = src.m_used;
+		m_allocSize = src.m_allocSize;
+		m_val = new T[m_allocSize];
+		size_t toCopy = m_used;
+		for (size_t i = 0; i < toCopy; i++) {
+			m_val[i] = src.m_val[i];
+		}
+	}
+
+	~CVector() { // destructor
+		delete[] m_val;
+	}				 
+
+
+	void pushback(const T & toAdd) {
+		if (m_used + 1 > m_allocSize) {
+			CVector::realloc(m_allocSize * 2);
+		}
+		m_val[m_used++] = toAdd;
+	}
+
+	inline bool isValidGet(const size_t & getFrom) const {
+		return getFrom < m_used;
+	}
+
+	T operator[](const size_t & getFrom) const {
+		return m_val[getFrom];
+	}
 };
-
-CLinkList::SLLNode::SLLNode(CShared_ptr<CMail> &newVal)
-	: m_val(newVal) {
-	m_next = nullptr;
-}
-
-CLinkList::CLinkList() {
-	m_head = nullptr;
-	m_tail = nullptr;
-}
-
-CLinkList::CLinkList(const CLinkList &copyFrom) {
-	m_head = nullptr;
-	m_tail = nullptr;
-	SLLNode *current = copyFrom.m_head;
-	while (current != nullptr) {
-		pushback(current->m_val);
-		current = current->m_next;
-	}
-}
-
-CLinkList::~CLinkList() {
-	while (m_head != nullptr) {
-		popfront();
-	}
-}
-
-void CLinkList::pushback(CShared_ptr<CMail> &toPushBack) {
-	SLLNode *newNode = new SLLNode(toPushBack);
-	if (m_head == nullptr) {
-		m_head = m_tail = newNode;
-		return;
-	}
-
-	m_tail->m_next = newNode;
-	m_tail = newNode;
-}
-
-void CLinkList::popfront() {
-	if (m_head != nullptr) {
-		SLLNode *oldHead = m_head;
-		m_head = m_head->m_next;
-		delete oldHead;
-	}
-	if (m_head == nullptr) {
-		m_tail = nullptr;
-	}
-}
-
-const CShared_ptr<CMail> CLinkList::getfront() const {
-	return m_head->m_val;
-}
-
-bool CLinkList::isHeadNull() const {
-	return m_head == nullptr;
-}
 
 class CMailIterator {
 private:
-	CLinkList m_mailList;
-
+	CVector<CShared_ptr<CMail>> m_mailList;
+	size_t m_current;
 public:
 	CMailIterator();
-	CMailIterator(const CLinkList &);
+	CMailIterator(const CVector<CShared_ptr<CMail>> &);
 
 	explicit operator bool(void) const;
 	bool operator!(void) const;
@@ -248,24 +240,28 @@ public:
 	CMailIterator &operator++(void);
 };
 
-CMailIterator::CMailIterator() : m_mailList() {}
+CMailIterator::CMailIterator() : m_mailList() {
+	m_current = 0;
+}
 
-CMailIterator::CMailIterator(const CLinkList &mailList) : m_mailList(mailList) {}
+CMailIterator::CMailIterator(const CVector<CShared_ptr<CMail>> &mailList) : m_mailList(mailList) {
+	m_current = 0;
+}
 
 CMailIterator::operator bool() const {
-	return !m_mailList.isHeadNull();
+	return m_mailList.isValidGet(m_current);
 }
 
 bool CMailIterator::operator!() const {
-	return m_mailList.isHeadNull();
+	return !m_mailList.isValidGet(m_current);
 }
 
 const CMail &CMailIterator::operator*() const {
-	return m_mailList.getfront().operator*();
+	return *(m_mailList[m_current]);
 }
 
 CMailIterator &CMailIterator::operator++() {
-	m_mailList.popfront();
+	++m_current;
 	return *this;
 }
 
@@ -273,8 +269,8 @@ class CPerson {
 private:
 	MyString m_address;
 
-	CLinkList m_inbox;
-	CLinkList m_outbox;
+	CVector<CShared_ptr<CMail>> m_inbox;
+	CVector<CShared_ptr<CMail>> m_outbox;
 
 public:
 	CPerson(const MyString &address);
