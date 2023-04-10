@@ -78,7 +78,10 @@ private:
 		return toReturn;
 	}
 
-	int compare(const CCompany & other) const {
+	/// @brief Compares two company names by their canonical name
+	/// @param other The other company to compare the canonical name with
+	/// @return 0 if equal, less than 0 if first different char is lesser, more than 0 if first char is greater
+	int compare(const CCompany &other) const {
 		return m_canonicalName.compare(other.m_canonicalName);
 	}
 
@@ -86,6 +89,48 @@ public:
 	/// @brief Construct a new CCompany object given by the name
 	/// @param name Name of the company
 	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {}
+
+	/// @brief Uses CCompany::compare to compare two companies
+	/// @param other The other company to compare with
+	/// @return true if first different char is lesser, otherwise false
+	bool operator<(const CCompany &other) const {
+		return compare(other) < 0;
+	}
+
+	/// @brief Uses CCompany::compare to compare two companies
+	/// @param other The other company to compare with
+	/// @return true if first different char is greater, otherwise false
+	bool operator>(const CCompany &other) const {
+		return compare(other) > 0;
+	}
+
+	/// @brief Uses CCompany::compare to compare two companies
+	/// @param other The other company to compare with
+	/// @return true if equal or first different char is lesser, otherwise false
+	bool operator<=(const CCompany &other) const {
+		return compare(other) <= 0;
+	}
+
+	/// @brief Uses CCompany::compare to compare two companies
+	/// @param other The other company to compare with
+	/// @return true if equal or first different char is greater, otherwise false
+	bool operator>=(const CCompany &other) const {
+		return compare(other) >= 0;
+	}
+
+	/// @brief Uses CCompany::compare to compare two companies
+	/// @param other The other company to compare with
+	/// @return true if equal, otherwise false
+	bool operator==(const CCompany &other) const {
+		return compare(other) == 0;
+	}
+
+	/// @brief Uses CCompany::compare to compare two companies
+	/// @param other The other company to compare with
+	/// @return true if not equal, otherwise false
+	bool operator!=(const CCompany &other) const {
+		return compare(other) != 0;
+	}
 };
 
 class CInvoice {
@@ -119,7 +164,7 @@ public:
 class CVATRegister {
 private:
 	// todo
-	
+
 public:
 	CVATRegister(void);
 	bool registerCompany(const string &name);
