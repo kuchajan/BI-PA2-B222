@@ -135,16 +135,46 @@ public:
 
 class CInvoice {
 private:
-	// todo
+	CDate m_date;
+	string m_seller;
+	string m_buyer;
+	unsigned int m_amount;
+	double m_vat;
 
 public:
-	CInvoice(const CDate &date, const string &seller, const string &buyer,
-			 unsigned int amount, double vat);
-	CDate date(void) const;
-	string buyer(void) const;
-	string seller(void) const;
-	unsigned int amount(void) const;
-	double vat(void) const;
+	/// @brief Constructor of CInvoice
+	/// @param date Date of the invoice
+	/// @param seller The seller
+	/// @param buyer The buyer
+	/// @param amount The amount of money transfered
+	/// @param vat The value added tax
+	CInvoice(const CDate &date, const string &seller, const string &buyer, unsigned int amount, double vat)
+		: m_date(date), m_seller(seller), m_buyer(buyer), m_amount(amount), m_vat(vat) {}
+
+	/// @brief Getter of date
+	CDate date() const {
+		return m_date;
+	}
+	/// @brief Getter of seller
+	string seller() const {
+		return m_seller;
+	}
+	/// @brief Getter of buyer
+	string buyer() const {
+		return m_buyer;
+	}
+	/// @brief Getter of amount
+	unsigned int amount() const {
+		return m_amount;
+	}
+	/// @brief Getter of valued added tax
+	double vat() const {
+		return m_vat;
+	}
+
+	bool operator==(const CInvoice &other) {
+		return m_date.compare(other.m_date) == 0 && m_buyer == other.m_buyer && m_seller == other.m_seller && m_amount == other.m_amount && m_vat == other.m_vat;
+	}
 };
 
 class CSortOpt {
