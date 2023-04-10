@@ -61,6 +61,33 @@ public:
 };
 #endif /* __PROGTEST__ */
 
+class CCompany {
+private:
+	string m_originalName;
+	string m_canonicalName;
+	/// @brief converts a string to a canonical string, which contains only lowercase characters and no redundant spaces
+	/// @param src string to convert
+	/// @return a canonical string
+	string toCanonical(const string &src) {
+		// code shown on proseminar
+		istringstream iss(src);
+		ostringstream oss;
+		copy(istream_iterator<string>(iss), istream_iterator<string>(), ostream_iterator<string>(oss, " ")); // get rid of extra white spaces
+		string toReturn = oss.str();
+		std::transform(toReturn.begin(), toReturn.end(), toReturn.begin(), [](unsigned char c) { return std::tolower(c); }); // transform all chars in string to lowercase
+		return toReturn;
+	}
+
+	int compare(const CCompany & other) const {
+		return m_canonicalName.compare(other.m_canonicalName);
+	}
+
+public:
+	/// @brief Construct a new CCompany object given by the name
+	/// @param name Name of the company
+	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {}
+};
+
 class CInvoice {
 private:
 	// todo
