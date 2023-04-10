@@ -180,7 +180,16 @@ bool equalLists(const list<CInvoice> &a, const list<CInvoice> &b) {
 	// todo
 }
 
+void testCCompany() {
+	assert(CCompany("first Company") == CCompany("First Company"));
+	assert(CCompany("Second     Company") == CCompany("Second Company "));
+	assert(CCompany("ThirdCompany, Ltd.") != CCompany("Third Company, Ltd."));
+	assert(CCompany("Third Company, Ltd.") == CCompany("Third Company, Ltd."));
+	assert(CCompany("Third Company, Ltd.") == CCompany(" Third  Company,  Ltd.  "));
+}
+
 int main(void) {
+	testCCompany();
 	CVATRegister r;
 	assert(r.registerCompany("first Company"));
 	assert(r.registerCompany("Second     Company"));
