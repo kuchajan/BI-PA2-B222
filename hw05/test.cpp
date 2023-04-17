@@ -278,6 +278,26 @@ class CVATRegister {
 private:
 	unordered_map<string, CCompany> m_companyRegister;
 
+	/// @brief Finds two companies from the given invoice, returns their iterators and whether they were found
+	/// @param[in,out] x The invoice to get the companies from (names are overwritten by their canonical name)
+	/// @param[out] iSeller Iterator to the selling company
+	/// @param[out] iBuyer Iterator to the buying company
+	/// @return True when found, otherwise false
+	bool findCompaniesFromInvoice(CInvoice &x, std::unordered_map<std::string, CCompany>::iterator &iSeller, std::unordered_map<std::string, CCompany>::iterator &iBuyer) {
+		CCompany seller(x.seller());
+		CCompany buyer(x.buyer());
+
+		if ((iSeller = m_companyRegister.find(seller.getCanonicalName())) == m_companyRegister.end()) {
+			return false;
+		}
+		if ((iBuyer = m_companyRegister.find(buyer.getCanonicalName())) == m_companyRegister.end()) {
+			return false;
+		}
+
+		x = CInvoice(x.date(), seller.getCanonicalName(), buyer.getCanonicalName(), x.amount(), x.vat());
+		return true;
+	}
+
 public:
 	/// @brief Empty constructor of CVATRegister
 	CVATRegister() : m_companyRegister() {}
@@ -292,6 +312,28 @@ public:
 		}
 		m_companyRegister.insert(make_pair(tempCompany.getCanonicalName(), tempCompany));
 		return true;
+	}
+
+	/// @brief Attempts to add an invoice to a list of issued invoices of a selling company from the invoice
+	/// @param x The invoice to add
+	/// @return True when succesfully added, otherwise false
+	bool addIssued(CInvoice x) {
+		std::unordered_map<std::string, CCompany>::iterator iSeller, iBuyer;
+		if (!findCompaniesFromInvoice(x, iSeller, iBuyer)) {
+			return false;
+		}
+		return (*iSeller).second.addIssued(x);
+	}
+
+	/// @brief Attempts to add an invoice to a list of accepted invoices of a buying company from the invoice
+	/// @param x The invoice to add
+	/// @return True when succesfully added, otherwise false
+	bool addAccepted(CInvoice x) {
+		std::unordered_map<std::string, CCompany>::iterator iSeller, iBuyer;
+		if (!findCompaniesFromInvoice(x, iSeller, iBuyer)) {
+			return false;
+		}
+		return (*iBuyer).second.addAccepted(x);
 	}
 
 	bool delIssued(const CInvoice &x);
