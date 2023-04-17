@@ -249,12 +249,12 @@ public:
 		return compare(other) != 0;
 	}
 
-	/// @brief Getter of canonical name 
+	/// @brief Getter of canonical name
 	string getCanonicalName() const {
 		return m_canonicalName;
 	}
 
-	/// @brief Getter of original name 
+	/// @brief Getter of original name
 	string getOriginalName() const {
 		return m_originalName;
 	}
@@ -265,6 +265,7 @@ private:
 	// todo
 
 public:
+	// note: I would personally prefer an enum instead of this, but the Gods of ProgTest have spoken and so it shall be
 	static const int BY_DATE = 0;
 	static const int BY_BUYER = 1;
 	static const int BY_SELLER = 2;
@@ -343,7 +344,7 @@ public:
 
 #ifndef __PROGTEST__
 bool equalLists(const list<CInvoice> &a, const list<CInvoice> &b) {
-	// todo
+	return equal(a.cbegin(), a.cend(), b.cbegin());
 }
 
 void testCCompany() {
