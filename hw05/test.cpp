@@ -77,8 +77,13 @@ string toCanonical(const string &src) {
 class CInvoice {
 private:
 	CDate m_date;
-	string m_seller;
-	string m_buyer;
+
+	string m_sellerOriginal;
+	string m_sellerCanonical;
+
+	string m_buyerOriginal;
+	string m_buyerCanonical;
+
 	unsigned int m_amount;
 	double m_vat;
 
@@ -92,8 +97,22 @@ public:
 	/// @param amount The amount of money transfered
 	/// @param vat The value added tax
 	CInvoice(const CDate &date, const string &seller, const string &buyer, const unsigned int &amount, const double &vat)
-		: m_date(date), m_seller(seller), m_buyer(buyer), m_amount(amount), m_vat(vat) {
+		: m_date(date), m_sellerCanonical(toCanonical(seller)), m_buyerCanonical(toCanonical(buyer)), m_amount(amount), m_vat(vat) {
 		m_order = 0;
+		m_sellerOriginal = "";
+		m_buyerOriginal = "";
+	}
+
+	/// @brief Set the original name of the selling company
+	/// @param sellerOriginal The original name of the selling company
+	void setSellerOriginal(const string &sellerOriginal) {
+		m_sellerOriginal = string(sellerOriginal);
+	}
+
+	/// @brief Set the original name of the buying company
+	/// @param sellerOriginal The original name of the buying company
+	void setBuyerOriginal(const string &buyerOriginal) {
+		m_buyerOriginal = string(buyerOriginal);
 	}
 
 	/// @brief Gets the order of the invoice
@@ -114,11 +133,11 @@ public:
 	}
 	/// @brief Getter of seller
 	string seller() const {
-		return m_seller;
+		return m_sellerOriginal;
 	}
 	/// @brief Getter of buyer
 	string buyer() const {
-		return m_buyer;
+		return m_buyerOriginal;
 	}
 	/// @brief Getter of amount
 	unsigned int amount() const {
@@ -133,7 +152,7 @@ public:
 	/// @param other The other invoice
 	/// @return True when equal, otherwise false
 	bool operator==(const CInvoice &other) const {
-		return m_date.compare(other.m_date) == 0 && m_buyer == other.m_buyer && m_seller == other.m_seller && m_amount == other.m_amount && m_vat == other.m_vat;
+		return m_date.compare(other.m_date) == 0 && m_buyerOriginal == other.m_buyerOriginal && m_sellerOriginal == other.m_sellerOriginal && m_amount == other.m_amount && m_vat == other.m_vat;
 	}
 
 	struct hashFunction {
@@ -145,8 +164,8 @@ public:
 			size_t monthHash = std::hash<int>()(invoice.m_date.month()) << 1;
 			size_t yearHash = std::hash<int>()(invoice.m_date.year()) << 2;
 
-			size_t sellerHash = std::hash<string>()(invoice.m_seller) << 3;
-			size_t buyerHash = std::hash<string>()(invoice.m_buyer) << 4;
+			size_t sellerHash = std::hash<string>()(invoice.m_sellerCanonical) << 3;
+			size_t buyerHash = std::hash<string>()(invoice.m_buyerCanonical) << 4;
 
 			size_t amountHash = std::hash<unsigned int>()(invoice.m_amount) << 5;
 			size_t vatHash = std::hash<double>()(invoice.m_vat) << 6;
