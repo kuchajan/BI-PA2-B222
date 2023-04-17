@@ -147,6 +147,12 @@ class CCompany {
 private:
 	string m_originalName;
 	string m_canonicalName;
+
+	size_t m_invoiceCount;
+
+	unordered_set<CInvoice, CInvoice::hashFunction> m_issued;
+	unordered_set<CInvoice, CInvoice::hashFunction> m_accepted;
+
 	/// @brief converts a string to a canonical string, which contains only lowercase characters and no redundant spaces
 	/// @param src string to convert
 	/// @return a canonical string
@@ -167,10 +173,39 @@ private:
 		return m_canonicalName.compare(other.m_canonicalName);
 	}
 
+	/// @brief Adds an invoice to a given set of invoices, if not already contained
+	/// @param invoice The invoice to add
+	/// @param invoices The set where to add the invoice
+	/// @return True when succesfully added, otherwise false
+	bool add(CInvoice &invoice, unordered_set<CInvoice, CInvoice::hashFunction> &invoices) {
+		if (invoices.count(invoice) != 0) {
+			return false;
+		}
+		invoice.setOrder(m_invoiceCount++);
+		invoices.insert(invoice);
+		return true;
+	}
+
 public:
 	/// @brief Construct a new CCompany object given by the name
 	/// @param name Name of the company
-	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {}
+	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {
+		m_invoiceCount = 0;
+	}
+
+	/// @brief Adds an invoice to the set of issued invoices, if not already contained
+	/// @param invoice The invoice to add
+	/// @return True when succesfully added, otherwise false
+	bool addIssued(CInvoice &invoice) {
+		return add(invoice, m_issued);
+	}
+
+	/// @brief Adds an invoice to the set of accepted invoices, if not already contained
+	/// @param invoice The invoice to add
+	/// @return True when succesfully added, otherwise false
+	bool addAccepted(CInvoice &invoice) {
+		return add(invoice, m_accepted);
+	}
 
 	/// @brief Uses CCompany::compare to compare two companies
 	/// @param other The other company to compare with
