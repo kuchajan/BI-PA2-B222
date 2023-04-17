@@ -69,6 +69,8 @@ private:
 	unsigned int m_amount;
 	double m_vat;
 
+	size_t m_order;
+
 public:
 	/// @brief Constructor of CInvoice
 	/// @param date Date of the invoice
@@ -76,8 +78,22 @@ public:
 	/// @param buyer The buyer
 	/// @param amount The amount of money transfered
 	/// @param vat The value added tax
-	CInvoice(const CDate &date, const string &seller, const string &buyer, const unsigned int & amount, const double & vat)
-		: m_date(date), m_seller(seller), m_buyer(buyer), m_amount(amount), m_vat(vat) {}
+	CInvoice(const CDate &date, const string &seller, const string &buyer, const unsigned int &amount, const double &vat)
+		: m_date(date), m_seller(seller), m_buyer(buyer), m_amount(amount), m_vat(vat) {
+		m_order = 0;
+	}
+
+	/// @brief Gets the order of the invoice
+	/// @return The order of the invoice
+	size_t getOrder() {
+		return m_order;
+	}
+
+	/// @brief Sets the order of the invoice
+	/// @param order The order to set
+	void setOrder(const size_t &order) {
+		m_order = order;
+	}
 
 	/// @brief Getter of date
 	CDate date() const {
