@@ -61,6 +61,19 @@ public:
 };
 #endif /* __PROGTEST__ */
 
+/// @brief converts a string to a canonical string, which contains only lowercase characters and no redundant spaces
+/// @param src string to convert
+/// @return a canonical string
+string toCanonical(const string &src) {
+	// code shown on proseminar
+	istringstream iss(src);
+	ostringstream oss;
+	copy(istream_iterator<string>(iss), istream_iterator<string>(), ostream_iterator<string>(oss, " ")); // get rid of extra white spaces
+	string toReturn = oss.str();
+	std::transform(toReturn.begin(), toReturn.end(), toReturn.begin(), [](unsigned char c) { return std::tolower(c); }); // transform all chars in string to lowercase
+	return toReturn;
+}
+
 class CInvoice {
 private:
 	CDate m_date;
@@ -152,19 +165,6 @@ private:
 
 	unordered_set<CInvoice, CInvoice::hashFunction> m_issued;
 	unordered_set<CInvoice, CInvoice::hashFunction> m_accepted;
-
-	/// @brief converts a string to a canonical string, which contains only lowercase characters and no redundant spaces
-	/// @param src string to convert
-	/// @return a canonical string
-	string toCanonical(const string &src) {
-		// code shown on proseminar
-		istringstream iss(src);
-		ostringstream oss;
-		copy(istream_iterator<string>(iss), istream_iterator<string>(), ostream_iterator<string>(oss, " ")); // get rid of extra white spaces
-		string toReturn = oss.str();
-		std::transform(toReturn.begin(), toReturn.end(), toReturn.begin(), [](unsigned char c) { return std::tolower(c); }); // transform all chars in string to lowercase
-		return toReturn;
-	}
 
 	/// @brief Compares two company names by their canonical name
 	/// @param other The other company to compare the canonical name with
