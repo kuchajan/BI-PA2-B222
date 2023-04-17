@@ -288,6 +288,9 @@ private:
 		CCompany seller(x.seller());
 		CCompany buyer(x.buyer());
 
+		if (seller == buyer) {
+			return false;
+		}
 		if ((iSeller = m_companyRegister.find(seller.getCanonicalName())) == m_companyRegister.end()) {
 			return false;
 		}
