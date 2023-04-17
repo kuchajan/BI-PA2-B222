@@ -276,13 +276,24 @@ public:
 
 class CVATRegister {
 private:
-	// todo
+	unordered_map<string, CCompany> m_companyRegister;
 
 public:
-	CVATRegister(void);
-	bool registerCompany(const string &name);
-	bool addIssued(const CInvoice &x);
-	bool addAccepted(const CInvoice &x);
+	/// @brief Empty constructor of CVATRegister
+	CVATRegister() : m_companyRegister() {}
+
+	/// @brief Registers a company if it doesn't already exist
+	/// @param name The name of the company
+	/// @return True if succesfully added, otherwise false
+	bool registerCompany(const string &name) {
+		CCompany tempCompany(name);
+		if (m_companyRegister.count(tempCompany.getCanonicalName()) != 0) {
+			return false;
+		}
+		m_companyRegister.insert(make_pair(tempCompany.getCanonicalName(), tempCompany));
+		return true;
+	}
+
 	bool delIssued(const CInvoice &x);
 	bool delAccepted(const CInvoice &x);
 	list<CInvoice> unmatched(const string &company, const CSortOpt &sortBy) const;
