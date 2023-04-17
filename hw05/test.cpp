@@ -61,6 +61,53 @@ public:
 };
 #endif /* __PROGTEST__ */
 
+class CInvoice {
+private:
+	CDate m_date;
+	string m_seller;
+	string m_buyer;
+	unsigned int m_amount;
+	double m_vat;
+
+public:
+	/// @brief Constructor of CInvoice
+	/// @param date Date of the invoice
+	/// @param seller The seller
+	/// @param buyer The buyer
+	/// @param amount The amount of money transfered
+	/// @param vat The value added tax
+	CInvoice(const CDate &date, const string &seller, const string &buyer, const unsigned int & amount, const double & vat)
+		: m_date(date), m_seller(seller), m_buyer(buyer), m_amount(amount), m_vat(vat) {}
+
+	/// @brief Getter of date
+	CDate date() const {
+		return m_date;
+	}
+	/// @brief Getter of seller
+	string seller() const {
+		return m_seller;
+	}
+	/// @brief Getter of buyer
+	string buyer() const {
+		return m_buyer;
+	}
+	/// @brief Getter of amount
+	unsigned int amount() const {
+		return m_amount;
+	}
+	/// @brief Getter of valued added tax
+	double vat() const {
+		return m_vat;
+	}
+
+	/// @brief Compare two invoices whether they are equal
+	/// @param other The other invoice
+	/// @return True when equal, otherwise false
+	bool operator==(const CInvoice &other) const {
+		return m_date.compare(other.m_date) == 0 && m_buyer == other.m_buyer && m_seller == other.m_seller && m_amount == other.m_amount && m_vat == other.m_vat;
+	}
+};
+
 class CCompany {
 private:
 	string m_originalName;
@@ -131,49 +178,15 @@ public:
 	bool operator!=(const CCompany &other) const {
 		return compare(other) != 0;
 	}
-};
 
-class CInvoice {
-private:
-	CDate m_date;
-	string m_seller;
-	string m_buyer;
-	unsigned int m_amount;
-	double m_vat;
-
-public:
-	/// @brief Constructor of CInvoice
-	/// @param date Date of the invoice
-	/// @param seller The seller
-	/// @param buyer The buyer
-	/// @param amount The amount of money transfered
-	/// @param vat The value added tax
-	CInvoice(const CDate &date, const string &seller, const string &buyer, unsigned int amount, double vat)
-		: m_date(date), m_seller(seller), m_buyer(buyer), m_amount(amount), m_vat(vat) {}
-
-	/// @brief Getter of date
-	CDate date() const {
-		return m_date;
-	}
-	/// @brief Getter of seller
-	string seller() const {
-		return m_seller;
-	}
-	/// @brief Getter of buyer
-	string buyer() const {
-		return m_buyer;
-	}
-	/// @brief Getter of amount
-	unsigned int amount() const {
-		return m_amount;
-	}
-	/// @brief Getter of valued added tax
-	double vat() const {
-		return m_vat;
+	/// @brief Getter of canonical name 
+	string getCanonicalName() const {
+		return m_canonicalName;
 	}
 
-	bool operator==(const CInvoice &other) {
-		return m_date.compare(other.m_date) == 0 && m_buyer == other.m_buyer && m_seller == other.m_seller && m_amount == other.m_amount && m_vat == other.m_vat;
+	/// @brief Getter of original name 
+	string getOriginalName() const {
+		return m_originalName;
 	}
 };
 
