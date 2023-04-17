@@ -122,6 +122,25 @@ public:
 	bool operator==(const CInvoice &other) const {
 		return m_date.compare(other.m_date) == 0 && m_buyer == other.m_buyer && m_seller == other.m_seller && m_amount == other.m_amount && m_vat == other.m_vat;
 	}
+
+	struct hashFunction {
+		/// @brief Hashes the invoice
+		/// @param invoice invoice to hash
+		/// @return Hash of the invoice
+		size_t operator()(const CInvoice &invoice) const {
+			size_t dayHash = std::hash<int>()(invoice.m_date.day());
+			size_t monthHash = std::hash<int>()(invoice.m_date.month()) << 1;
+			size_t yearHash = std::hash<int>()(invoice.m_date.year()) << 2;
+
+			size_t sellerHash = std::hash<string>()(invoice.m_seller) << 3;
+			size_t buyerHash = std::hash<string>()(invoice.m_buyer) << 4;
+
+			size_t amountHash = std::hash<unsigned int>()(invoice.m_amount) << 5;
+			size_t vatHash = std::hash<double>()(invoice.m_vat) << 6;
+
+			return dayHash ^ monthHash ^ yearHash ^ sellerHash ^ buyerHash ^ amountHash ^ vatHash;
+		}
+	};
 };
 
 class CCompany {
