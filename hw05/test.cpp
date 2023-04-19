@@ -131,14 +131,24 @@ public:
 	CDate date() const {
 		return m_date;
 	}
-	/// @brief Getter of seller
+	/// @brief Getter of original name of seller
 	string seller() const {
 		return m_sellerOriginal;
 	}
-	/// @brief Getter of buyer
+	/// @brief Getter of canonical name of seller
+	string getSellerCanonical() const {
+		return m_sellerCanonical;
+	}
+
+	/// @brief Getter of original name of buyer
 	string buyer() const {
 		return m_buyerOriginal;
 	}
+	/// @brief Getter of canonical name of buyer
+	string getBuyerCanonical() const {
+		return m_buyerCanonical;
+	}
+
 	/// @brief Getter of amount
 	unsigned int amount() const {
 		return m_amount;
@@ -152,7 +162,35 @@ public:
 	/// @param other The other invoice
 	/// @return True when equal, otherwise false
 	bool operator==(const CInvoice &other) const {
-		return m_date.compare(other.m_date) == 0 && m_buyerOriginal == other.m_buyerOriginal && m_sellerOriginal == other.m_sellerOriginal && m_amount == other.m_amount && m_vat == other.m_vat;
+		return m_date.compare(other.m_date) == 0 && m_buyerCanonical == other.m_buyerCanonical && m_sellerCanonical == other.m_sellerCanonical && m_amount == other.m_amount && m_vat == other.m_vat;
+	}
+
+	int normalizeCmpRes(const int &res) const {
+		return res < 0 ? -1 : (res == 0 ? 0 : 1);
+	}
+
+	int cmpDate(const CInvoice &rhs) const {
+		return normalizeCmpRes(m_date.compare(rhs.m_date));
+	}
+
+	int cmpSeller(const CInvoice &rhs) const {
+		return normalizeCmpRes(m_sellerOriginal.compare(rhs.m_sellerOriginal));
+	}
+
+	int cmpBuyer(const CInvoice &rhs) const {
+		return normalizeCmpRes(m_buyerOriginal.compare(rhs.m_buyerOriginal));
+	}
+
+	int cmpAmount(const CInvoice &rhs) const {
+		return m_amount < rhs.m_amount ? -1 : (m_amount == rhs.m_amount ? 0 : 1);
+	}
+
+	int cmpVAT(const CInvoice &rhs) const {
+		return m_vat < rhs.m_vat ? -1 : (m_vat == rhs.m_vat ? 0 : 1);
+	}
+
+	int cmpOrder(const CInvoice &rhs) const {
+		return m_order < rhs.m_order ? -1 : 1; // orders can never be same (comparing orders of invoices from different companies is non-sensical)
 	}
 
 	struct hashFunction {
@@ -173,6 +211,89 @@ public:
 			return dayHash ^ monthHash ^ yearHash ^ sellerHash ^ buyerHash ^ amountHash ^ vatHash;
 		}
 	};
+};
+
+class CSortOpt {
+private:
+	vector<pair<int, bool>> m_keys;
+
+	/// @brief
+	/// @param lhs
+	/// @param rhs
+	/// @param key
+	/// @return
+	int compareByKey(const CInvoice &lhs, const CInvoice &rhs, const pair<int, bool> &key) const {
+		int res = 0;
+		switch (key.first) {
+			case BY_DATE: {
+				res = lhs.cmpDate(rhs);
+				break;
+			}
+			case BY_BUYER: {
+				res = lhs.cmpBuyer(rhs);
+				break;
+			}
+			case BY_SELLER: {
+				res = lhs.cmpSeller(rhs);
+				break;
+			}
+			case BY_AMOUNT: {
+				res = lhs.cmpAmount(rhs);
+				break;
+			}
+			case BY_VAT: {
+				res = lhs.cmpVAT(rhs);
+				break;
+			}
+			default: {
+				throw invalid_argument("Tried to sort with a wrong key value");
+				break;
+			}
+		}
+		// invert if not ascending
+		return ((int)(!key.second) * res) - ((int)(key.second) * res);
+	}
+
+	/// @brief
+	/// @param lhs
+	/// @param rhs
+	/// @return
+	int compare(const CInvoice &lhs, const CInvoice &rhs) const {
+		for (auto key : m_keys) {
+			int res = compareByKey(lhs, rhs, key);
+			if (res != 0) {
+				return res;
+			}
+		}
+		return lhs.cmpOrder(rhs);
+	}
+
+public:
+	// note: I would personally prefer an enum instead of this, but the Gods of ProgTest have spoken and so it shall be
+	static const int BY_DATE = 0;
+	static const int BY_BUYER = 1;
+	static const int BY_SELLER = 2;
+	static const int BY_AMOUNT = 3;
+	static const int BY_VAT = 4;
+
+	/// @brief Empty constructor
+	CSortOpt() {}
+
+	/// @brief Adds a key which to sort by
+	/// @param key Key to add
+	/// @param ascending whether to sort should be ascending or not (descending)
+	/// @return This object (to chain methods)
+	CSortOpt &addKey(int key, bool ascending = true) {
+		if (key < 0 || key > 4) {
+			throw invalid_argument("Tried to insert an invalid key.");
+		}
+		m_keys.push_back(make_pair(key, ascending));
+		return *this;
+	}
+
+	bool operator()(const CInvoice &lhs, const CInvoice &rhs) {
+		return compare(lhs, rhs) > 0;
+	}
 };
 
 class CCompany {
@@ -286,25 +407,10 @@ public:
 		copy(m_accepted.begin(), m_accepted.end(), back_inserter(invoices));
 
 		// sort them
-		sort(invoices.begin(),invoices.end(),sortOpt);
+		sort(invoices.begin(), invoices.end(), sortOpt);
 
 		return invoices;
 	}
-};
-
-class CSortOpt {
-private:
-	// todo
-
-public:
-	// note: I would personally prefer an enum instead of this, but the Gods of ProgTest have spoken and so it shall be
-	static const int BY_DATE = 0;
-	static const int BY_BUYER = 1;
-	static const int BY_SELLER = 2;
-	static const int BY_AMOUNT = 3;
-	static const int BY_VAT = 4;
-	CSortOpt(void);
-	CSortOpt &addKey(int key, bool ascending = true);
 };
 
 class CVATRegister {
