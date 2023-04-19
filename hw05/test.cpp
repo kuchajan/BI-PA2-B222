@@ -423,20 +423,18 @@ private:
 	/// @param[out] iBuyer Iterator to the buying company
 	/// @return True when found, otherwise false
 	bool findCompaniesFromInvoice(CInvoice &x, std::unordered_map<std::string, CCompany>::iterator &iSeller, std::unordered_map<std::string, CCompany>::iterator &iBuyer) {
-		CCompany seller(x.seller());
-		CCompany buyer(x.buyer());
-
-		if (seller == buyer) {
+		if (x.getSellerCanonical() == x.getBuyerCanonical()) {
 			return false;
 		}
-		if ((iSeller = m_companyRegister.find(seller.getCanonicalName())) == m_companyRegister.end()) {
+		if ((iSeller = m_companyRegister.find(x.getSellerCanonical())) == m_companyRegister.end()) {
 			return false;
 		}
-		if ((iBuyer = m_companyRegister.find(buyer.getCanonicalName())) == m_companyRegister.end()) {
+		if ((iBuyer = m_companyRegister.find(x.getBuyerCanonical())) == m_companyRegister.end()) {
 			return false;
 		}
 
-		x = CInvoice(x.date(), seller.getCanonicalName(), buyer.getCanonicalName(), x.amount(), x.vat());
+		x.setSellerOriginal((*iSeller).second.getOriginalName());
+		x.setBuyerOriginal((*iBuyer).second.getOriginalName());
 		return true;
 	}
 
