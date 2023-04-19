@@ -277,6 +277,19 @@ public:
 	string getOriginalName() const {
 		return m_originalName;
 	}
+
+	vector<CInvoice> getInvoices(const CSortOpt &sortOpt) const {
+		vector<CInvoice> invoices;
+
+		// copy all invoices
+		copy(m_issued.begin(), m_issued.end(), back_inserter(invoices));
+		copy(m_accepted.begin(), m_accepted.end(), back_inserter(invoices));
+
+		// sort them
+		sort(invoices.begin(),invoices.end(),sortOpt);
+
+		return invoices;
+	}
 };
 
 class CSortOpt {
