@@ -322,10 +322,7 @@ private:
 	string m_originalName;
 	string m_canonicalName;
 
-	size_t m_invoiceCount;
-
-	unordered_set<CInvoice, CInvoice::hashFunction> m_issued;
-	unordered_set<CInvoice, CInvoice::hashFunction> m_accepted;
+	unordered_map<CInvoice, unique_ptr<CInvoice>, CInvoice::hashFunction> m_invoices;
 
 	/// @brief Compares two company names by their canonical name
 	/// @param other The other company to compare the canonical name with
@@ -334,38 +331,35 @@ private:
 		return m_canonicalName.compare(other.m_canonicalName);
 	}
 
+public:
+	/// @brief Construct a new CCompany object given by the name
+	/// @param name Name of the company
+	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {}
+
+	unordered_map<CInvoice, unique_ptr<CInvoice>, CInvoice::hashFunction>::iterator find(CInvoice &invoice) {
+		return m_invoices.find(invoice);
+	}
+
 	/// @brief Adds an invoice to a given set of invoices, if not already contained
 	/// @param invoice The invoice to add
 	/// @param invoices The set where to add the invoice
 	/// @return True when succesfully added, otherwise false
-	bool add(CInvoice &invoice, unordered_set<CInvoice, CInvoice::hashFunction> &invoices) {
-		if (invoices.count(invoice) != 0) {
-			return false;
+	bool add(unique_ptr<CInvoice> &invoice, bool issuing) {
+		// Check if it exists already
+		auto iter = find(*invoice); // Through the find function, since we then do more operations on it if it exists
+		if (iter != m_invoices.end()) {
+			// Check if it was issued / accepted already
+			if (issuing ? (*((*iter).second)).getWasIssued() : (*((*iter).second)).getWasAccepted()) {
+				return false;
+			}
+			// Set that it was issued / accepted now
+			issuing ? (*((*iter).second)).setWasIssued(true) : (*((*iter).second)).setWasAccepted(true);
+			return true;
 		}
-		invoice.setOrder(m_invoiceCount++);
-		invoices.insert(invoice);
+
+		// Add it, since it doesn't exist yet
+		m_invoices.insert(make_pair(*invoice, invoice));
 		return true;
-	}
-
-public:
-	/// @brief Construct a new CCompany object given by the name
-	/// @param name Name of the company
-	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {
-		m_invoiceCount = 0;
-	}
-
-	/// @brief Adds an invoice to the set of issued invoices, if not already contained
-	/// @param invoice The invoice to add
-	/// @return True when succesfully added, otherwise false
-	bool addIssued(CInvoice &invoice) {
-		return add(invoice, m_issued);
-	}
-
-	/// @brief Adds an invoice to the set of accepted invoices, if not already contained
-	/// @param invoice The invoice to add
-	/// @return True when succesfully added, otherwise false
-	bool addAccepted(CInvoice &invoice) {
-		return add(invoice, m_accepted);
 	}
 
 	/// @brief Uses CCompany::compare to compare two companies
@@ -424,8 +418,9 @@ public:
 		vector<CInvoice> invoices;
 
 		// copy all invoices
-		copy(m_issued.begin(), m_issued.end(), back_inserter(invoices));
-		copy(m_accepted.begin(), m_accepted.end(), back_inserter(invoices));
+		for (auto iter = m_invoices.begin(); iter != m_invoices.end(); ++iter) {
+			invoices.push_back(*(*iter).second);
+		}
 
 		// sort them
 		sort(invoices.begin(), invoices.end(), sortOpt);
