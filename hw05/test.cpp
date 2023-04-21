@@ -89,6 +89,9 @@ private:
 
 	size_t m_order;
 
+	bool wasIssued;
+	bool wasAccepted;
+
 public:
 	/// @brief Constructor of CInvoice
 	/// @param date Date of the invoice
@@ -101,6 +104,24 @@ public:
 		m_order = 0;
 		m_sellerOriginal = "";
 		m_buyerOriginal = "";
+		wasIssued = false;
+		wasAccepted = false;
+	}
+
+	bool getWasIssued() const {
+		return wasIssued;
+	}
+
+	void setWasIssued(bool setTo) {
+		wasIssued = setTo;
+	}
+
+	bool getWasAccepted() const {
+		return wasIssued;
+	}
+
+	void setWasAccepted(bool setTo) {
+		wasAccepted = setTo;
 	}
 
 	/// @brief Set the original name of the selling company
