@@ -365,6 +365,26 @@ public:
 		return true;
 	}
 
+	bool del(shared_ptr<CInvoice> invoice, bool issuing, bool &deleteInOther) {
+		// we already know that the invoice exists
+		// we don't know if it was already deleted from the issue / accept
+		if (issuing ? !invoice->getWasIssued() : !invoice->getWasAccepted()) {
+			return false;
+		}
+		// okay, it wasn't, set the issue / accept
+		issuing ? invoice->setWasIssued(false) : invoice->setWasAccepted(false);
+		// we just need to check if we need to get rid of it
+		if (!invoice->getWasIssued() && !invoice->getWasAccepted()) {
+			deleteInvoice(invoice);
+			deleteInOther = true;
+		}
+		return true;
+	}
+
+	void deleteInvoice(const shared_ptr<CInvoice> &invoice) {
+		m_invoices.erase(*invoice);
+	}
+
 	/// @brief Uses CCompany::compare to compare two companies
 	/// @param other The other company to compare with
 	/// @return true if first different char is lesser, otherwise false
@@ -486,6 +506,32 @@ private:
 		return (*iSeller).second.add((*iter).second, issuing);
 	}
 
+	bool del(CInvoice x, bool issuing) {
+		std::unordered_map<std::string, CCompany>::iterator iSeller, iBuyer;
+		if (!findCompaniesFromInvoice(x, iSeller, iBuyer)) {
+			return false;
+		}
+
+		bool success = false;
+		auto iter = iSeller->second.find(x, success);
+
+		if (!success) {
+			return false;
+		}
+
+		bool deleteInOther = false;
+
+		if (!iSeller->second.del(iter->second, issuing, deleteInOther)) {
+			return false;
+		}
+
+		if (deleteInOther) {
+			auto iter2 = iBuyer->second.find(x, success);
+			iBuyer->second.deleteInvoice(iter2->second);
+		}
+		return true;
+	}
+
 public:
 	/// @brief Empty constructor of CVATRegister
 	CVATRegister() : m_companyRegister() {}
@@ -516,8 +562,12 @@ public:
 		return add(x, false);
 	}
 
-	bool delIssued(const CInvoice &x);
-	bool delAccepted(const CInvoice &x);
+	bool delIssued(const CInvoice &x) {
+		return del(x, true);
+	}
+	bool delAccepted(const CInvoice &x) {
+		return del(x, false);
+	}
 
 	list<CInvoice> unmatched(const string &company, const CSortOpt &sortBy) const {
 		string canonical = toCanonical(company);
