@@ -584,7 +584,7 @@ public:
 
 #ifndef __PROGTEST__
 bool equalLists(const list<CInvoice> &a, const list<CInvoice> &b) {
-	return equal(a.cbegin(), a.cend(), b.cbegin());
+	return a == b;
 }
 
 void testCCompany() {
