@@ -417,12 +417,14 @@ public:
 		return m_originalName;
 	}
 
-	vector<CInvoice> getInvoices(const CSortOpt &sortOpt) const {
+	vector<CInvoice> getUnmatchedInvoices(const CSortOpt &sortOpt) const {
 		vector<CInvoice> invoices;
 
-		// copy all invoices
+		// copy the invoices that are not issued or are not accepted
 		for (auto iter = m_invoices.begin(); iter != m_invoices.end(); ++iter) {
-			invoices.push_back(*(*iter).second);
+			if ((*(*iter).second).getWasIssued() != true && (*(*iter).second).getWasAccepted() != true) {
+				invoices.push_back(*(*iter).second);
+			}
 		}
 
 		// sort them
@@ -516,7 +518,18 @@ public:
 
 	bool delIssued(const CInvoice &x);
 	bool delAccepted(const CInvoice &x);
-	list<CInvoice> unmatched(const string &company, const CSortOpt &sortBy) const;
+
+	list<CInvoice> unmatched(const string &company, const CSortOpt &sortBy) const {
+		string canonical = toCanonical(company);
+		auto iCompany = m_companyRegister.find(canonical);
+		if (iCompany == m_companyRegister.end()) {
+			return list<CInvoice>();
+		}
+
+		vector<CInvoice> invoices = (*iCompany).second.getUnmatchedInvoices(sortBy);
+
+		return list<CInvoice>(invoices.begin(), invoices.end());
+	}
 };
 
 #ifndef __PROGTEST__
