@@ -272,7 +272,7 @@ private:
 			}
 		}
 		// invert if not ascending
-		return ((int)(!key.second) * res) - ((int)(key.second) * res);
+		return key.second ? res : res * (-1);
 	}
 
 	/// @brief
@@ -312,8 +312,8 @@ public:
 		return *this;
 	}
 
-	bool operator()(const CInvoice &lhs, const CInvoice &rhs) {
-		return compare(lhs, rhs) > 0;
+	bool operator()(const CInvoice &lhs, const CInvoice &rhs) const {
+		return compare(lhs, rhs) < 0;
 	}
 };
 
@@ -442,7 +442,7 @@ public:
 
 		// copy the invoices that are not issued or are not accepted
 		for (auto iter = m_invoices.begin(); iter != m_invoices.end(); ++iter) {
-			if (!iter->second->getWasIssued() || !iter->second->getWasAccepted()) {
+			if ((*(*iter).second).getWasIssued() != true && (*(*iter).second).getWasAccepted() != true) {
 				invoices.push_back(*(*iter).second);
 			}
 		}
