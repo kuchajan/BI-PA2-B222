@@ -322,7 +322,7 @@ private:
 	string m_originalName;
 	string m_canonicalName;
 
-	unordered_map<CInvoice, unique_ptr<CInvoice>, CInvoice::hashFunction> m_invoices;
+	unordered_map<CInvoice, shared_ptr<CInvoice>, CInvoice::hashFunction> m_invoices;
 
 	/// @brief Compares two company names by their canonical name
 	/// @param other The other company to compare the canonical name with
@@ -337,17 +337,19 @@ public:
 	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {}
 	CCompany(const string &name, const string &canonicalName) : m_originalName(name), m_canonicalName(canonicalName) {}
 
-	unordered_map<CInvoice, unique_ptr<CInvoice>, CInvoice::hashFunction>::iterator find(CInvoice &invoice) {
-		return m_invoices.find(invoice);
+	unordered_map<CInvoice, shared_ptr<CInvoice>, CInvoice::hashFunction>::iterator find(const CInvoice &invoice, bool &success) {
+		auto iter = m_invoices.find(invoice);
+		success = iter != m_invoices.end();
+		return iter;
 	}
 
 	/// @brief Adds an invoice to a given set of invoices, if not already contained
 	/// @param invoice The invoice to add
 	/// @param invoices The set where to add the invoice
 	/// @return True when succesfully added, otherwise false
-	bool add(unique_ptr<CInvoice> &invoice, bool issuing) {
+	bool add(shared_ptr<CInvoice> invoice, bool issuing) {
 		// Check if it exists already
-		auto iter = find(*invoice); // Through the find function, since we then do more operations on it if it exists
+		auto iter = m_invoices.find(*invoice); // Through the find function, since we then do more operations on it if it exists
 		if (iter != m_invoices.end()) {
 			// Check if it was issued / accepted already
 			if (issuing ? (*((*iter).second)).getWasIssued() : (*((*iter).second)).getWasAccepted()) {
@@ -434,6 +436,8 @@ class CVATRegister {
 private:
 	unordered_map<string, CCompany> m_companyRegister;
 
+	size_t m_invoiceCount;
+
 	/// @brief Finds two companies from the given invoice, returns their iterators and whether they were found
 	/// @param[in,out] x The invoice to get the companies from (names are overwritten by their canonical name)
 	/// @param[out] iSeller Iterator to the selling company
@@ -455,6 +459,31 @@ private:
 		return true;
 	}
 
+	/// @brief Attempts to add an invoice to a list of issued invoices of a selling company from the invoice
+	/// @param x The invoice to add
+	/// @return True when succesfully added, otherwise false
+	bool add(CInvoice x, bool issuing) {
+		std::unordered_map<std::string, CCompany>::iterator iSeller, iBuyer;
+		if (!findCompaniesFromInvoice(x, iSeller, iBuyer)) {
+			return false;
+		}
+
+		bool success = false;
+		auto iter = (*iSeller).second.find(x, success);
+
+		if (!success) {
+			// if it doesn't exist in the first one, it surely doesn't in the other one
+			shared_ptr<CInvoice> toAdd = make_shared<CInvoice>(x);
+			toAdd->setOrder(m_invoiceCount++);
+			issuing ? toAdd->setWasIssued(true) : toAdd->setWasAccepted(true);
+			// no reasone to fail
+			(*iSeller).second.add(toAdd, issuing);
+			(*iBuyer).second.add(toAdd, issuing);
+			return true;
+		}
+		return (*iSeller).second.add((*iter).second, issuing);
+	}
+
 public:
 	/// @brief Empty constructor of CVATRegister
 	CVATRegister() : m_companyRegister() {}
@@ -474,23 +503,15 @@ public:
 	/// @brief Attempts to add an invoice to a list of issued invoices of a selling company from the invoice
 	/// @param x The invoice to add
 	/// @return True when succesfully added, otherwise false
-	bool addIssued(CInvoice x) {
-		std::unordered_map<std::string, CCompany>::iterator iSeller, iBuyer;
-		if (!findCompaniesFromInvoice(x, iSeller, iBuyer)) {
-			return false;
-		}
-		return (*iSeller).second.addIssued(x);
+	bool addIssued(const CInvoice &x) {
+		return add(x, true);
 	}
 
 	/// @brief Attempts to add an invoice to a list of accepted invoices of a buying company from the invoice
 	/// @param x The invoice to add
 	/// @return True when succesfully added, otherwise false
-	bool addAccepted(CInvoice x) {
-		std::unordered_map<std::string, CCompany>::iterator iSeller, iBuyer;
-		if (!findCompaniesFromInvoice(x, iSeller, iBuyer)) {
-			return false;
-		}
-		return (*iBuyer).second.addAccepted(x);
+	bool addAccepted(const CInvoice &x) {
+		return add(x, false);
 	}
 
 	bool delIssued(const CInvoice &x);
