@@ -335,6 +335,7 @@ public:
 	/// @brief Construct a new CCompany object given by the name
 	/// @param name Name of the company
 	CCompany(const string &name) : m_originalName(name), m_canonicalName(toCanonical(name)) {}
+	CCompany(const string &name, const string &canonicalName) : m_originalName(name), m_canonicalName(canonicalName) {}
 
 	unordered_map<CInvoice, unique_ptr<CInvoice>, CInvoice::hashFunction>::iterator find(CInvoice &invoice) {
 		return m_invoices.find(invoice);
@@ -462,11 +463,11 @@ public:
 	/// @param name The name of the company
 	/// @return True if succesfully added, otherwise false
 	bool registerCompany(const string &name) {
-		CCompany tempCompany(name);
-		if (m_companyRegister.count(tempCompany.getCanonicalName()) != 0) {
+		string canonical = toCanonical(name);
+		if (m_companyRegister.count(canonical) != 0) {
 			return false;
 		}
-		m_companyRegister.insert(make_pair(tempCompany.getCanonicalName(), tempCompany));
+		m_companyRegister.emplace(make_pair(canonical, CCompany(name, canonical)));
 		return true;
 	}
 
