@@ -104,10 +104,8 @@ public:
 	/// @param amount The amount of money transfered
 	/// @param vat The value added tax
 	CInvoice(const CDate &date, const string &seller, const string &buyer, const unsigned int &amount, const double &vat)
-		: m_date(date), m_sellerCanonical(toCanonical(seller)), m_buyerCanonical(toCanonical(buyer)), m_amount(amount), m_vat(vat) {
+		: m_date(date), m_sellerOriginal(seller), m_sellerCanonical(toCanonical(seller)), m_buyerOriginal(buyer), m_buyerCanonical(toCanonical(buyer)), m_amount(amount), m_vat(vat) {
 		m_order = 0;
-		m_sellerOriginal = "";
-		m_buyerOriginal = "";
 		wasIssued = false;
 		wasAccepted = false;
 	}
