@@ -61,6 +61,12 @@ public:
 };
 #endif /* __PROGTEST__ */
 
+string toLowerCase(const string & toTransform) {
+	string newString(toTransform);
+	transform(newString.begin(), newString.end(), newString.begin(), [](unsigned char c) { return std::tolower(c); }); // transform all chars in string to lowercase
+	return newString;
+}
+
 /// @brief converts a string to a canonical string, which contains only lowercase characters and no redundant spaces
 /// @param src string to convert
 /// @return a canonical string
@@ -69,9 +75,7 @@ string toCanonical(const string &src) {
 	istringstream iss(src);
 	ostringstream oss;
 	copy(istream_iterator<string>(iss), istream_iterator<string>(), ostream_iterator<string>(oss, " ")); // get rid of extra white spaces
-	string toReturn = oss.str();
-	std::transform(toReturn.begin(), toReturn.end(), toReturn.begin(), [](unsigned char c) { return std::tolower(c); }); // transform all chars in string to lowercase
-	return toReturn;
+	return toLowerCase(oss.str());
 }
 
 class CInvoice {
@@ -195,11 +199,11 @@ public:
 	}
 
 	int cmpSeller(const CInvoice &rhs) const {
-		return normalizeCmpRes(m_sellerOriginal.compare(rhs.m_sellerOriginal));
+		return normalizeCmpRes(toLowerCase(m_sellerOriginal).compare(toLowerCase(rhs.m_sellerOriginal)));
 	}
 
 	int cmpBuyer(const CInvoice &rhs) const {
-		return normalizeCmpRes(m_buyerOriginal.compare(rhs.m_buyerOriginal));
+		return normalizeCmpRes(toLowerCase(m_buyerOriginal).compare(toLowerCase(rhs.m_buyerOriginal)));
 	}
 
 	int cmpAmount(const CInvoice &rhs) const {
