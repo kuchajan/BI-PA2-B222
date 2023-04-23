@@ -597,8 +597,88 @@ void testCCompany() {
 	assert(CCompany("Third Company, Ltd.") == CCompany(" Third  Company,  Ltd.  "));
 }
 
+void testCMP1() {
+	CInvoice a(CDate(2000,1,1),"a","a",1,1);
+	a.setOrder(1);
+	CInvoice b(CDate(2000,1,2),"b","b",2,2);
+	b.setOrder(2);
+	CInvoice c(CDate(2000,1,3),"c","c",3,3);
+	c.setOrder(3);
+
+	assert(b.cmpOrder(a) ==  1);
+	assert(b.cmpOrder(c) == -1);
+
+	assert(b.cmpDate(a) ==  1);
+	assert(b.cmpDate(b) ==  0);
+	assert(b.cmpDate(c) == -1);
+
+	assert(b.cmpBuyer(a) ==  1);
+	assert(b.cmpBuyer(b) ==  0);
+	assert(b.cmpBuyer(c) == -1);
+
+	assert(b.cmpSeller(a) ==  1);
+	assert(b.cmpSeller(b) ==  0);
+	assert(b.cmpSeller(c) == -1);
+
+	assert(b.cmpAmount(a) ==  1);
+	assert(b.cmpAmount(b) ==  0);
+	assert(b.cmpAmount(c) == -1);
+
+	assert(b.cmpVAT(a) ==  1);
+	assert(b.cmpVAT(b) ==  0);
+	assert(b.cmpVAT(c) == -1);
+}
+
+void testCMP2() {
+	CInvoice a(CDate(2000,1,1),"a","a",1,1);
+	a.setOrder(1);
+	CInvoice b(CDate(2000,1,2),"b","b",2,2);
+	b.setOrder(2);
+	CInvoice c(CDate(2000,1,3),"c","c",3,3);
+	c.setOrder(3);
+
+	assert(CSortOpt()(a,b));
+	assert(CSortOpt().addKey(CSortOpt::BY_BUYER, true)(a,b));
+	assert(!CSortOpt().addKey(CSortOpt::BY_BUYER, false)(a,b));
+}
+
+void testSort0() {
+	vector<CInvoice> invoices {
+		CInvoice(CDate(2000, 1, 1), "a", "a", 200, 30.000000),
+		CInvoice(CDate(2000, 1, 1), "b", "b", 200, 30.000000),
+		CInvoice(CDate(2000, 1, 2), "b", "b", 100, 20.000000),
+		CInvoice(CDate(2000, 1, 1), "d", "d", 200, 30.000000),
+		CInvoice(CDate(2000, 1, 1), "e", "e", 200, 30.000000)};
+	vector<CInvoice> copy = invoices;
+	sort(invoices.begin(), invoices.end(), CSortOpt().addKey(CSortOpt::BY_BUYER, true).addKey(CSortOpt::BY_DATE, true));
+	assert(invoices == copy);
+}
+void testSort1() {
+	vector<CInvoice> invoices {
+		CInvoice(CDate(2000, 1, 1), "first Company", "Third Company, Ltd.", 200, 30.000000),
+		CInvoice(CDate(2000, 1, 2), "first Company", "Second     Company", 200, 30.000000),
+		CInvoice(CDate(2000, 1, 1), "first Company", "Second     Company", 100, 20.000000),
+		CInvoice(CDate(2000, 1, 1), "first Company", "Second     Company", 100, 30.000000),
+		CInvoice(CDate(2000, 1, 1), "first Company", "Second     Company", 300, 30.000000),
+		CInvoice(CDate(2000, 1, 1), "Second     Company", "first Company", 300, 30.000000)};
+	invoices[0].setOrder(0);
+	invoices[1].setOrder(1);
+	invoices[2].setOrder(2);
+	invoices[3].setOrder(3);
+	invoices[4].setOrder(4);
+	invoices[5].setOrder(5);
+	vector<CInvoice> copy = invoices;
+
+	sort(invoices.begin(), invoices.end(), CSortOpt().addKey(CSortOpt::BY_BUYER, false).addKey(CSortOpt::BY_DATE, false));
+	assert(invoices == copy);
+}
+
 int main(void) {
 	testCCompany();
+	testCMP1();
+	testCMP2();
+	testSort0();
+	testSort1();
 	CVATRegister r;
 	assert(r.registerCompany("first Company"));
 	assert(r.registerCompany("Second     Company"));
