@@ -444,7 +444,7 @@ public:
 
 		// copy the invoices that are not issued or are not accepted
 		for (auto iter = m_invoices.begin(); iter != m_invoices.end(); ++iter) {
-			if ((*(*iter).second).getWasIssued() != true && (*(*iter).second).getWasAccepted() != true) {
+			if (!iter->second->getWasIssued() || !iter->second->getWasAccepted()) {
 				invoices.push_back(*(*iter).second);
 			}
 		}
