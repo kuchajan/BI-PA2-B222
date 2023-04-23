@@ -117,7 +117,7 @@ public:
 	}
 
 	bool getWasAccepted() const {
-		return wasIssued;
+		return wasAccepted;
 	}
 
 	void setWasAccepted(bool setTo) {
