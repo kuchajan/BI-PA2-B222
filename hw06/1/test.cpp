@@ -45,6 +45,18 @@ public:
 };
 #endif /* __PROGTEST__ */
 
+/// @brief Returns a new CRect with calculated absolute position
+/// @param winPos The position of a window
+/// @param relPos The relative position of an element
+/// @return The absolute position of an element
+CRect getAbsolutePos(const CRect &winPos, const CRect &relPos) {
+	return CRect(
+		(winPos.m_W * relPos.m_X) + winPos.m_X,
+		(winPos.m_H * relPos.m_Y) + winPos.m_Y,
+		winPos.m_W * relPos.m_W,
+		winPos.m_H * relPos.m_H);
+}
+
 class CWindow {
 public:
 	CWindow(int id,
