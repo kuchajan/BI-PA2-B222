@@ -57,42 +57,66 @@ CRect getAbsolutePos(const CRect &winPos, const CRect &relPos) {
 		winPos.m_H * relPos.m_H);
 }
 
-class CWindow {
+class CElement {
+private:
+	int m_id;
+
+protected:
+	CRect m_relPos;
+	CRect m_absPos;
+
 public:
-	CWindow(int id,
-			const string &title,
-			const CRect &absPos);
+	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
+};
+
+class CTitleable : public CElement {
+private:
+protected:
+	string m_title;
+
+public:
+	CTitleable(const int &id, const CRect &relPos, const string &title) : CElement(id, relPos), m_title(title) {}
+};
+
+// I'm not inheriting from CTitleable for I will later copy this implementation into hw06_2 that will inherit from CPanel which will not inherit from CTitleable
+class CWindow : public CElement {
+private:
+	vector<unique_ptr<CElement>> m_addOrder;
+	multimap<int, CElement *> m_elements;
+	string m_title;
+
+public:
+	CWindow(const int &id, const string &title, const CRect &absPos) : CElement(id, absPos), m_title(title) {
+		swap(m_absPos, m_relPos);
+	}
 	// add
 	// search
 	// setPosition
 };
 
-class CButton {
+class CButton : public CTitleable {
 public:
-	CButton(int id,
-			const CRect &relPos,
-			const string &name);
+	using CTitleable::CTitleable;
 };
 
-class CInput {
+class CInput : public CTitleable {
 public:
-	CInput(int id,
-		   const CRect &relPos,
-		   const string &value);
+	using CTitleable::CTitleable;
 	// setValue
 	// getValue
 };
-class CLabel {
+class CLabel : public CTitleable {
 public:
-	CLabel(int id,
-		   const CRect &relPos,
-		   const string &label);
+	using CTitleable::CTitleable;
 };
 
-class CComboBox {
+class CComboBox : public CElement {
+private:
+	vector<string> m_items;
+	size_t m_selected;
+
 public:
-	CComboBox(int id,
-			  const CRect &relPos);
+	using CElement::CElement;
 	// add
 	// setSelected
 	// getSelected
