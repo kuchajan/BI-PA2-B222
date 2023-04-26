@@ -67,6 +67,10 @@ protected:
 
 public:
 	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
+
+	int getId() {
+		return m_id;
+	}
 };
 
 class CTitleable : public CElement {
