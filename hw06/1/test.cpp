@@ -161,6 +161,10 @@ private:
 public:
 	using CElement::CElement;
 	// add
+	CComboBox &add(const string &toAdd) {
+		m_items.emplace_back(string(toAdd));
+		return *this;
+	}
 	// setSelected
 	// getSelected
 };
