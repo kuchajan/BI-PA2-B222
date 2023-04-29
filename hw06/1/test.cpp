@@ -57,6 +57,15 @@ CRect getAbsolutePos(const CRect &winPos, const CRect &relPos) {
 		winPos.m_H * relPos.m_H);
 }
 
+/// @brief Checks if a sorted vector of ints contains a given value
+/// @param checking Value to find
+/// @param toCheck Vector to check
+/// @return True if value was found, otherwise false
+bool isContained(const int &checking, const vector<int> &toCheck) {
+	auto it = lower_bound(toCheck.begin(), toCheck.end(), checking);
+	return it != toCheck.end();
+}
+
 class CElement {
 private:
 	int m_id;
@@ -66,12 +75,35 @@ protected:
 	CRect m_absPos;
 
 	// functions to override
+	void printIndent(ostream &os, const int &indent, vector<int> &pipePos, const bool &printLastSpace = true) const {
+		for (int i = 0; i < indent; i++) {
+			if (i == indent - 1) {
+				os << ((printLastSpace) ? ("+- ") : ("+-"));
+				return;
+			}
+			if (isContained(i, pipePos)) {
+				os << "|  ";
+				continue;
+			}
+			os << "   ";
+		}
+	}
+	void printCommon(ostream &os, const int &indent, vector<int> &pipePos) const {
+		printIndent(os, indent, pipePos);
+		os << "[" << m_id << "] " << getElementName() << " " << m_absPos << "\n";
+	}
+	void printCommon(ostream &os, const int &indent, vector<int> &pipePos, const string &title) const {
+		printIndent(os, indent, pipePos);
+		os << "[" << m_id << "] " << getElementName() << " \"" << title << "\" " << m_absPos << "\n";
+	}
 	virtual string getElementName() const = 0;
 
 public:
 	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
 
 	virtual shared_ptr<CElement> clone() const = 0;
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const = 0;
 
 	int getId() {
 		return m_id;
@@ -85,6 +117,10 @@ protected:
 
 public:
 	CTitleable(const int &id, const CRect &relPos, const string &title) : CElement(id, relPos), m_title(title) {}
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos, m_title);
+	}
 };
 
 // I'm not inheriting from CTitleable for I will later copy this implementation into hw06_2 that will inherit from CPanel which will not inherit from CTitleable
@@ -105,6 +141,18 @@ public:
 
 	virtual shared_ptr<CElement> clone() const override {
 		return make_shared<CWindow>(*this);
+	}
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos, m_title);
+		pipePos.push_back(indent++);
+
+		for (auto iter = m_addOrder.begin(); iter != m_addOrder.end(); ++iter) {
+			if (next(iter) == m_addOrder.end()) { // Element is second last
+				pipePos.pop_back();
+			}
+			(*iter)->print(os, indent, pipePos);
+		}
 	}
 
 	// add
@@ -176,6 +224,17 @@ private:
 
 public:
 	using CElement::CElement;
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos);
+		indent++;
+		for (size_t i = 0; i < m_items.size(); ++i) {
+			printIndent(os, indent, pipePos, false);
+			os << ((i == m_selected) ? (">" + m_items[i] + "<") : (" " + m_items[i]));
+			os << "\n";
+		}
+	}
+
 	virtual shared_ptr<CElement> clone() const override {
 		return make_shared<CComboBox>(*this);
 	}
@@ -189,6 +248,11 @@ public:
 };
 
 // output operators
+ostream &operator<<(ostream &os, const CElement &element) {
+	vector<int> pipePos;
+	element.print(os, 0, pipePos);
+	return os;
+}
 
 #ifndef __PROGTEST__
 template <typename _T>
