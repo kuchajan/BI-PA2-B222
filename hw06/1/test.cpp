@@ -96,7 +96,7 @@ private:
 	multimap<int, weak_ptr<CElement>> m_elements;
 	string m_title;
 
-	virtual string getElementName() const {
+	virtual string getElementName() const override {
 		return "Window";
 	}
 
@@ -120,7 +120,7 @@ public:
 
 class CButton : public CTitleable {
 private:
-	virtual string getElementName() const {
+	virtual string getElementName() const override {
 		return "Button";
 	}
 
@@ -130,7 +130,7 @@ public:
 
 class CInput : public CTitleable {
 private:
-	virtual string getElementName() const {
+	virtual string getElementName() const override {
 		return "Input";
 	}
 
@@ -141,7 +141,7 @@ public:
 };
 class CLabel : public CTitleable {
 private:
-	virtual string getElementName() const {
+	virtual string getElementName() const override {
 		return "Label";
 	}
 
@@ -154,7 +154,7 @@ private:
 	vector<string> m_items;
 	size_t m_selected;
 
-	virtual string getElementName() const {
+	virtual string getElementName() const override {
 		return "ComboBox";
 	}
 
