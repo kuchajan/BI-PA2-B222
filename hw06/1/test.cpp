@@ -71,6 +71,10 @@ protected:
 public:
 	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
 
+	virtual shared_ptr<CElement> clone() const {
+		return make_shared<CElement>(*this);
+	}
+
 	int getId() {
 		return m_id;
 	}
@@ -88,8 +92,8 @@ public:
 // I'm not inheriting from CTitleable for I will later copy this implementation into hw06_2 that will inherit from CPanel which will not inherit from CTitleable
 class CWindow : public CElement {
 private:
-	vector<unique_ptr<CElement>> m_addOrder;
-	multimap<int, CElement *> m_elements;
+	vector<shared_ptr<CElement>> m_addOrder;
+	multimap<int, weak_ptr<CElement>> m_elements;
 	string m_title;
 
 	virtual string getElementName() const {
@@ -101,6 +105,15 @@ public:
 		swap(m_absPos, m_relPos);
 	}
 	// add
+	CWindow &add(const CElement &toAdd) {
+		shared_ptr<CElement> addSptr = toAdd.clone();
+		weak_ptr<CElement> addWptr = addSptr;
+
+		m_addOrder.push_back(addSptr);
+		m_elements.insert(make_pair(addSptr->getId(), addWptr));
+		return *this;
+	}
+
 	// search
 	// setPosition
 };
