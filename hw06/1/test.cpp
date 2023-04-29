@@ -71,9 +71,7 @@ protected:
 public:
 	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
 
-	virtual shared_ptr<CElement> clone() const {
-		return make_shared<CElement>(*this);
-	}
+	virtual shared_ptr<CElement> clone() const = 0;
 
 	int getId() {
 		return m_id;
@@ -104,6 +102,11 @@ public:
 	CWindow(const int &id, const string &title, const CRect &absPos) : CElement(id, absPos), m_title(title) {
 		swap(m_absPos, m_relPos);
 	}
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CWindow>(*this);
+	}
+
 	// add
 	CWindow &add(const CElement &toAdd) {
 		shared_ptr<CElement> addSptr = toAdd.clone();
@@ -126,6 +129,10 @@ private:
 
 public:
 	using CTitleable::CTitleable;
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CButton>(*this);
+	}
 };
 
 class CInput : public CTitleable {
@@ -136,6 +143,11 @@ private:
 
 public:
 	using CTitleable::CTitleable;
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CInput>(*this);
+	}
+
 	// setValue
 	// getValue
 };
@@ -147,6 +159,10 @@ private:
 
 public:
 	using CTitleable::CTitleable;
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CLabel>(*this);
+	}
 };
 
 class CComboBox : public CElement {
@@ -160,6 +176,9 @@ private:
 
 public:
 	using CElement::CElement;
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CComboBox>(*this);
+	}
 	// add
 	CComboBox &add(const string &toAdd) {
 		m_items.emplace_back(string(toAdd));
