@@ -74,7 +74,7 @@ protected:
 	CRect m_relPos;
 	CRect m_absPos;
 
-	// functions to override
+	// common methods
 	void printIndent(ostream &os, const int &indent, vector<int> &pipePos, const bool &printLastSpace = true) const {
 		for (int i = 0; i < indent; i++) {
 			if (i == indent - 1) {
@@ -88,6 +88,12 @@ protected:
 			os << "   ";
 		}
 	}
+	// methods to override
+
+	virtual bool isCWindow() const {
+		return false;
+	}
+
 	void printCommon(ostream &os, const int &indent, vector<int> &pipePos) const {
 		printIndent(os, indent, pipePos);
 		os << "[" << m_id << "] " << getElementName() << " " << m_absPos << "\n";
@@ -103,10 +109,20 @@ public:
 
 	virtual shared_ptr<CElement> clone() const = 0;
 
+	virtual bool isContainer() const {
+		return false;
+	}
+
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const = 0;
 
 	int getId() {
 		return m_id;
+	}
+
+	virtual void updatePosition(const CRect &parentAbsPos) {
+		if (!isCWindow()) {
+			m_absPos = getAbsolutePos(parentAbsPos, m_relPos);
+		}
 	}
 };
 
@@ -134,6 +150,17 @@ private:
 		return "Window";
 	}
 
+	virtual bool isCWindow() const {
+		return true;
+	}
+
+protected:
+	virtual void updateChildrenPos() {
+		for (auto element : m_addOrder) {
+			updatePosition(m_absPos);
+		}
+	}
+
 public:
 	CWindow(const int &id, const string &title, const CRect &absPos) : CElement(id, absPos), m_title(title) {
 		swap(m_absPos, m_relPos);
@@ -141,6 +168,10 @@ public:
 
 	virtual shared_ptr<CElement> clone() const override {
 		return make_shared<CWindow>(*this);
+	}
+
+	virtual bool isContainer() const override {
+		return true;
 	}
 
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
@@ -160,6 +191,9 @@ public:
 		shared_ptr<CElement> addSptr = toAdd.clone();
 		weak_ptr<CElement> addWptr = addSptr;
 
+		// update the position of the child
+		addSptr->updatePosition(m_absPos);
+
 		m_addOrder.push_back(addSptr);
 		m_elements.insert(make_pair(addSptr->getId(), addWptr));
 		return *this;
@@ -167,6 +201,10 @@ public:
 
 	// search
 	// setPosition
+	void setPosition(const CRect &newPos) {
+		m_absPos = newPos;
+		updateChildrenPos();
+	}
 };
 
 class CButton : public CTitleable {
