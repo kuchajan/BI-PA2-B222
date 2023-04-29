@@ -246,7 +246,13 @@ public:
 		return *this;
 	}
 	// setSelected
+	void setSelected(const size_t &selected) {
+		m_selected = selected;
+	}
 	// getSelected
+	size_t getSelected() const {
+		return m_selected;
+	}
 };
 
 // output operators
