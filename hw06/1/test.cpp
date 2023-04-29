@@ -65,6 +65,9 @@ protected:
 	CRect m_relPos;
 	CRect m_absPos;
 
+	// functions to override
+	virtual string getElementName() const = 0;
+
 public:
 	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
 
@@ -89,6 +92,10 @@ private:
 	multimap<int, CElement *> m_elements;
 	string m_title;
 
+	virtual string getElementName() const {
+		return "Window";
+	}
+
 public:
 	CWindow(const int &id, const string &title, const CRect &absPos) : CElement(id, absPos), m_title(title) {
 		swap(m_absPos, m_relPos);
@@ -99,17 +106,32 @@ public:
 };
 
 class CButton : public CTitleable {
+private:
+	virtual string getElementName() const {
+		return "Button";
+	}
+
 public:
 	using CTitleable::CTitleable;
 };
 
 class CInput : public CTitleable {
+private:
+	virtual string getElementName() const {
+		return "Input";
+	}
+
 public:
 	using CTitleable::CTitleable;
 	// setValue
 	// getValue
 };
 class CLabel : public CTitleable {
+private:
+	virtual string getElementName() const {
+		return "Label";
+	}
+
 public:
 	using CTitleable::CTitleable;
 };
@@ -118,6 +140,10 @@ class CComboBox : public CElement {
 private:
 	vector<string> m_items;
 	size_t m_selected;
+
+	virtual string getElementName() const {
+		return "ComboBox";
+	}
 
 public:
 	using CElement::CElement;
