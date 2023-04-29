@@ -115,7 +115,7 @@ public:
 
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const = 0;
 
-	int getId() {
+	int getId() const {
 		return m_id;
 	}
 
