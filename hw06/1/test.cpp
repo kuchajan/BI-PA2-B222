@@ -223,7 +223,9 @@ private:
 	}
 
 public:
-	using CElement::CElement;
+	CComboBox(const int &id, const CRect &relPos) : CElement(id, relPos) {
+		m_selected = 0;
+	}
 
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
 		printCommon(os, indent, pipePos);
