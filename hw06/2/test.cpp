@@ -89,10 +89,6 @@ protected:
 	}
 	// methods to override
 
-	virtual bool isCWindow() const {
-		return false;
-	}
-
 	void printCommon(ostream &os, const int &indent, vector<int> &pipePos) const {
 		printIndent(os, indent, pipePos);
 		os << "[" << m_id << "] " << getElementName() << " " << m_absPos << "\n";
@@ -149,6 +145,10 @@ protected:
 		for (auto element : m_elements) {
 			element->updatePosition(m_absPos);
 		}
+	}
+
+	virtual bool isCWindow() const {
+		return false;
 	}
 
 	virtual void updatePosition(const CRect &parentAbsPos) override {
