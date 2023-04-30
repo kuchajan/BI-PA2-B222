@@ -200,6 +200,17 @@ public:
 	}
 
 	// search
+	CElement *search(const int &searchID) {
+		multimap<int, weak_ptr<CElement>>::iterator iter = m_elements.find(searchID);
+		if (iter != m_elements.end()) {
+			// paranoia
+			if (auto lockedptr = iter->second.lock()) {
+				return iter->second.lock().get();
+			}
+			throw logic_error("CWindow::search: Could not lock weak pointer");
+		}
+		return nullptr;
+	}
 	// setPosition
 	void setPosition(const CRect &newPos) {
 		m_absPos = newPos;
