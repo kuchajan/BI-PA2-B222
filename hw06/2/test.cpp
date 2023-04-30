@@ -93,10 +93,6 @@ protected:
 		return false;
 	}
 
-	virtual bool isContainer() const {
-		return false;
-	}
-
 	void printCommon(ostream &os, const int &indent, vector<int> &pipePos) const {
 		printIndent(os, indent, pipePos);
 		os << "[" << m_id << "] " << getElementName() << " " << m_absPos << "\n";
@@ -144,10 +140,6 @@ class CPanel : public CElement {
 private:
 	virtual string getElementName() const override {
 		return "Panel";
-	}
-
-	virtual bool isContainer() const override {
-		return true;
 	}
 
 protected:
