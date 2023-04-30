@@ -109,10 +109,6 @@ public:
 
 	virtual shared_ptr<CElement> clone() const = 0;
 
-	virtual bool isContainer() const {
-		return false;
-	}
-
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const = 0;
 
 	int getId() const {
@@ -123,6 +119,10 @@ public:
 		if (!isCWindow()) {
 			m_absPos = getAbsolutePos(parentAbsPos, m_relPos);
 		}
+	}
+
+	virtual CElement *search(const int &id) {
+		return (m_id == id) ? this : nullptr;
 	}
 };
 
@@ -142,8 +142,7 @@ public:
 // I'm not inheriting from CTitleable for I will later copy this implementation into hw06_2 that will inherit from CPanel which will not inherit from CTitleable
 class CWindow : public CElement {
 private:
-	vector<shared_ptr<CElement>> m_addOrder;
-	multimap<int, weak_ptr<CElement>> m_elements;
+	vector<shared_ptr<CElement>> m_elements;
 	string m_title;
 
 	virtual string getElementName() const override {
@@ -156,7 +155,7 @@ private:
 
 protected:
 	virtual void updateChildrenPos() {
-		for (auto element : m_addOrder) {
+		for (auto element : m_elements) {
 			element->updatePosition(m_absPos);
 		}
 	}
@@ -167,10 +166,9 @@ public:
 	}
 
 	CWindow(const CWindow &copyFrom) : CWindow(copyFrom.getId(), copyFrom.m_title, copyFrom.m_absPos) {
-		m_addOrder.clear();
 		m_elements.clear();
 
-		for (auto element : copyFrom.m_addOrder) {
+		for (auto element : copyFrom.m_elements) {
 			add(*element);
 		}
 	}
@@ -179,16 +177,12 @@ public:
 		return make_shared<CWindow>(*this);
 	}
 
-	virtual bool isContainer() const override {
-		return true;
-	}
-
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
 		printCommon(os, indent, pipePos, m_title);
 		pipePos.push_back(indent++);
 
-		for (auto iter = m_addOrder.begin(); iter != m_addOrder.end(); ++iter) {
-			if (next(iter) == m_addOrder.end()) { // Element is second last
+		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
+			if (next(iter) == m_elements.end()) { // Element is second last
 				pipePos.pop_back();
 			}
 			(*iter)->print(os, indent, pipePos);
@@ -203,21 +197,22 @@ public:
 		// update the position of the child
 		addSptr->updatePosition(m_absPos);
 
-		m_addOrder.push_back(addSptr);
-		m_elements.insert(make_pair(addSptr->getId(), addWptr));
+		m_elements.push_back(addSptr);
 		return *this;
 	}
 
 	// search
-	CElement *search(const int &searchID) {
-		multimap<int, weak_ptr<CElement>>::iterator iter = m_elements.find(searchID);
-		if (iter != m_elements.end()) {
-			// paranoia
-			if (auto lockedptr = iter->second.lock()) {
-				return iter->second.lock().get();
-			}
-			throw logic_error("CWindow::search: Could not lock weak pointer");
+	virtual CElement *search(const int &id) override {
+		if (id == getId()) {
+			return this;
 		}
+		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
+			CElement *res = (*iter)->search(id);
+			if (res != nullptr) {
+				return res;
+			}
+		}
+
 		return nullptr;
 	}
 	// setPosition
