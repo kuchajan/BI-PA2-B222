@@ -93,6 +93,10 @@ protected:
 		return false;
 	}
 
+	virtual bool isContainer() const {
+		return false;
+	}
+
 	void printCommon(ostream &os, const int &indent, vector<int> &pipePos) const {
 		printIndent(os, indent, pipePos);
 		os << "[" << m_id << "] " << getElementName() << " " << m_absPos << "\n";
@@ -115,9 +119,7 @@ public:
 	}
 
 	virtual void updatePosition(const CRect &parentAbsPos) {
-		if (!isCWindow()) {
-			m_absPos = getAbsolutePos(parentAbsPos, m_relPos);
-		}
+		m_absPos = getAbsolutePos(parentAbsPos, m_relPos);
 	}
 
 	virtual CElement *search(const int &id) {
@@ -138,17 +140,99 @@ public:
 	}
 };
 
-class CPanel {
+class CPanel : public CElement {
+private:
+	virtual string getElementName() const override {
+		return "Panel";
+	}
+
+	virtual bool isContainer() const override {
+		return true;
+	}
+
+protected:
+	vector<shared_ptr<CElement>> m_elements;
+
+	void updateChildrenPos() {
+		for (auto element : m_elements) {
+			element->updatePosition(m_absPos);
+		}
+	}
+
+	virtual void updatePosition(const CRect &parentAbsPos) override {
+		if (!isCWindow()) {
+			m_absPos = getAbsolutePos(parentAbsPos, m_relPos);
+		}
+		updateChildrenPos();
+	}
+
+	void addElement(const CElement &toAdd) {
+		shared_ptr<CElement> addSptr = toAdd.clone();
+		weak_ptr<CElement> addWptr = addSptr;
+
+		// update the position of the child
+		addSptr->updatePosition(m_absPos);
+
+		m_elements.push_back(addSptr);
+	}
+
+	void printChildren(ostream &os, int indent, vector<int> &pipePos) const {
+		if (m_elements.size() > 1) {
+			pipePos.push_back(indent);
+		}
+		++indent;
+
+		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
+			if (next(iter) == m_elements.end() && m_elements.size() > 1) { // Element is second last
+				pipePos.pop_back();
+			}
+			(*iter)->print(os, indent, pipePos);
+		}
+	}
+
 public:
-	CPanel(int id,
-		   const CRect &relPos);
+	using CElement::CElement;
+
+	CPanel(const CPanel &copyFrom) : CPanel(copyFrom.getId(), copyFrom.m_relPos) {
+		m_elements.clear();
+
+		for (auto element : copyFrom.m_elements) {
+			add(*element);
+		}
+	}
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CPanel>(*this);
+	}
+	// I hope I won't have to implement a copy constructor...
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos);
+		printChildren(os, indent, pipePos);
+	}
+
+	virtual CElement *search(const int &id) override {
+		if (id == getId()) {
+			return this;
+		}
+		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
+			CElement *res = (*iter)->search(id);
+			if (res != nullptr) {
+				return res;
+			}
+		}
+
+		return nullptr;
+	}
 	// add
+	CPanel &add(const CElement &toAdd) {
+		addElement(toAdd);
+		return *this;
+	}
 };
 
 // I'm not inheriting from CTitleable for I will later copy this implementation into hw06_2 that will inherit from CPanel which will not inherit from CTitleable
-class CWindow : public CElement {
+class CWindow : public CPanel {
 private:
-	vector<shared_ptr<CElement>> m_elements;
 	string m_title;
 
 	virtual string getElementName() const override {
@@ -160,14 +244,8 @@ private:
 	}
 
 protected:
-	virtual void updateChildrenPos() {
-		for (auto element : m_elements) {
-			element->updatePosition(m_absPos);
-		}
-	}
-
 public:
-	CWindow(const int &id, const string &title, const CRect &absPos) : CElement(id, absPos), m_title(title) {
+	CWindow(const int &id, const string &title, const CRect &absPos) : CPanel(id, absPos), m_title(title) {
 		swap(m_absPos, m_relPos);
 	}
 
@@ -183,51 +261,21 @@ public:
 		return make_shared<CWindow>(*this);
 	}
 
-	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
-		printCommon(os, indent, pipePos, m_title);
-		if (m_elements.size() > 1) {
-			pipePos.push_back(indent);
-		}
-		++indent;
-
-		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
-			if (next(iter) == m_elements.end() && m_elements.size() > 1) { // Element is second last
-				pipePos.pop_back();
-			}
-			(*iter)->print(os, indent, pipePos);
-		}
-	}
-
 	// add
 	CWindow &add(const CElement &toAdd) {
-		shared_ptr<CElement> addSptr = toAdd.clone();
-		weak_ptr<CElement> addWptr = addSptr;
-
-		// update the position of the child
-		addSptr->updatePosition(m_absPos);
-
-		m_elements.push_back(addSptr);
+		addElement(toAdd);
 		return *this;
 	}
 
-	// search
-	virtual CElement *search(const int &id) override {
-		if (id == getId()) {
-			return this;
-		}
-		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
-			CElement *res = (*iter)->search(id);
-			if (res != nullptr) {
-				return res;
-			}
-		}
-
-		return nullptr;
-	}
 	// setPosition
 	void setPosition(const CRect &newPos) {
 		m_absPos = newPos;
 		updateChildrenPos();
+	}
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos, m_title);
+		printChildren(os, indent, pipePos);
 	}
 };
 
@@ -422,7 +470,6 @@ void testWindowInsideWindow2() {
 	CWindow b(2, "b", CRect(10, 10, 200, 200));
 	a.add(CButton(3, CRect(0.5, 0.5, 0.1, 0.1), "OK"));
 	b.add(a);
-	cout << b;
 	assert(toString(b) ==
 		   "[2] Window \"b\" (10,10,200,200)\n"
 		   "+- [1] Window \"a\" (0,0,100,100)\n"
