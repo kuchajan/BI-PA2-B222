@@ -329,6 +329,85 @@ string toString(const _T &x) {
 	return oss.str();
 }
 
+void testWindowInsideWindow() {
+	CWindow a(0, "a", CRect(10, 10, 600, 480));
+	CWindow b(10, "b", CRect(20, 30, 640, 520));
+	a.add(CComboBox(1, CRect(0.1, 0.3, 0.8, 0.1)).add("Karate").add("Judo").add("Box").add("Progtest"));
+	a.add(b);
+	a.add(CComboBox(2, CRect(0.1, 0.5, 0.8, 0.1)).add("PA2").add("OSY").add("Both"));
+	assert(toString(a) ==
+		   "[0] Window \"a\" (10,10,600,480)\n"
+		   "+- [1] ComboBox (70,154,480,48)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [10] Window \"b\" (20,30,640,520)\n"
+		   "+- [2] ComboBox (70,250,480,48)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	dynamic_cast<CWindow &>(*a.search(10))
+		.add(CComboBox(11, CRect(0.1, 0.3, 0.8, 0.1)).add("Karate").add("Judo").add("Box").add("Progtest"))
+		.add(CComboBox(12, CRect(0.1, 0.5, 0.8, 0.1)).add("PA2").add("OSY").add("Both"));
+	assert(toString(b) ==
+		   "[10] Window \"b\" (20,30,640,520)\n");
+	assert(toString(*a.search(10)) ==
+		   "[10] Window \"b\" (20,30,640,520)\n"
+		   "+- [11] ComboBox (84,186,512,52)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [12] ComboBox (84,290,512,52)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	assert(toString(a) ==
+		   "[0] Window \"a\" (10,10,600,480)\n"
+		   "+- [1] ComboBox (70,154,480,48)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [10] Window \"b\" (20,30,640,520)\n"
+		   "|  +- [11] ComboBox (84,186,512,52)\n"
+		   "|  |  +->Karate<\n"
+		   "|  |  +- Judo\n"
+		   "|  |  +- Box\n"
+		   "|  |  +- Progtest\n"
+		   "|  +- [12] ComboBox (84,290,512,52)\n"
+		   "|     +->PA2<\n"
+		   "|     +- OSY\n"
+		   "|     +- Both\n"
+		   "+- [2] ComboBox (70,250,480,48)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	a.setPosition(CRect(0, 0, 1000, 1000));
+	assert(toString(a) ==
+		   "[0] Window \"a\" (0,0,1000,1000)\n"
+		   "+- [1] ComboBox (100,300,800,100)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [10] Window \"b\" (20,30,640,520)\n"
+		   "|  +- [11] ComboBox (84,186,512,52)\n"
+		   "|  |  +->Karate<\n"
+		   "|  |  +- Judo\n"
+		   "|  |  +- Box\n"
+		   "|  |  +- Progtest\n"
+		   "|  +- [12] ComboBox (84,290,512,52)\n"
+		   "|     +->PA2<\n"
+		   "|     +- OSY\n"
+		   "|     +- Both\n"
+		   "+- [2] ComboBox (100,500,800,100)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+}
+
 int main(void) {
 	assert(sizeof(CButton) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
 	assert(sizeof(CInput) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
@@ -403,6 +482,8 @@ int main(void) {
 		   "   +->PA2<\n"
 		   "   +- OSY\n"
 		   "   +- Both\n");
+
+	testWindowInsideWindow();
 	return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
