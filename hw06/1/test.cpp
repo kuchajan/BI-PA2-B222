@@ -62,8 +62,7 @@ CRect getAbsolutePos(const CRect &winPos, const CRect &relPos) {
 /// @param toCheck Vector to check
 /// @return True if value was found, otherwise false
 bool isContained(const int &checking, const vector<int> &toCheck) {
-	auto it = lower_bound(toCheck.begin(), toCheck.end(), checking);
-	return it != toCheck.end();
+	return binary_search(toCheck.begin(), toCheck.end(), checking);
 }
 
 class CElement {
