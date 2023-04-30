@@ -149,7 +149,7 @@ private:
 		return "Window";
 	}
 
-	virtual bool isCWindow() const {
+	virtual bool isCWindow() const override {
 		return true;
 	}
 
@@ -179,10 +179,13 @@ public:
 
 	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
 		printCommon(os, indent, pipePos, m_title);
-		pipePos.push_back(indent++);
+		if (m_elements.size() > 1) {
+			pipePos.push_back(indent);
+		}
+		++indent;
 
 		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
-			if (next(iter) == m_elements.end()) { // Element is second last
+			if (next(iter) == m_elements.end() && m_elements.size() > 1) { // Element is second last
 				pipePos.pop_back();
 			}
 			(*iter)->print(os, indent, pipePos);
@@ -329,7 +332,7 @@ string toString(const _T &x) {
 	return oss.str();
 }
 
-void testWindowInsideWindow() {
+void testWindowInsideWindow1() {
 	CWindow a(0, "a", CRect(10, 10, 600, 480));
 	CWindow b(10, "b", CRect(20, 30, 640, 520));
 	a.add(CComboBox(1, CRect(0.1, 0.3, 0.8, 0.1)).add("Karate").add("Judo").add("Box").add("Progtest"));
@@ -408,6 +411,18 @@ void testWindowInsideWindow() {
 		   "   +- Both\n");
 }
 
+void testWindowInsideWindow2() {
+	CWindow a(1, "a", CRect(0, 0, 100, 100));
+	CWindow b(2, "b", CRect(10, 10, 200, 200));
+	a.add(CButton(3, CRect(0.5, 0.5, 0.1, 0.1), "OK"));
+	b.add(a);
+	cout << b;
+	assert(toString(b) ==
+		   "[2] Window \"b\" (10,10,200,200)\n"
+		   "+- [1] Window \"a\" (0,0,100,100)\n"
+		   "   +- [3] Button \"OK\" (50,50,10,10)\n");
+}
+
 int main(void) {
 	assert(sizeof(CButton) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
 	assert(sizeof(CInput) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
@@ -483,7 +498,8 @@ int main(void) {
 		   "   +- OSY\n"
 		   "   +- Both\n");
 
-	testWindowInsideWindow();
+	testWindowInsideWindow1();
+	testWindowInsideWindow2();
 	return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
