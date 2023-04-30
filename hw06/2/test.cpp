@@ -339,7 +339,178 @@ string toString(const T_ &x) {
 	return oss.str();
 }
 
+void testWindowInsideWindow1() {
+	CWindow a(0, "a", CRect(10, 10, 600, 480));
+	CWindow b(10, "b", CRect(20, 30, 640, 520));
+	a.add(CComboBox(1, CRect(0.1, 0.3, 0.8, 0.1)).add("Karate").add("Judo").add("Box").add("Progtest"));
+	a.add(b);
+	a.add(CComboBox(2, CRect(0.1, 0.5, 0.8, 0.1)).add("PA2").add("OSY").add("Both"));
+	assert(toString(a) ==
+		   "[0] Window \"a\" (10,10,600,480)\n"
+		   "+- [1] ComboBox (70,154,480,48)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [10] Window \"b\" (20,30,640,520)\n"
+		   "+- [2] ComboBox (70,250,480,48)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	dynamic_cast<CWindow &>(*a.search(10))
+		.add(CComboBox(11, CRect(0.1, 0.3, 0.8, 0.1)).add("Karate").add("Judo").add("Box").add("Progtest"))
+		.add(CComboBox(12, CRect(0.1, 0.5, 0.8, 0.1)).add("PA2").add("OSY").add("Both"));
+	assert(toString(b) ==
+		   "[10] Window \"b\" (20,30,640,520)\n");
+	assert(toString(*a.search(10)) ==
+		   "[10] Window \"b\" (20,30,640,520)\n"
+		   "+- [11] ComboBox (84,186,512,52)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [12] ComboBox (84,290,512,52)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	assert(toString(a) ==
+		   "[0] Window \"a\" (10,10,600,480)\n"
+		   "+- [1] ComboBox (70,154,480,48)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [10] Window \"b\" (20,30,640,520)\n"
+		   "|  +- [11] ComboBox (84,186,512,52)\n"
+		   "|  |  +->Karate<\n"
+		   "|  |  +- Judo\n"
+		   "|  |  +- Box\n"
+		   "|  |  +- Progtest\n"
+		   "|  +- [12] ComboBox (84,290,512,52)\n"
+		   "|     +->PA2<\n"
+		   "|     +- OSY\n"
+		   "|     +- Both\n"
+		   "+- [2] ComboBox (70,250,480,48)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	a.setPosition(CRect(0, 0, 1000, 1000));
+	assert(toString(a) ==
+		   "[0] Window \"a\" (0,0,1000,1000)\n"
+		   "+- [1] ComboBox (100,300,800,100)\n"
+		   "|  +->Karate<\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +- Progtest\n"
+		   "+- [10] Window \"b\" (20,30,640,520)\n"
+		   "|  +- [11] ComboBox (84,186,512,52)\n"
+		   "|  |  +->Karate<\n"
+		   "|  |  +- Judo\n"
+		   "|  |  +- Box\n"
+		   "|  |  +- Progtest\n"
+		   "|  +- [12] ComboBox (84,290,512,52)\n"
+		   "|     +->PA2<\n"
+		   "|     +- OSY\n"
+		   "|     +- Both\n"
+		   "+- [2] ComboBox (100,500,800,100)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+}
+
+void testWindowInsideWindow2() {
+	CWindow a(1, "a", CRect(0, 0, 100, 100));
+	CWindow b(2, "b", CRect(10, 10, 200, 200));
+	a.add(CButton(3, CRect(0.5, 0.5, 0.1, 0.1), "OK"));
+	b.add(a);
+	cout << b;
+	assert(toString(b) ==
+		   "[2] Window \"b\" (10,10,200,200)\n"
+		   "+- [1] Window \"a\" (0,0,100,100)\n"
+		   "   +- [3] Button \"OK\" (50,50,10,10)\n");
+}
+
+void testPart1() {
+	assert(sizeof(CButton) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
+	assert(sizeof(CInput) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
+	assert(sizeof(CLabel) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
+	CWindow a(0, "Sample window", CRect(10, 10, 600, 480));
+	a.add(CButton(1, CRect(0.1, 0.8, 0.3, 0.1), "Ok")).add(CButton(2, CRect(0.6, 0.8, 0.3, 0.1), "Cancel"));
+	a.add(CLabel(10, CRect(0.1, 0.1, 0.2, 0.1), "Username:"));
+	a.add(CInput(11, CRect(0.4, 0.1, 0.5, 0.1), "chucknorris"));
+	a.add(CComboBox(20, CRect(0.1, 0.3, 0.8, 0.1)).add("Karate").add("Judo").add("Box").add("Progtest"));
+	assert(toString(a) ==
+		   "[0] Window \"Sample window\" (10,10,600,480)\n"
+		   "+- [1] Button \"Ok\" (70,394,180,48)\n"
+		   "+- [2] Button \"Cancel\" (370,394,180,48)\n"
+		   "+- [10] Label \"Username:\" (70,58,120,48)\n"
+		   "+- [11] Input \"chucknorris\" (250,58,300,48)\n"
+		   "+- [20] ComboBox (70,154,480,48)\n"
+		   "   +->Karate<\n"
+		   "   +- Judo\n"
+		   "   +- Box\n"
+		   "   +- Progtest\n");
+	CWindow b = a;
+	assert(toString(*b.search(20)) ==
+		   "[20] ComboBox (70,154,480,48)\n"
+		   "+->Karate<\n"
+		   "+- Judo\n"
+		   "+- Box\n"
+		   "+- Progtest\n");
+	assert(dynamic_cast<CComboBox &>(*b.search(20)).getSelected() == 0);
+	dynamic_cast<CComboBox &>(*b.search(20)).setSelected(3);
+	assert(dynamic_cast<CInput &>(*b.search(11)).getValue() == "chucknorris");
+	dynamic_cast<CInput &>(*b.search(11)).setValue("chucknorris@fit.cvut.cz");
+	b.add(CComboBox(21, CRect(0.1, 0.5, 0.8, 0.1)).add("PA2").add("OSY").add("Both"));
+	assert(toString(b) ==
+		   "[0] Window \"Sample window\" (10,10,600,480)\n"
+		   "+- [1] Button \"Ok\" (70,394,180,48)\n"
+		   "+- [2] Button \"Cancel\" (370,394,180,48)\n"
+		   "+- [10] Label \"Username:\" (70,58,120,48)\n"
+		   "+- [11] Input \"chucknorris@fit.cvut.cz\" (250,58,300,48)\n"
+		   "+- [20] ComboBox (70,154,480,48)\n"
+		   "|  +- Karate\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +->Progtest<\n"
+		   "+- [21] ComboBox (70,250,480,48)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+	assert(toString(a) ==
+		   "[0] Window \"Sample window\" (10,10,600,480)\n"
+		   "+- [1] Button \"Ok\" (70,394,180,48)\n"
+		   "+- [2] Button \"Cancel\" (370,394,180,48)\n"
+		   "+- [10] Label \"Username:\" (70,58,120,48)\n"
+		   "+- [11] Input \"chucknorris\" (250,58,300,48)\n"
+		   "+- [20] ComboBox (70,154,480,48)\n"
+		   "   +->Karate<\n"
+		   "   +- Judo\n"
+		   "   +- Box\n"
+		   "   +- Progtest\n");
+	b.setPosition(CRect(20, 30, 640, 520));
+	assert(toString(b) ==
+		   "[0] Window \"Sample window\" (20,30,640,520)\n"
+		   "+- [1] Button \"Ok\" (84,446,192,52)\n"
+		   "+- [2] Button \"Cancel\" (404,446,192,52)\n"
+		   "+- [10] Label \"Username:\" (84,82,128,52)\n"
+		   "+- [11] Input \"chucknorris@fit.cvut.cz\" (276,82,320,52)\n"
+		   "+- [20] ComboBox (84,186,512,52)\n"
+		   "|  +- Karate\n"
+		   "|  +- Judo\n"
+		   "|  +- Box\n"
+		   "|  +->Progtest<\n"
+		   "+- [21] ComboBox (84,290,512,52)\n"
+		   "   +->PA2<\n"
+		   "   +- OSY\n"
+		   "   +- Both\n");
+
+	testWindowInsideWindow1();
+	testWindowInsideWindow2();
+}
+
 int main(void) {
+	testPart1();
 	assert(sizeof(CButton) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
 	assert(sizeof(CInput) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
 	assert(sizeof(CLabel) - sizeof(string) < sizeof(CComboBox) - sizeof(vector<string>));
