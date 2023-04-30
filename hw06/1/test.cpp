@@ -166,6 +166,15 @@ public:
 		swap(m_absPos, m_relPos);
 	}
 
+	CWindow(const CWindow &copyFrom) : CWindow(copyFrom.getId(), copyFrom.m_title, copyFrom.m_absPos) {
+		m_addOrder.clear();
+		m_elements.clear();
+
+		for (auto element : copyFrom.m_addOrder) {
+			add(*element);
+		}
+	}
+
 	virtual shared_ptr<CElement> clone() const override {
 		return make_shared<CWindow>(*this);
 	}
