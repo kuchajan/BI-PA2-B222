@@ -235,7 +235,13 @@ public:
 	}
 
 	// setValue
+	void setValue(const string &newVal) {
+		m_title = newVal;
+	}
 	// getValue
+	string getValue() const {
+		return m_title;
+	}
 };
 class CLabel : public CTitleable {
 private:
