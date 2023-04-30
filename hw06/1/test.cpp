@@ -157,7 +157,7 @@ private:
 protected:
 	virtual void updateChildrenPos() {
 		for (auto element : m_addOrder) {
-			updatePosition(m_absPos);
+			element->updatePosition(m_absPos);
 		}
 	}
 
