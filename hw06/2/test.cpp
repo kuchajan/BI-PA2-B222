@@ -45,14 +45,98 @@ public:
 };
 #endif /* __PROGTEST__ */
 
-class CWindow {
+/// @brief Returns a new CRect with calculated absolute position
+/// @param winPos The position of a window
+/// @param relPos The relative position of an element
+/// @return The absolute position of an element
+CRect getAbsolutePos(const CRect &winPos, const CRect &relPos) {
+	return CRect(
+		(winPos.m_W * relPos.m_X) + winPos.m_X,
+		(winPos.m_H * relPos.m_Y) + winPos.m_Y,
+		winPos.m_W * relPos.m_W,
+		winPos.m_H * relPos.m_H);
+}
+
+/// @brief Checks if a sorted vector of ints contains a given value
+/// @param checking Value to find
+/// @param toCheck Vector to check
+/// @return True if value was found, otherwise false
+bool isContained(const int &checking, const vector<int> &toCheck) {
+	auto it = lower_bound(toCheck.begin(), toCheck.end(), checking);
+	return it != toCheck.end();
+}
+
+class CElement {
+private:
+	int m_id;
+
+protected:
+	CRect m_relPos;
+	CRect m_absPos;
+
+	// common methods
+	void printIndent(ostream &os, const int &indent, vector<int> &pipePos, const bool &printLastSpace = true) const {
+		for (int i = 0; i < indent; i++) {
+			if (i == indent - 1) {
+				os << ((printLastSpace) ? ("+- ") : ("+-"));
+				return;
+			}
+			if (isContained(i, pipePos)) {
+				os << "|  ";
+				continue;
+			}
+			os << "   ";
+		}
+	}
+	// methods to override
+
+	virtual bool isCWindow() const {
+		return false;
+	}
+
+	void printCommon(ostream &os, const int &indent, vector<int> &pipePos) const {
+		printIndent(os, indent, pipePos);
+		os << "[" << m_id << "] " << getElementName() << " " << m_absPos << "\n";
+	}
+	void printCommon(ostream &os, const int &indent, vector<int> &pipePos, const string &title) const {
+		printIndent(os, indent, pipePos);
+		os << "[" << m_id << "] " << getElementName() << " \"" << title << "\" " << m_absPos << "\n";
+	}
+	virtual string getElementName() const = 0;
+
 public:
-	CWindow(int id,
-			const string &title,
-			const CRect &absPos);
-	// add
-	// search
-	// setPosition
+	CElement(const int &id, const CRect &relPos) : m_id(id), m_relPos(relPos), m_absPos(CRect(0, 0, 0, 0)) {}
+
+	virtual shared_ptr<CElement> clone() const = 0;
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const = 0;
+
+	int getId() const {
+		return m_id;
+	}
+
+	virtual void updatePosition(const CRect &parentAbsPos) {
+		if (!isCWindow()) {
+			m_absPos = getAbsolutePos(parentAbsPos, m_relPos);
+		}
+	}
+
+	virtual CElement *search(const int &id) {
+		return (m_id == id) ? this : nullptr;
+	}
+};
+
+class CTitleable : public CElement {
+private:
+protected:
+	string m_title;
+
+public:
+	CTitleable(const int &id, const CRect &relPos, const string &title) : CElement(id, relPos), m_title(title) {}
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos, m_title);
+	}
 };
 
 class CPanel {
@@ -62,38 +146,190 @@ public:
 	// add
 };
 
-class CButton {
-public:
-	CButton(int id,
-			const CRect &relPos,
-			const string &name);
-};
+// I'm not inheriting from CTitleable for I will later copy this implementation into hw06_2 that will inherit from CPanel which will not inherit from CTitleable
+class CWindow : public CElement {
+private:
+	vector<shared_ptr<CElement>> m_elements;
+	string m_title;
 
-class CInput {
-public:
-	CInput(int id,
-		   const CRect &relPos,
-		   const string &value);
-	// setValue
-	// getValue
-};
-class CLabel {
-public:
-	CLabel(int id,
-		   const CRect &relPos,
-		   const string &label);
-};
+	virtual string getElementName() const override {
+		return "Window";
+	}
 
-class CComboBox {
+	virtual bool isCWindow() const override {
+		return true;
+	}
+
+protected:
+	virtual void updateChildrenPos() {
+		for (auto element : m_elements) {
+			element->updatePosition(m_absPos);
+		}
+	}
+
 public:
-	CComboBox(int id,
-			  const CRect &relPos);
+	CWindow(const int &id, const string &title, const CRect &absPos) : CElement(id, absPos), m_title(title) {
+		swap(m_absPos, m_relPos);
+	}
+
+	CWindow(const CWindow &copyFrom) : CWindow(copyFrom.getId(), copyFrom.m_title, copyFrom.m_absPos) {
+		m_elements.clear();
+
+		for (auto element : copyFrom.m_elements) {
+			add(*element);
+		}
+	}
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CWindow>(*this);
+	}
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos, m_title);
+		if (m_elements.size() > 1) {
+			pipePos.push_back(indent);
+		}
+		++indent;
+
+		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
+			if (next(iter) == m_elements.end() && m_elements.size() > 1) { // Element is second last
+				pipePos.pop_back();
+			}
+			(*iter)->print(os, indent, pipePos);
+		}
+	}
+
 	// add
+	CWindow &add(const CElement &toAdd) {
+		shared_ptr<CElement> addSptr = toAdd.clone();
+		weak_ptr<CElement> addWptr = addSptr;
+
+		// update the position of the child
+		addSptr->updatePosition(m_absPos);
+
+		m_elements.push_back(addSptr);
+		return *this;
+	}
+
+	// search
+	virtual CElement *search(const int &id) override {
+		if (id == getId()) {
+			return this;
+		}
+		for (auto iter = m_elements.begin(); iter != m_elements.end(); ++iter) {
+			CElement *res = (*iter)->search(id);
+			if (res != nullptr) {
+				return res;
+			}
+		}
+
+		return nullptr;
+	}
+	// setPosition
+	void setPosition(const CRect &newPos) {
+		m_absPos = newPos;
+		updateChildrenPos();
+	}
+};
+
+class CButton : public CTitleable {
+private:
+	virtual string getElementName() const override {
+		return "Button";
+	}
+
+public:
+	using CTitleable::CTitleable;
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CButton>(*this);
+	}
+};
+
+class CInput : public CTitleable {
+private:
+	virtual string getElementName() const override {
+		return "Input";
+	}
+
+public:
+	using CTitleable::CTitleable;
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CInput>(*this);
+	}
+
+	// setValue
+	void setValue(const string &newVal) {
+		m_title = newVal;
+	}
+	// getValue
+	string getValue() const {
+		return m_title;
+	}
+};
+class CLabel : public CTitleable {
+private:
+	virtual string getElementName() const override {
+		return "Label";
+	}
+
+public:
+	using CTitleable::CTitleable;
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CLabel>(*this);
+	}
+};
+
+class CComboBox : public CElement {
+private:
+	vector<string> m_items;
+	size_t m_selected;
+
+	virtual string getElementName() const override {
+		return "ComboBox";
+	}
+
+public:
+	CComboBox(const int &id, const CRect &relPos) : CElement(id, relPos) {
+		m_selected = 0;
+	}
+
+	virtual void print(ostream &os, int indent, vector<int> &pipePos) const override {
+		printCommon(os, indent, pipePos);
+		indent++;
+		for (size_t i = 0; i < m_items.size(); ++i) {
+			printIndent(os, indent, pipePos, false);
+			os << ((i == m_selected) ? (">" + m_items[i] + "<") : (" " + m_items[i]));
+			os << "\n";
+		}
+	}
+
+	virtual shared_ptr<CElement> clone() const override {
+		return make_shared<CComboBox>(*this);
+	}
+	// add
+	CComboBox &add(const string &toAdd) {
+		m_items.emplace_back(string(toAdd));
+		return *this;
+	}
 	// setSelected
+	void setSelected(const size_t &selected) {
+		m_selected = selected;
+	}
 	// getSelected
+	size_t getSelected() const {
+		return m_selected;
+	}
 };
 
 // output operators
+ostream &operator<<(ostream &os, const CElement &element) {
+	vector<int> pipePos;
+	element.print(os, 0, pipePos);
+	return os;
+}
 
 #ifndef __PROGTEST__
 template <typename T_>
