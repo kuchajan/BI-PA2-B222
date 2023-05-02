@@ -26,13 +26,58 @@ using namespace std;
 #endif /* __PROGTEST__ */
 
 template <typename M_>
+class CContestant {
+private:
+	string m_name;
+	map<string, M_> m_matches;
+
+public:
+	CContestant(const string &name) : m_name(name) {}
+
+	/// @brief Finds out if other name is already contained
+	bool contains(const string &otherName) const {
+		return m_matches.find(otherName) != m_matches.end();
+	}
+
+	void addMatch(const string &otherName, const M_ &result) {
+		m_matches.insert(make_pair(otherName, result));
+	}
+};
+
+template <typename M_>
 class CContest {
 private:
+	map<string, CContestant<M_>> m_contestants;
 	// todo
+
+	/// @brief Finds a contestant or inserts a new contestant by their name
+	typename map<string, CContestant<M_>>::iterator findContestant(const string &contestant) {
+		auto iter = m_contestants.find(contestant);
+		if (iter == m_contestants.end()) {
+			iter = m_contestants.emplace(make_pair(contestant, CContestant<M_>(contestant))).first;
+		}
+		return iter;
+	}
+
 public:
 	// default constructor
 	// destructor
 	// addMatch ( contestant1, contestant2, result )
+	CContest &addMatch(const string &contestant1, const string &contestant2, const M_ &result) {
+		if (contestant1 == contestant2) {
+			throw logic_error("Attempted to add a match with one and the same contestant");
+		}
+
+		auto iter1 = findContestant(contestant1);
+
+		if (iter1->second.contains(contestant2) || findContestant(contestant2)->second.contains(contestant1)) {
+			throw logic_error("Match already added");
+		}
+
+		iter1->second.addMatch(contestant2, result);
+
+		return *this;
+	}
 	// isOrdered ( comparator )
 	// results ( comparator )
 };
