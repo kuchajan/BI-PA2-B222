@@ -51,6 +51,16 @@ public:
 	}
 };
 
+class CSorter {
+private:
+	map<string, set<string>> m_family; // first is parent, second are their children
+	bool m_isValid;
+
+public:
+	template <typename M_, typename F>
+	CSorter(const map<string, CContestant<M_>> &contestants, F comparator) {}
+};
+
 template <typename M_>
 class CContest {
 private:
