@@ -104,7 +104,7 @@ private:
 	}
 
 public:
-	CSorter(const map<string, CContestant<M_>> &contestants, F comparator) {
+	CSorter(const map<string, CContestant<M_>> &contestants, const F &comparator) {
 		m_isValid = true;
 		// add the family and their children
 		// if there is ever a result of zero, set validity to false and end
@@ -189,13 +189,13 @@ public:
 	}
 	// isOrdered ( comparator )
 	template <typename F>
-	bool isOrdered(F comparator) {
+	bool isOrdered(const F &comparator) const {
 		CSorter<M_, F> sorter(m_contestants, comparator);
 		return sorter.getValid();
 	}
 	// results ( comparator )
 	template <typename F>
-	list<string> results(F comparator) {
+	list<string> results(const F &comparator) const {
 		CSorter<M_, F> sorter(m_contestants, comparator);
 		if (!sorter.getValid()) {
 			throw logic_error("Attempted to sort something unsortable");
