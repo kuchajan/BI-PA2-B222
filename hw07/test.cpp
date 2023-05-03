@@ -178,6 +178,11 @@ public:
 		return *this;
 	}
 	// isOrdered ( comparator )
+	template <typename F>
+	bool isOrdered(F comparator) {
+		CSorter sorter(m_contestants, comparator);
+		return sorter.getValid();
+	}
 	// results ( comparator )
 };
 
