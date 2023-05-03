@@ -137,6 +137,10 @@ public:
 
 		validate();
 	}
+
+	bool getValid() const {
+		return m_isValid;
+	}
 };
 
 template <typename M_>
