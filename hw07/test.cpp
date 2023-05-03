@@ -56,6 +56,15 @@ private:
 	map<string, set<string>> m_family; // first is parent, second are their children
 	bool m_isValid;
 
+	/// @brief Finds a contestant or inserts a new contestant by their name
+	map<string, set<string>>::iterator findContestant(const string &contestant) {
+		auto iter = m_family.find(contestant);
+		if (iter == m_family.end()) {
+			iter = m_family.emplace(make_pair(contestant, set<string>())).first;
+		}
+		return iter;
+	}
+
 public:
 	template <typename M_, typename F>
 	CSorter(const map<string, CContestant<M_>> &contestants, F comparator) {}
