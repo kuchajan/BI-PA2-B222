@@ -65,6 +65,18 @@ private:
 		return iter;
 	}
 
+	void validate() {
+		// finds for every pair if one can access the other and not the other way
+		for (auto iterA = m_family.begin(); iterA != m_family.end(); ++iterA) {
+			for (auto iterB = next(iterA); iterB != m_family.end(); ++iterB) {
+				if (iterA->second.count(iterB->first) == iterB->second.count(iterA->first)) {
+					m_isValid = false;
+					return;
+				}
+			}
+		}
+	}
+
 public:
 	template <typename M_, typename F>
 	CSorter(const map<string, CContestant<M_>> &contestants, F comparator) {}
