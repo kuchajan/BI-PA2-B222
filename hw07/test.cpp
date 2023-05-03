@@ -42,6 +42,13 @@ public:
 	void addMatch(const string &otherName, const M_ &result) {
 		m_matches.insert(make_pair(otherName, result));
 	}
+
+	typename map<string, M_>::const_iterator begin() const {
+		return m_matches.cbegin();
+	}
+	typename map<string, M_>::const_iterator end() const {
+		return m_matches.cend();
+	}
 };
 
 template <typename M_>
