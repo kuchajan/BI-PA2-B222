@@ -65,6 +65,31 @@ private:
 		return iter;
 	}
 
+	// if test fails, first rework this to be more efficient
+	bool expand() {
+		bool expanded = false;
+		// for every parent
+		for (pair<string, set<string>> parent : m_family) {
+			// for every of their child
+			for (string child : parent.second) {
+				// for the children of the child
+				auto mapIter = m_family.find(child);
+				for (auto iter = mapIter->second.begin(); iter != mapIter->second.end(); ++iter) {
+					// attemp to add the children to the parent
+					if (parent.first == (*iter)) {
+						// loop found
+						m_isValid = false;
+						return false;
+					}
+					if (m_family[parent.first].insert(*iter).second) {
+						expanded = true;
+					}
+				}
+			}
+		}
+		return expanded;
+	}
+
 	void validate() {
 		// finds for every pair if one can access the other and not the other way
 		for (auto iterA = m_family.begin(); iterA != m_family.end(); ++iterA) {
