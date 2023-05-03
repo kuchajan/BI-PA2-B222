@@ -194,6 +194,14 @@ public:
 		return sorter.getValid();
 	}
 	// results ( comparator )
+	template <typename F>
+	list<string> results(F comparator) {
+		CSorter sorter(m_contestants, comparator);
+		if (!sorter.getValid()) {
+			throw logic_error("Attempted to sort something unsortable");
+		}
+		return sorter.getList();
+	}
 };
 
 #ifndef __PROGTEST__
