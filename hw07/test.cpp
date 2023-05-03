@@ -104,7 +104,39 @@ private:
 
 public:
 	template <typename M_, typename F>
-	CSorter(const map<string, CContestant<M_>> &contestants, F comparator) {}
+	CSorter(const map<string, CContestant<M_>> &contestants, F comparator) {
+		m_isValid = true;
+		// add the family and their children
+		// if there is ever a result of zero, set validity to false and end
+		for (auto iterContest = contestants.begin(); iterContest != contestants.end(); ++iterContest) {
+			auto iterNode1 = findContestant(iterContest->first);
+			for (auto pairChild : iterContest->second) {
+				auto iterNode2 = findContestant(pairChild.first);
+				int result = comparator(pairChild.second);
+				if (result == 0) {
+					m_isValid = false;
+					return; // since we already know it's not valid
+				}
+				if (result > 0) {
+					iterNode1->second.insert(iterNode2->first);
+				}
+				if (result < 0) {
+					iterNode2->second.insert(iterNode1->first);
+				}
+			}
+		}
+
+		// everything added, now expand!
+		// we will find loops this way too
+		while (expand()) {
+		}
+
+		if (!m_isValid) { // if it's not valid, there's no point in validating
+			return;
+		}
+
+		validate();
+	}
 };
 
 template <typename M_>
