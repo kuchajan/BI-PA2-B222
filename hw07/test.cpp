@@ -138,6 +138,16 @@ public:
 		validate();
 	}
 
+	list<string> getList() const {
+		vector<string> toReturn;
+		for (auto pair : m_family) {
+			toReturn.push_back(pair.first);
+		}
+
+		sort(toReturn.begin(), toReturn.end(), [this](const string &a, const string &b) { return m_family.find(a)->second.size() > m_family.find(b)->second.size(); });
+		return list<string>(toReturn.begin(), toReturn.end());
+	}
+
 	bool getValid() const {
 		return m_isValid;
 	}
