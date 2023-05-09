@@ -89,6 +89,11 @@ CMatrix<uint8_t> getGrayScale(const char *filepath) {
 	return grayScaleData;
 }
 
+char getChar(const uint8_t &val) {
+	string chooseFrom = "MNFV$I*:.";
+	return chooseFrom[(val * (chooseFrom.length() - 1)) / 255];
+}
+
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
 		cout << "Usage: " << argv[0] << " file" << endl;
@@ -96,6 +101,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	CMatrix<uint8_t> gs = getGrayScale(argv[1]);
+	for (int y = 0; y < gs.getHeight(); ++y) {
+		for (int x = 0; x < gs.getWidth(); ++x) {
+			cout << getChar(gs.getData(x, y));
+		}
+		cout << '\n';
+	}
 
 	return 0;
 }
