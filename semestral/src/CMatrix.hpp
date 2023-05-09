@@ -19,6 +19,17 @@ private:
 	int m_height;
 	T *m_data;
 
+	inline bool checkPosValid(const int &collumn, const int &row) const {
+		return collumn < m_width && row < m_height;
+	}
+	inline bool checkIndexValid(const size_t &index) const {
+		return index < getElementCount();
+	}
+
+	inline size_t getIndex(const int &collumn, const int &row) const {
+		return row * m_width + collumn;
+	}
+
 public:
 	CMatrix() {
 		m_data == nullptr;
@@ -51,5 +62,31 @@ public:
 	}
 	size_t getElementCount() const {
 		return m_height * m_width;
+	}
+
+	T getData(const int &collumn, const int &row) const {
+		if (!checkPosValid(collumn, row)) {
+			throw invalid_argument("CMatrix::getData: collumn or row is invalid.");
+		}
+		return m_data[getIndex(collumn, row)];
+	}
+	T getData(const size_t &index) const {
+		if (!checkIndexValid(index)) {
+			throw invalid_argument("CMatrix::getData: index is invalid.");
+		}
+		return m_data[index];
+	}
+
+	void setData(const int &collumn, const int &row, const T &data) {
+		if (!checkPosValid(collumn, row)) {
+			throw invalid_argument("CMatrix::setData: collumn or row is invalid.");
+		}
+		m_data[getIndex(collumn, row)] = data;
+	}
+	void setData(const size_t &index, const T &data) {
+		if (!checkIndexValid(index)) {
+			throw invalid_argument("CMatrix::setData: index is invalid.");
+		}
+		m_data[index] = data;
 	}
 };
