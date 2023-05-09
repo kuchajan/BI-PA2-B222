@@ -90,14 +90,16 @@ CMatrix<uint8_t> getGrayScale(const char *filepath) {
 	return grayScaleData;
 }
 
+// Common charset: "MNFV$I*:."
+
 int main(int argc, char *argv[]) {
-	if (argc < 2) {
-		cout << "Usage: " << argv[0] << " file" << endl;
+	if (argc < 3) {
+		cout << "Usage: " << argv[0] << " file charset" << endl;
 		return 0;
 	}
 
 	CMatrix<uint8_t> gs = getGrayScale(argv[1]);
-	CCharset charset("MNFV$I*:.");
+	CCharset charset(argv[2]);
 
 	for (int y = 0; y < gs.getHeight(); ++y) {
 		for (int x = 0; x < gs.getWidth(); ++x) {
