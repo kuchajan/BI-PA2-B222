@@ -42,4 +42,14 @@ public:
 		delete[] m_data;
 		m_data = nullptr;
 	}
+
+	int getHeight() const {
+		return m_height;
+	}
+	int getWidth() const {
+		return m_width;
+	}
+	size_t getElementCount() const {
+		return m_height * m_width;
+	}
 };
