@@ -7,6 +7,7 @@
 
 using namespace std;
 
+#include "CCharset.hpp"
 #include "CMatrix.hpp"
 
 /// @brief Gets a value of a pixel from a given position on a surface
@@ -16,7 +17,7 @@ using namespace std;
 /// @return The value of a pixel
 /// @exception Throws a logic_error when surface->format->BytesPerPixel is not 1 nor 2 nor 3 nor 4
 /// @exception Throws an invalid_argument when x>= surface->w or y >= surface->h
-uint32_t getPixel(SDL_Surface *surface, size_t x, size_t y) {
+uint32_t getPixel(SDL_Surface *surface, int x, int y) {
 	if (x >= surface->w || y >= surface->h) {
 		throw invalid_argument("getPixel: The x or y is outside of bounds of surface");
 	}
@@ -89,11 +90,6 @@ CMatrix<uint8_t> getGrayScale(const char *filepath) {
 	return grayScaleData;
 }
 
-char getChar(const uint8_t &val) {
-	string chooseFrom = "MNFV$I*:.";
-	return chooseFrom[(val * (chooseFrom.length() - 1)) / 255];
-}
-
 int main(int argc, char *argv[]) {
 	if (argc < 2) {
 		cout << "Usage: " << argv[0] << " file" << endl;
@@ -101,9 +97,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	CMatrix<uint8_t> gs = getGrayScale(argv[1]);
+	CCharset charset("MNFV$I*:.");
+
 	for (int y = 0; y < gs.getHeight(); ++y) {
 		for (int x = 0; x < gs.getWidth(); ++x) {
-			cout << getChar(gs.getData(x, y));
+			cout << charset.getChar(gs.getData(x, y));
 		}
 		cout << '\n';
 	}
