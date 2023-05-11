@@ -32,7 +32,7 @@ private:
 
 public:
 	CMatrix() {
-		m_data == nullptr;
+		m_data = nullptr;
 	}
 	CMatrix(const int &width, const int &height) : m_width(width), m_height(height) {
 		if (m_width == 0 || m_height == 0) {
