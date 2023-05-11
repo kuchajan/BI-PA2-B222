@@ -41,8 +41,6 @@ public:
 		m_data = new T[m_width * m_height];
 	}
 	CMatrix(const CMatrix &src) {
-		delete[] m_data;
-
 		m_width = src.m_width;
 		m_height = src.m_height;
 
