@@ -27,3 +27,16 @@ CImage::~CImage() {
 	SDL_FreeSurface(m_data);
 	m_data = nullptr;
 }
+
+// getters
+int CImage::getWidth() const {
+	return m_data->w;
+}
+
+int CImage::getHeight() const {
+	return m_data->h;
+}
+
+SDL_PixelFormat *CImage::getFormat() const {
+	return m_data->format;
+}
