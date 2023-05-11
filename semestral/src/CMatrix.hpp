@@ -52,6 +52,14 @@ public:
 		m_data = nullptr;
 	}
 
+	CMatrix operator=(CMatrix src) {
+		swap(m_data, src.m_data);
+		swap(m_width, src.m_width);
+		swap(m_height, src.m_height);
+
+		return *this;
+	}
+
 	int getHeight() const {
 		return m_height;
 	}
