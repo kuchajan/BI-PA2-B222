@@ -5,6 +5,10 @@
 
 using namespace std;
 
+inline bool CImage::checkPos(const int &x, const int &y) const {
+	return x < m_data->w && y < m_data->h;
+}
+
 // Constructors / destructors
 CImage::CImage() {
 	m_data = nullptr;
