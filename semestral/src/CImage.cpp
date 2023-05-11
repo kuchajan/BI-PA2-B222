@@ -86,6 +86,11 @@ CImage::~CImage() {
 	m_data = nullptr;
 }
 
+CImage CImage::operator=(CImage src) {
+	swap(m_data, src.m_data);
+	return *this;
+}
+
 // getters
 int CImage::getWidth() const {
 	return m_data->w;

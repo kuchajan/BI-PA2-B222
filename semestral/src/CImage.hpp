@@ -18,11 +18,11 @@ public:
 	CImage(const CImage &src);
 	~CImage();
 
+	CImage operator=(CImage src);
+
 	int getWidth() const;
 	int getHeight() const;
 	SDL_PixelFormat *getFormat() const;
 
 	uint8_t getGrayPixel(const int &x, const int &y);
-
-	// todo: overload operator=
 };
