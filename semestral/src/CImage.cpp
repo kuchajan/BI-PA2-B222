@@ -98,3 +98,10 @@ int CImage::getHeight() const {
 SDL_PixelFormat *CImage::getFormat() const {
 	return m_data->format;
 }
+
+uint8_t CImage::getGrayPixel(const int &x, const int &y) {
+	uint32_t pixel = getPixel(x, y);
+	uint8_t red, green, blue;
+	SDL_GetRGB(pixel, m_data->format, &red, &green, &blue);
+	return (red + green + blue) / 3;
+}
