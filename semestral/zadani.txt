@@ -30,7 +30,7 @@ Budu implementovat nástroj, který načte několik vstupních parametrů. Tyto 
 
 Filtry budou pracovat na úrovni již přeložených obrázků. Tyto filtry budou moct zvýšit či snížit jas, kontrast, otočit obrázek o 90 stupňů doleva, doprava, o 180 stupňů, zrcadlit horizontálně či vertikálně, udělat negativ obrázku, zvětšit či zmenšit obrázek, přidání vodoznaku, a další.
 
-Obrázky, se kterými by měl tento nástroj
+Program by měl umět načíst více druhů obrázků. Konkrétně by měl umět načítat soubory JPG, PNG a TIFF.
 
 Na výstupu by pak měly být úspěšně vygenerované obrázky, podle druhu výstupu v souborech, nebo na terminálu.
 
