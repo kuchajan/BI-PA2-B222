@@ -76,6 +76,7 @@ CImage::CImage(const char *filepath) {
 }
 
 CImage::CImage(const CImage &src) {
+	m_data = nullptr;
 	if (SDL_BlitSurface(src.m_data, nullptr, m_data, nullptr)) {
 		throw logic_error("CImage::CImage: Failed to copy image data");
 	}
