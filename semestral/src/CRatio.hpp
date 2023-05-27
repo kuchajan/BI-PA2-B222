@@ -1,14 +1,14 @@
 #pragma once
 
+int gcd(int first, int second);
+int lcm(int first, int second);
+
 class CRatio {
 private:
 	int m_numerator;
 	int m_denominator;
 
 	int cmp(const CRatio &other);
-
-	int gcd(int first, int second);
-	int lcm(int first, int second);
 
 public:
 	CRatio(int numerator, int denominator);
