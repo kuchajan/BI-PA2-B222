@@ -8,7 +8,7 @@ private:
 	int m_numerator;
 	int m_denominator;
 
-	int cmp(const CRatio &other);
+	int cmp(const CRatio &other) const;
 
 public:
 	CRatio(int numerator, int denominator);
@@ -17,12 +17,12 @@ public:
 	CRatio operator+(CRatio &other);
 	CRatio operator-(CRatio &other);
 
-	bool operator<(CRatio &other);
-	bool operator>(CRatio &other);
-	bool operator==(CRatio &other);
-	bool operator!=(CRatio &other);
-	bool operator<=(CRatio &other);
-	bool operator>=(CRatio &other);
+	bool operator<(CRatio &other) const;
+	bool operator>(CRatio &other) const;
+	bool operator==(CRatio &other) const;
+	bool operator!=(CRatio &other) const;
+	bool operator<=(CRatio &other) const;
+	bool operator>=(CRatio &other) const;
 
 	int nearestLowestRoundNumerator(CRatio &other);
 	int nearestHighestRoundNumerator(CRatio &other);
