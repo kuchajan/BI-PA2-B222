@@ -24,6 +24,6 @@ public:
 	bool operator<=(CRatio &other) const;
 	bool operator>=(CRatio &other) const;
 
-	int nearestLowestRoundNumerator(CRatio &other);
-	int nearestHighestRoundNumerator(CRatio &other);
+	int nearestLowestRoundNumerator(CRatio &other) const;
+	int nearestHighestRoundNumerator(CRatio &other) const;
 };

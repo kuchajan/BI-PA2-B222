@@ -53,3 +53,15 @@ bool CRatio::operator<=(CRatio &other) const {
 bool CRatio::operator>=(CRatio &other) const {
 	return cmp(other) != -1;
 }
+
+int CRatio::nearestLowestRoundNumerator(CRatio &other) const {
+	return (other.m_numerator * this->m_denominator) / m_denominator;
+}
+
+int CRatio::nearestHighestRoundNumerator(CRatio &other) const {
+	// example: for this 1/40 = and other = 5/30, return (7)/40
+	int tmp = (other.m_numerator * this->m_denominator);
+	int res = tmp / m_denominator;
+	// (res * m_denominator == tmp) is another way to say (tmp % m_denominator == 0), just more efficient (I think)
+	return (res * m_denominator == tmp) ? res : res + 1;
+}
