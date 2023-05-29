@@ -1,5 +1,4 @@
 #include "CFilterResize.hpp"
-#include "CRatio.hpp"
 
 using namespace std;
 
@@ -18,12 +17,10 @@ char CFilterResize::average(const CMatrix<char> &input, int fromX, int toX, int 
 }
 
 pair<int, int> CFilterResize::getRange(int index, int oldDimSize, int newDimSize) const {
-	CRatio inverseOld(1, oldDimSize);
-
-	CRatio from(index, newDimSize);
-	CRatio to(index + 1, newDimSize);
-
-	return make_pair<int, int>(inverseOld.nearestLowestRoundNumerator(from), inverseOld.nearestHighestRoundNumerator(to));
+	int tmp = (index + 1) * oldDimSize;
+	int resHi = tmp / newDimSize;
+	// (resHi * newDimSize == tmp) is another way to say (tmp % newDimSize == 0)
+	return make_pair<int, int>((index * oldDimSize) / newDimSize, ((resHi * newDimSize == tmp) ? resHi : (resHi + 1)));
 }
 
 CFilterResize::CFilterResize(int width, int height) : m_newWidth(width), m_newHeight(height) {}
