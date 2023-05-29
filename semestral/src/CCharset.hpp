@@ -15,5 +15,5 @@ private:
 
 public:
 	CCharset(const char *charset);
-	char getChar(const uint8_t &value);
+	char getChar(const uint8_t &value) const;
 };

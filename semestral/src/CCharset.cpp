@@ -18,6 +18,6 @@ CCharset::CCharset(const char *charset) : m_charset(charset) {
 	}
 }
 
-char CCharset::getChar(const uint8_t &value) {
+char CCharset::getChar(const uint8_t &value) const {
 	return m_charset[(value * (m_charset.length() - 1)) / 255];
 }
