@@ -17,4 +17,13 @@ char CFilterResize::average(const CMatrix<char> &input, int fromX, int toX, int 
 	return (char)res;
 }
 
+pair<int, int> CFilterResize::getRange(int index, int oldDimSize, int newDimSize) const {
+	CRatio inverseOld(1, oldDimSize);
+
+	CRatio from(index, newDimSize);
+	CRatio to(index + 1, newDimSize);
+
+	return make_pair<int, int>(inverseOld.nearestLowestRoundNumerator(from), inverseOld.nearestHighestRoundNumerator(to));
+}
+
 CFilterResize::CFilterResize(int width, int height) : m_newWidth(width), m_newHeight(height) {}
