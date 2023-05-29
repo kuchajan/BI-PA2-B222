@@ -7,7 +7,7 @@ private:
 	int m_newWidth;
 	int m_newHeight;
 
-	char average(const CMatrix<char> &input, int fromX, int toX, int fromY, int toY);
+	char average(const CMatrix<char> &input, int fromX, int toX, int fromY, int toY) const;
 	pair<int, int> getRange(int index, int oldDimSize, int newDimSize) const;
 
 public:

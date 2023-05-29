@@ -2,7 +2,7 @@
 
 using namespace std;
 
-char CFilterResize::average(const CMatrix<char> &input, int fromX, int toX, int fromY, int toY) {
+char CFilterResize::average(const CMatrix<char> &input, int fromX, int toX, int fromY, int toY) const {
 	double res = 0;
 	int i = 0;
 
