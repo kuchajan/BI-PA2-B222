@@ -13,4 +13,5 @@ private:
 public:
 	CFilterResize(int width, int height);
 	virtual CMatrix<char> apply(const CMatrix<char> &input) const override;
+	virtual shared_ptr<CFilter> clone() const override;
 };

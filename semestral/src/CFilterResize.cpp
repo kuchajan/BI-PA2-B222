@@ -38,3 +38,7 @@ CMatrix<char> CFilterResize::apply(const CMatrix<char> &input) const {
 
 	return res;
 }
+
+shared_ptr<CFilter> CFilterResize::clone() const {
+	return make_shared<CFilterResize>(*this);
+}
