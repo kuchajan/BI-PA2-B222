@@ -2,7 +2,7 @@
 
 using namespace std;
 
-char CFilterResize::average(const CMatrix<char> &input, int fromX, int toX, int fromY, int toY) const {
+unsigned char CFilterResize::average(const CMatrix<unsigned char> &input, int fromX, int toX, int fromY, int toY) const {
 	double res = 0;
 	int i = 0;
 
@@ -13,7 +13,7 @@ char CFilterResize::average(const CMatrix<char> &input, int fromX, int toX, int 
 		}
 	}
 
-	return (char)res;
+	return (unsigned char)res;
 }
 
 pair<int, int> CFilterResize::getRange(int index, int oldDimSize, int newDimSize) const {
@@ -25,8 +25,8 @@ pair<int, int> CFilterResize::getRange(int index, int oldDimSize, int newDimSize
 
 CFilterResize::CFilterResize(int width, int height) : m_newWidth(width), m_newHeight(height) {}
 
-CMatrix<char> CFilterResize::apply(const CMatrix<char> &input) const {
-	CMatrix<char> res(m_newWidth, m_newHeight);
+CMatrix<unsigned char> CFilterResize::apply(const CMatrix<unsigned char> &input) const {
+	CMatrix<unsigned char> res(m_newWidth, m_newHeight);
 
 	for (int x = 0; x < m_newWidth; ++x) {
 		for (int y = 0; y < m_newHeight; ++y) {

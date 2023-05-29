@@ -10,6 +10,6 @@ class CFilter {
 private:
 protected:
 public:
-	virtual CMatrix<char> apply(const CMatrix<char> &input) const = 0;
+	virtual CMatrix<unsigned char> apply(const CMatrix<unsigned char> &input) const = 0;
 	virtual std::shared_ptr<CFilter> clone() const = 0;
 };
