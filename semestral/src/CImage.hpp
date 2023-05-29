@@ -7,12 +7,14 @@
 
 using namespace std;
 // todo: use SDL_GetError
+
+///@brief Wrapper around SDL
 class CImage {
 private:
 	SDL_Surface *m_data;
 
 	inline bool checkPos(const int &x, const int &y) const;
-	uint32_t getPixel(const int &x, const int &y);
+	uint32_t getPixel(const int &x, const int &y) const;
 
 public:
 	CImage();
@@ -26,5 +28,5 @@ public:
 	int getHeight() const;
 	SDL_PixelFormat *getFormat() const;
 
-	uint8_t getGrayPixel(const int &x, const int &y);
+	uint8_t getGrayPixel(const int &x, const int &y) const;
 };

@@ -16,7 +16,7 @@ inline bool CImage::checkPos(const int &x, const int &y) const {
 /// @exception Throws a logic_error when m_data->format->BytesPerPixel is lower than 1 or higher than 4
 /// @exception Throws a logic_error when surface locking fails
 /// @exception Throws an invalid_argument when position is out of bounds
-uint32_t CImage::getPixel(const int &x, const int &y) {
+uint32_t CImage::getPixel(const int &x, const int &y) const {
 	if (!checkPos(x, y)) {
 		throw invalid_argument("CImage::getPixel: The x or y is outside of bounds of image");
 	}
@@ -105,7 +105,7 @@ SDL_PixelFormat *CImage::getFormat() const {
 	return m_data->format;
 }
 
-uint8_t CImage::getGrayPixel(const int &x, const int &y) {
+uint8_t CImage::getGrayPixel(const int &x, const int &y) const {
 	uint32_t pixel = getPixel(x, y);
 	uint8_t red, green, blue;
 	SDL_GetRGB(pixel, m_data->format, &red, &green, &blue);
