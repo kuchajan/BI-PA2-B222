@@ -7,7 +7,7 @@ unsigned char CFilterResize::average(const CMatrix<unsigned char> &input, int fr
 	int i = 0;
 
 	for (int x = fromX; x < toX; ++x) {
-		for (int y = fromY; x < toY; ++y) {
+		for (int y = fromY; y < toY; ++y) {
 			res = res * i / (i + 1) + input.getData(x, y) / (i + 1);
 			++i;
 		}
