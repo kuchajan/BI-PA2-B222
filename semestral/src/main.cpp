@@ -4,25 +4,16 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <vector>
 
 using namespace std;
 
+#include "CArt.hpp"
 #include "CCharset.hpp"
+#include "CFilter.hpp"
+#include "CFilterResize.hpp"
 #include "CImage.hpp"
 #include "CMatrix.hpp"
-
-CMatrix<uint8_t> getGrayScale(const char *filepath) {
-	CImage image(filepath);
-	CMatrix<uint8_t> grayScaleData(image.getWidth(), image.getHeight());
-
-	for (int y = 0; y < image.getHeight(); ++y) {
-		for (int x = 0; x < image.getWidth(); ++x) {
-			grayScaleData.setData(x, y, image.getGrayPixel(x, y));
-		}
-	}
-
-	return grayScaleData;
-}
 
 // Common charset: "MNFV$I*:."
 
@@ -36,15 +27,15 @@ int main(int argc, char *argv[]) {
 		throw logic_error("getImageData: IMG_Init fail");
 	}
 
-	CMatrix<uint8_t> gs = getGrayScale(argv[1]);
+	CImage image(argv[1]);
 	CCharset charset(argv[2]);
+	vector<shared_ptr<CFilter>> filters;
+	CFilterResize tmpFilt(32, 16);
+	filters.push_back(tmpFilt.clone());
 
-	for (int y = 0; y < gs.getHeight(); ++y) {
-		for (int x = 0; x < gs.getWidth(); ++x) {
-			cout << charset.getChar(gs.getData(x, y));
-		}
-		cout << '\n';
-	}
+	CArt art(image, charset, filters);
+
+	cout << art;
 
 	IMG_Quit();
 	return 0;
