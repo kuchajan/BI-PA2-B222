@@ -25,3 +25,13 @@ CMatrix<char> CArt::getResult(const CMatrix<unsigned char> &grayScale, const CCh
 }
 
 CArt::CArt(const CImage &image, const CCharset &charset, const vector<shared_ptr<CFilter>> &filters) : m_result(getResult(getGrayScale(image, filters), charset)) {}
+
+ostream &operator<<(ostream &os, const CArt &art) {
+	for (int y = 0; y < art.m_result.getHeight(); ++y) {
+		for (int x = 0; x < art.m_result.getWidth(); ++x) {
+			os << art.m_result.getData(x, y);
+		}
+		os << "\n";
+	}
+	return os;
+}
