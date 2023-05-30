@@ -9,7 +9,7 @@
 using namespace std;
 
 /// @brief Creates a new charset to use to generate art
-/// @param charset The charset to use
+/// @param charset String of characters to use
 /// @exception Throws an invalid_argument when charset length is 0 or more than 256
 CCharset::CCharset(const char *charset) : m_charset(charset) {
 	size_t length = m_charset.length();
@@ -19,5 +19,5 @@ CCharset::CCharset(const char *charset) : m_charset(charset) {
 }
 
 char CCharset::getChar(const uint8_t &value) const {
-	return m_charset[(value * (m_charset.length() - 1)) / 255];
+	return m_charset[(value * (m_charset.length())) / 256];
 }
