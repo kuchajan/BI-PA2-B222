@@ -16,6 +16,6 @@ private:
 	// todo: somehow parse the image in such a way that it can be smaller or larger than original
 
 public:
-	CArt(const CImage &image, const CCharset &charset, const int &width, const int &height);
+	CArt(const CImage &image, const CCharset &charset, const vector<shared_ptr<CFilter>> &filters);
 	friend ostream &operator<<(ostream &os, const CArt &art);
 };
