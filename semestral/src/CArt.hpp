@@ -1,8 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 
 #include "CCharset.hpp"
+#include "CFilter.hpp"
 #include "CImage.hpp"
 #include "CMatrix.hpp"
 
@@ -12,8 +14,8 @@ class CArt {
 private:
 	CMatrix<char> m_result;
 
-	// todo: get average of numbers without overflow
-	// todo: somehow parse the image in such a way that it can be smaller or larger than original
+	CMatrix<unsigned char> getGrayScale(const CImage &image, const vector<shared_ptr<CFilter>> &filters) const;
+	CMatrix<char> getResult(const CMatrix<unsigned char> &grayScale, const CCharset &charset) const;
 
 public:
 	CArt(const CImage &image, const CCharset &charset, const vector<shared_ptr<CFilter>> &filters);
