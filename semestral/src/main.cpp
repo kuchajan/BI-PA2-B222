@@ -130,6 +130,16 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 
 			throw invalid_argument("Unknown argument for -os");
 		}
+
+		if (strcmp(argv[i], "-fs") == 0) {
+			if (i + 3 >= argc) {
+				throw invalid_argument("Too few arguments for -fs");
+			}
+			addFilterToImages(art, CFilterResize(atoi(argv[i + 1]), atoi(argv[i + 2])).clone(), getImageIdx(argv[i + 3]));
+			i += 3;
+			continue;
+		}
+
 		throw invalid_argument(string("Unknown argument: ") + argv[i]);
 	}
 
