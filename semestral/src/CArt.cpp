@@ -29,9 +29,10 @@ CMatrix<char> CArt::getResult() const {
 CArt::CArt(char *path) : m_path(path), m_charset(" .:*I$VFNM") {}
 
 ostream &operator<<(ostream &os, const CArt &art) {
-	for (int y = 0; y < art.m_result.getHeight(); ++y) {
-		for (int x = 0; x < art.m_result.getWidth(); ++x) {
-			os << art.m_result.getData(x, y);
+	CMatrix<char> result = art.getResult();
+	for (int y = 0; y < result.getHeight(); ++y) {
+		for (int x = 0; x < result.getWidth(); ++x) {
+			os << result.getData(x, y);
 		}
 		os << "\n";
 	}
