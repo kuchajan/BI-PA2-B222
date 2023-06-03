@@ -28,6 +28,14 @@ CMatrix<char> CArt::getResult() const {
 
 CArt::CArt(char *path) : m_path(path), m_charset(" .:*I$VFNM") {}
 
+void CArt::setCharset(CCharset cs) {
+	swap(m_charset, cs);
+}
+
+void CArt::addFilter(shared_ptr<CFilter> filter) {
+	m_filters.push_back(filter);
+}
+
 ostream &operator<<(ostream &os, const CArt &art) {
 	CMatrix<char> result = art.getResult();
 	for (int y = 0; y < result.getHeight(); ++y) {
