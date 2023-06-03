@@ -150,6 +150,42 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 			continue;
 		}
 
+		if (strcmp(argv[i], "-fb") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-fct") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-frr") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-frl") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-fmh") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-fmv") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-ffh") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-ffv") == 0) {
+			continue;
+		}
+
+		if (strcmp(argv[i], "-fi") == 0) {
+			continue;
+		}
+
 		throw invalid_argument(string("Unknown argument: ") + argv[i]);
 	}
 
