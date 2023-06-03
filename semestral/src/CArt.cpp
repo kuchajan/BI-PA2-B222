@@ -24,7 +24,7 @@ CMatrix<char> CArt::getResult(const CMatrix<unsigned char> &grayScale, const CCh
 	return result;
 }
 
-CArt::CArt(const CImage &image, const CCharset &charset, const vector<shared_ptr<CFilter>> &filters) : m_result(getResult(getGrayScale(image, filters), charset)) {}
+CArt::CArt(char *path) : m_path(path), m_charset(" .:*I$VFNM") {}
 
 ostream &operator<<(ostream &os, const CArt &art) {
 	for (int y = 0; y < art.m_result.getHeight(); ++y) {
