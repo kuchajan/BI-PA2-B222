@@ -65,9 +65,21 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 	return output;
 }
 
-	CArt art(image, charset, filters);
+int main(int argc, char *argv[]) {
+	if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF) == 0) {
+		throw logic_error("IMG_Init fail");
+	}
+	shared_ptr<COutput> output;
+	try {
+		output = handleInput(argc, argv);
+	} catch (const exception &e) {
+		IMG_Quit();
+		cerr << e.what() << '\n';
+		printHelp(argv[0]);
+		return 0;
+	}
 
-	cout << art;
+	output->output();
 
 	IMG_Quit();
 	return 0;
