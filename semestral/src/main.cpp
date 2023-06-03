@@ -20,6 +20,7 @@ using namespace std;
 #include "CConsole.hpp"
 #include "CFile.hpp"
 // Filters
+#include "CFilterCrop.hpp"
 #include "CFilterResize.hpp"
 
 void printHelp(const char *progName) {
@@ -137,6 +138,15 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 			}
 			addFilterToImages(art, CFilterResize(atoi(argv[i + 1]), atoi(argv[i + 2])).clone(), getImageIdx(argv[i + 3]));
 			i += 3;
+			continue;
+		}
+
+		if (strcmp(argv[i], "-fcr") == 0) {
+			if (i + 5 >= argc) {
+				throw invalid_argument("Too few arguments for -fcr");
+			}
+			addFilterToImages(art, CFilterCrop(atoi(argv[i + 1]), atoi(argv[i + 2]), atoi(argv[i + 3]), atoi(argv[i + 4])).clone(), getImageIdx(argv[i + 5]));
+			i += 5;
 			continue;
 		}
 
