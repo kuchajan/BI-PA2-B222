@@ -20,8 +20,17 @@ using namespace std;
 #include "CConsole.hpp"
 #include "CFile.hpp"
 // Filters
+#include "CFilterBrightness.hpp"
+#include "CFilterContrast.hpp"
 #include "CFilterCrop.hpp"
+#include "CFilterFlipHorizontal.hpp"
+#include "CFilterFlipVertical.hpp"
+#include "CFilterInvert.hpp"
+#include "CFilterMirrorHorizontal.hpp"
+#include "CFilterMirrorVertical.hpp"
 #include "CFilterResize.hpp"
+#include "CFilterRotateLeft.hpp"
+#include "CFilterRotateRight.hpp"
 
 void printHelp(const char *progName) {
 	cout << "Usage: " << progName << " [options]\n"
@@ -151,38 +160,83 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 		}
 
 		if (strcmp(argv[i], "-fb") == 0) {
+			if (i + 2 >= argc) {
+				throw invalid_argument("Too few arguments for -fb");
+			}
+			addFilterToImages(art, CFilterBrightness(atoi(argv[i + 1])).clone(), getImageIdx(argv[i + 2]));
+			i += 2;
 			continue;
 		}
 
 		if (strcmp(argv[i], "-fct") == 0) {
+			if (i + 2 >= argc) {
+				throw invalid_argument("Too few arguments for -fct");
+			}
+			addFilterToImages(art, CFilterContrast(atoi(argv[i + 1])).clone(), getImageIdx(argv[i + 2]));
+			i += 2;
 			continue;
 		}
 
 		if (strcmp(argv[i], "-frr") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -frr");
+			}
+			++i;
+			addFilterToImages(art, CFilterRotateRight().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
 		if (strcmp(argv[i], "-frl") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -frl");
+			}
+			++i;
+			addFilterToImages(art, CFilterRotateLeft().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
 		if (strcmp(argv[i], "-fmh") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -fmh");
+			}
+			++i;
+			addFilterToImages(art, CFilterMirrorHorizontal().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
 		if (strcmp(argv[i], "-fmv") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -fmv");
+			}
+			++i;
+			addFilterToImages(art, CFilterMirrorVertical().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
 		if (strcmp(argv[i], "-ffh") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -ffh");
+			}
+			++i;
+			addFilterToImages(art, CFilterFlipHorizontal().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
 		if (strcmp(argv[i], "-ffv") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -ffv");
+			}
+			++i;
+			addFilterToImages(art, CFilterFlipVertical().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
 		if (strcmp(argv[i], "-fi") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -fi");
+			}
+			++i;
+			addFilterToImages(art, CFilterInvert().clone(), getImageIdx(argv[i]));
 			continue;
 		}
 
