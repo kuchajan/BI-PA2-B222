@@ -1,6 +1,7 @@
 #include "CArt.hpp"
 
-CMatrix<unsigned char> CArt::getGrayScale(const CImage &image, const vector<shared_ptr<CFilter>> &filters) const {
+CMatrix<unsigned char> CArt::getGrayScale() const {
+	CImage image(m_path);
 	CMatrix<unsigned char> grayScale(image.getWidth(), image.getHeight());
 
 	for (int x = 0; x < image.getWidth(); ++x) {
@@ -9,17 +10,18 @@ CMatrix<unsigned char> CArt::getGrayScale(const CImage &image, const vector<shar
 		}
 	}
 
-	for (shared_ptr<CFilter> filter : filters) {
+	for (shared_ptr<CFilter> filter : m_filters) {
 		grayScale = filter->apply(grayScale);
 	}
 
 	return grayScale;
 }
 
-CMatrix<char> CArt::getResult(const CMatrix<unsigned char> &grayScale, const CCharset &charset) const {
+CMatrix<char> CArt::getResult() const {
+	CMatrix<unsigned char> grayScale = getGrayScale();
 	CMatrix<char> result(grayScale.getWidth(), grayScale.getHeight());
 	for (size_t i = 0; i < result.getElementCount(); ++i) {
-		result.setData(i, charset.getChar(grayScale.getData(i)));
+		result.setData(i, m_charset.getChar(grayScale.getData(i)));
 	}
 	return result;
 }
