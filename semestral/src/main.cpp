@@ -63,6 +63,27 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 			continue;
 		}
 
+		if (strcmp(argv[i], "-os") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -os");
+			}
+			++i;
+			// todo: parse next argument to choose outputter
+			if (strcmp(argv[i], "1") == 0) {
+				output = CConsole().clone();
+				continue;
+			}
+			if (strcmp(argv[i], "2") == 0) {
+				if (i + 1 >= argc) {
+					throw invalid_argument("Too few arguments for -os 2");
+				}
+				++i;
+				output = CFile(argv[i]).clone();
+				continue;
+			}
+
+			throw invalid_argument("Unknown argument for -os");
+		}
 		throw invalid_argument(string("Unknown argument: ") + argv[i]);
 	}
 
