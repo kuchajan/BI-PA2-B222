@@ -11,11 +11,14 @@ using namespace std;
 #include "CArt.hpp"
 #include "CCharset.hpp"
 #include "CFilter.hpp"
-#include "CFilterResize.hpp"
 #include "CImage.hpp"
 #include "CMatrix.hpp"
-
-// Common charset: "MNFV$I*:."
+#include "COutput.hpp"
+// Outputs
+#include "CConsole.hpp"
+#include "CFile.hpp"
+// Filters
+#include "CFilterResize.hpp"
 
 void printHelp(const char *progName) {
 	cout << "Usage: " << progName << " [options]\n"
