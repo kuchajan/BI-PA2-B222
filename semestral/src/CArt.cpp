@@ -18,7 +18,7 @@ CMatrix<unsigned char> CArt::getGrayScale(const CImage &image, const vector<shar
 
 CMatrix<char> CArt::getResult(const CMatrix<unsigned char> &grayScale, const CCharset &charset) const {
 	CMatrix<char> result(grayScale.getWidth(), grayScale.getHeight());
-	for (int i = 0; i < result.getElementCount(); ++i) {
+	for (size_t i = 0; i < result.getElementCount(); ++i) {
 		result.setData(i, charset.getChar(grayScale.getData(i)));
 	}
 	return result;
