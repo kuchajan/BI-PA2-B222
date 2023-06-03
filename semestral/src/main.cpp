@@ -83,6 +83,23 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 			continue;
 		}
 
+		if (strcmp(argv[i], "-cs") == 0) {
+			if (i + 2 >= argc) {
+				throw invalid_argument("Too few arguments for -cs");
+			}
+
+			CCharset cs(argv[i + 1]);
+			vector<size_t> indexes = getImageIdx(argv[i + 2]);
+			for (size_t index : indexes) {
+				if (art.size() <= index) {
+					throw invalid_argument(string("No image defined for index ") + to_string(index));
+				}
+				art[index].setCharset(cs);
+			}
+			i += 2;
+			continue;
+		}
+
 		if (strcmp(argv[i], "-os") == 0) {
 			if (i + 1 >= argc) {
 				throw invalid_argument("Too few arguments for -os");
