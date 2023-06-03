@@ -42,6 +42,27 @@ void printHelp(const char *progName) {
 		 << endl;
 }
 
+vector<size_t> getImageIdx(char *arg) {
+	vector<size_t> imageIdx;
+	istringstream iss(arg);
+
+	char ch = ',';
+	while (!iss.eof()) {
+		if (iss.fail() || ch != ',') {
+			throw invalid_argument("Bad input of image indexes");
+		}
+		size_t n;
+		iss >> n;
+		if (iss.bad()) {
+			throw invalid_argument("Bad input of image indexes");
+		}
+		imageIdx.push_back(n);
+		iss >> ch;
+	}
+
+	return imageIdx;
+}
+
 shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 	vector<CArt> art;
 	shared_ptr<COutput> output = shared_ptr<COutput>(nullptr);
