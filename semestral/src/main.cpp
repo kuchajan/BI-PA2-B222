@@ -3,7 +3,9 @@
 #include <SDL2/SDL_image.h>
 
 #include <iostream>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace std;
