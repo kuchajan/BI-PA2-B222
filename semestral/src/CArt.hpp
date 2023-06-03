@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "CCharset.hpp"
@@ -12,12 +13,16 @@ using namespace std;
 
 class CArt {
 private:
-	CMatrix<char> m_result;
+	char *m_path;
+	CCharset m_charset;
+	vector<shared_ptr<CFilter>> m_filters;
 
-	CMatrix<unsigned char> getGrayScale(const CImage &image, const vector<shared_ptr<CFilter>> &filters) const;
-	CMatrix<char> getResult(const CMatrix<unsigned char> &grayScale, const CCharset &charset) const;
+	CMatrix<unsigned char> getGrayScale() const;
+	CMatrix<char> getResult() const;
 
 public:
-	CArt(const CImage &image, const CCharset &charset, const vector<shared_ptr<CFilter>> &filters);
+	CArt(char *path);
+	void setCharset(CCharset cs);
+	void addFilter(shared_ptr<CFilter> filter);
 	friend ostream &operator<<(ostream &os, const CArt &art);
 };
