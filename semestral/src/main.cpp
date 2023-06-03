@@ -64,6 +64,15 @@ vector<size_t> getImageIdx(char *arg) {
 	return imageIdx;
 }
 
+void addFilterToImages(vector<CArt> &art, const shared_ptr<CFilter> &filter, const vector<size_t> &indexes) {
+	for (size_t index : indexes) {
+		if (art.size() <= index) {
+			throw invalid_argument(string("No image defined for index ") + to_string(index));
+		}
+		art[index].addFilter(filter);
+	}
+}
+
 shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 	vector<CArt> art;
 	shared_ptr<COutput> output = shared_ptr<COutput>(nullptr);
