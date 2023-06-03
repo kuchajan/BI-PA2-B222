@@ -54,6 +54,14 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 
 	for (int i = 1; i < argc; ++i) {
 		// todo: iterate through all arguments and their sub arguments
+		if (strcmp(argv[i], "-i") == 0) {
+			if (i + 1 >= argc) {
+				throw invalid_argument("Too few arguments for -i");
+			}
+			++i;
+			art.emplace_back(CImage(argv[i]), charset, filters);
+			continue;
+		}
 
 		throw invalid_argument(string("Unknown argument: ") + argv[i]);
 	}
