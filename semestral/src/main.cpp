@@ -17,6 +17,28 @@ using namespace std;
 
 // Common charset: "MNFV$I*:."
 
+void printHelp(const char *progName) {
+	cout << "Usage: " << progName << " [options]\n"
+		 << "-i path : defines a path to an image to convert, may be used multiple times\n"
+		 << "-cs [characters] : defines a character set from which to generate an ascii art, cannot be more than 255 characters long\n"
+		 << "-os [value] : selects the type of output to use (only one can be used)\n"
+		 << "            - 1 : prints out all the results to the console and exits\n"
+		 << "            - 2 : prints each individual result to files\n"
+		 << "-frs : resets filters\n"
+		 << "-fs [width] [height] : resizes an image to given width and height\n"
+		 << "-fcr [fromX] [fromY] [toX] [toY] : crops an image\n"
+		 << "-fb [value] : changes the brightness by given value\n"
+		 << "-fct [value] : changes the contrast by given value\n"
+		 << "-frr : rotates the image by 90 degrees to the right\n"
+		 << "-frl : rotates the image by 90 degrees to the left\n"
+		 << "-fmh : mirrors the image horizontally\n"
+		 << "-fmv : mirrors the image vertically\n"
+		 << "-ffh : flips the image horizontally\n"
+		 << "-ffv : flips the image vertically\n"
+		 << "-fi : inverts the image\n"
+		 << endl;
+}
+
 int main(int argc, char *argv[]) {
 	if (argc < 3) {
 		cout << "Usage: " << argv[0] << " file charset" << endl;
