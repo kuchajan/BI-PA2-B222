@@ -43,8 +43,6 @@ void printHelp(const char *progName) {
 }
 
 shared_ptr<COutput> handleInput(int argc, char *argv[]) {
-	vector<shared_ptr<CFilter>> filters;
-	CCharset charset(" .:*I$VFNM");
 	vector<CArt> art;
 	shared_ptr<COutput> output = shared_ptr<COutput>(nullptr);
 
@@ -59,7 +57,7 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 				throw invalid_argument("Too few arguments for -i");
 			}
 			++i;
-			art.emplace_back(CImage(argv[i]), charset, filters);
+			art.emplace_back(argv[i]);
 			continue;
 		}
 
