@@ -2,8 +2,6 @@
 a.out
 *.o
 test.sh
-!semestral/examples/test/test.sh
-semestral/examples/test/output/
 semestral/ascii-art
 semestral/doc/
 semestral/examples/art_*.txt
