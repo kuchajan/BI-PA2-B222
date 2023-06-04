@@ -7,7 +7,7 @@ shared_ptr<COutput> CFile::clone() {
 }
 
 void CFile::output() {
-	int i = 1;
+	int i = 0;
 	for (auto art : m_art) {
 		string path = m_path + to_string(i) + ".txt";
 		ofstream of(path);

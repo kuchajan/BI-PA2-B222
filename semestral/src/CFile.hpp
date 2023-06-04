@@ -3,7 +3,7 @@
 #include "COutput.hpp"
 #include <fstream>
 
-/// @brief An outputter, which outputs the generated art in text files numbered from 1 to n
+/// @brief An outputter, which outputs the generated art in text files numbered from 0 to n
 class CFile : public COutput {
 private:
 	/// @brief The path where to save the text files
