@@ -20,3 +20,7 @@ src/%.o: src/%.cpp $(TEMPLATE)
 
 clean:
 	rm -f $(OBJ) ascii-art
+	rm -rf doc/
+
+doc: $(wildcard src/*.hpp)
+	doxygen Doxyfile
