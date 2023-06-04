@@ -34,6 +34,8 @@ using namespace std;
 #include "CFilterRotateLeft.hpp"
 #include "CFilterRotateRight.hpp"
 
+/// @brief Prints the help to this program
+/// @param progName The file name of the program
 void printHelp(const char *progName) {
 	cout << "Usage: " << progName << " [options]\n"
 		 << "-i path : defines a path to an image to convert, may be used multiple times\n"
@@ -56,6 +58,9 @@ void printHelp(const char *progName) {
 		 << endl;
 }
 
+/// @brief Gets the indexes of images from the argument
+/// @param arg The pointer to the c string representing the argument
+/// @return Vector of indexes
 vector<size_t> getImageIdx(char *arg) {
 	vector<size_t> imageIdx;
 	istringstream iss(arg);
@@ -77,6 +82,10 @@ vector<size_t> getImageIdx(char *arg) {
 	return imageIdx;
 }
 
+/// @brief Adds a filter to images specified by the index vector
+/// @param art The array of all images
+/// @param filter The filter to add
+/// @param indexes The indexes where to add the filter
 void addFilterToImages(vector<CArt> &art, const shared_ptr<CFilter> &filter, const vector<size_t> &indexes) {
 	for (size_t index : indexes) {
 		if (art.size() <= index) {
@@ -86,6 +95,14 @@ void addFilterToImages(vector<CArt> &art, const shared_ptr<CFilter> &filter, con
 	}
 }
 
+/// @brief Handles the arguments from console
+/// @param argc The count of arguments
+/// @param argv Array of c strings, which are the arguments
+/// @return a shared_ptr to an outputter to use
+/// @throws invalid_argument when too few arguments were passed
+/// @throws invalid_argument when any argument is wrong
+/// @throws invalid_argument when no image was specified in the arguments
+/// @throws invalid_argument when no outputter was specified in the arguments
 shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 	vector<CArt> art;
 	shared_ptr<COutput> output = shared_ptr<COutput>(nullptr);
