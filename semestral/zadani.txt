@@ -30,11 +30,11 @@ Budu implementovat nástroj, který načte několik vstupních parametrů. Tyto 
 
 Filtry budou pracovat na úrovni již přeložených obrázků. Tyto filtry budou moct zvýšit či snížit jas, kontrast, otočit obrázek o 90 stupňů doleva, doprava, o 180 stupňů, zrcadlit horizontálně či vertikálně, udělat negativ obrázku, zvětšit či zmenšit obrázek, přidání vodoznaku, a další.
 
-Program by měl umět načíst více druhů obrázků. Konkrétně by měl umět načítat soubory JPG, PNG a TIFF.
+Program by měl umět načíst více druhů obrázků. Konkrétně by měl umět načítat soubory JPG, PNG, TIFF a BMP.
 
 Na výstupu by pak měly být úspěšně vygenerované obrázky, podle druhu výstupu v souborech, nebo na terminálu.
 
-Druhy výstupů budou tři. První bude vygenerovaný obrázky vypisovat na standardní výstup a následně ukončí program. Druhý bude tyto obrázky ukládat do textových souborů. Očekává se, že uživatel zadá i jména výstupních souborů. Pokud tak neučiní, program se pokusí obrázky ukládat do nových souborů. Třetí z obrázků spustí prezentaci obrázků, a výstup bude opakovat tolikrát, kolik mu uživatel určí. Pokud uživatel neurčil, program si určí sám.
+Druhy výstupů budou tři. První bude vygenerovaný obrázky vypisovat na standardní výstup a následně ukončí program. Druhý bude tyto obrázky ukládat do textových souborů. Očekává se, že uživatel zadá i jména výstupních souborů. Pokud tak neučiní, program se pokusí obrázky ukládat do nových souborů. Třetí z obrázků spustí prezentaci obrázků, a výstup bude opakovat, dokud ho uživatel neukončí.
 
 Polymorfismus
 
@@ -44,7 +44,7 @@ Ze třídy CFilter se bude dědit několik tříd, jejichž prací bude implemen
 
 Ze třídy COutput se pak budou dědit 3 třídy právě podle druhu výstupu, které budou implementovat vlastní výstupní chování, které se zavolají metodou output. Polymorfismus této třídy umožňuje implementovat nové druhy výstupů.
 
-Dále je polymorfní třída CMatrix a to protože je šablonová. Může ukládat totiž jakýkoliv druh dat, což je pak využito k uložení stupňů šedi obrázku a následně i matice znaků, vygenerovaný právě ze stupňů šedi.
+Dále je CMatrix a třídou šablonovou. Toto je využito k uložení stupňů šedi obrázku a následně i matice znaků, vygenerovaný právě ze stupňů šedi.
 
 Zdroje obrázků:
 https://commons.wikimedia.org/w/index.php?title=File:Redwingblackbird1.jpg&oldid=605881990
