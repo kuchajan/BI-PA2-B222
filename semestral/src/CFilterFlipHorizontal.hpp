@@ -2,6 +2,7 @@
 
 #include "CFilter.hpp"
 
+/// @brief A filter, which flips the image by the horizontal central axis
 class CFilterFlipHorizontal : public CFilter {
 public:
 	virtual CMatrix<unsigned char> apply(const CMatrix<unsigned char> &input) const override;

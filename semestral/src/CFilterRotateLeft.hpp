@@ -2,6 +2,7 @@
 
 #include "CFilter.hpp"
 
+/// @brief A filter, which rotates the image by 90 degrees to the left
 class CFilterRotateLeft : public CFilter {
 public:
 	virtual CMatrix<unsigned char> apply(const CMatrix<unsigned char> &input) const override;
