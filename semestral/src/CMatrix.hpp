@@ -16,9 +16,12 @@ using namespace std;
 template <typename T>
 class CMatrix {
 private:
-	int m_width;  /// The width of the matrix
-	int m_height; /// The height of the matrix
-	T *m_data;	  /// Pointer to dynamically allocated data
+	/// @brief The width of the matrix
+	int m_width;
+	/// @brief The height of the matrix
+	int m_height;
+	/// @brief Pointer to dynamically allocated data
+	T *m_data;
 
 	/// @brief Checks, whether a given collumn and row are valid numbers
 	/// @param collumn The collumn to check
