@@ -4,7 +4,7 @@ CFilterContrast::CFilterContrast(int value) {
 	if (value < -255 || value > 255) {
 		throw invalid_argument("CFilterContrast: value to change contrast by is not within interval <-255,255>");
 	}
-	m_value = ((value + 255) * 259) / ((259 - value) * 255); //(-255,-1) to (0,1), 1 to 1, (1,255) to (1,~128)
+	m_value = ((value + 255.0) * 259) / ((259 - value) * 255); //(-255,-1) to (0,1), 1 to 1, (1,255) to (1,~128)
 }
 
 CMatrix<unsigned char> CFilterContrast::apply(const CMatrix<unsigned char> &input) const {
