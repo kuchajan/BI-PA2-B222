@@ -107,7 +107,9 @@ SDL_PixelFormat *CImage::getFormat() const {
 
 uint8_t CImage::getGrayPixel(const int &x, const int &y) const {
 	uint32_t pixel = getPixel(x, y);
-	uint8_t red, green, blue;
+	uint8_t red = 0, green = 0, blue = 0;
+	SDL_LockSurface(m_data);
 	SDL_GetRGB(pixel, m_data->format, &red, &green, &blue);
+	SDL_UnlockSurface(m_data);
 	return (red + green + blue) / 3;
 }
