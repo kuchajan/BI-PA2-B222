@@ -30,6 +30,7 @@ clean:
 
 doc: $(wildcard src/*.hpp)
 	doxygen Doxyfile
+	mv html doc
 
 TESTSCALE=assets/testscale.bmp
 LENA=assets/Lena.tiff
