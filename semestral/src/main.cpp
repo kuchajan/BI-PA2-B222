@@ -243,6 +243,9 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 		throw invalid_argument(string("Unknown argument: ") + argv[i]);
 	}
 
+	if (art.size() == 0) {
+		throw invalid_argument("No image was specified");
+	}
 	if (!output) {
 		throw invalid_argument("No outputter specified");
 	}
