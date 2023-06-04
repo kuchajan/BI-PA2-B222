@@ -1,8 +1,11 @@
 #include "CConsole.hpp"
 
 void CConsole::output() {
-	for (auto art : m_art) {
-		cout << art << "\n\n";
+	for (auto iter = m_art.begin(); iter != m_art.end(); ++iter) {
+		cout << (*iter);
+		if (next(iter) != m_art.end()) {
+			cout << "\n";
+		}
 	}
 }
 
