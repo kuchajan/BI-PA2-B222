@@ -1,7 +1,7 @@
 CXX = g++
-CF = -Wall -pedantic -Wextra -I/usr/include/SDL2 -D_REENTRANT
+CF = -Wall -pedantic -Wextra -D_REENTRANT -D_DEFAULT_SOURCE -D_XOPEN_SOURCE=600 -I/usr/include/SDL2
 CFD = $(CF) -g -fsanitize=address
-LF = -lSDL2 -lSDL2_image -lncurses
+LF = -lSDL2 -lSDL2_image -lncurses -ltinfo
 LFD = $(LF) -fsanitize=address 
 # pkg-config --cflags --libs sdl2
 
