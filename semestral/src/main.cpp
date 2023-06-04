@@ -1,6 +1,7 @@
 // SDL includes
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <ncurses.h>
 
 #include <iostream>
 #include <sstream>
@@ -19,6 +20,7 @@ using namespace std;
 // Outputs
 #include "CConsole.hpp"
 #include "CFile.hpp"
+#include "CPresentation.hpp"
 // Filters
 #include "CFilterBrightness.hpp"
 #include "CFilterContrast.hpp"
@@ -39,6 +41,7 @@ void printHelp(const char *progName) {
 		 << "-os [value] : selects the type of output to use (only one can be used)\n"
 		 << "            - 1 : prints out all the results to the console\n"
 		 << "            - 2 [path]: prints each individual result to files\n"
+		 << "            - 3 : starts a presentation of the images (space to start/stop, left to go to previous, right to go to next, q to exit)\n"
 		 << "-fs [width] [height] [indexes] : resizes images to given width and height\n"
 		 << "-fcr [fromX] [fromY] [width] [height] [indexes] : crops images\n"
 		 << "-fb [value] [indexes] : changes the brightness by given value\n"
@@ -92,7 +95,6 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 	}
 
 	for (int i = 1; i < argc; ++i) {
-		// todo: iterate through all arguments and their sub arguments
 		if (strcmp(argv[i], "-i") == 0) {
 			if (i + 1 >= argc) {
 				throw invalid_argument("Too few arguments for -i");
@@ -124,21 +126,29 @@ shared_ptr<COutput> handleInput(int argc, char *argv[]) {
 				throw invalid_argument("Too few arguments for -os");
 			}
 			++i;
-			// todo: parse next argument to choose outputter
-			if (strcmp(argv[i], "1") == 0) {
-				output = CConsole().clone();
-				continue;
-			}
-			if (strcmp(argv[i], "2") == 0) {
-				if (i + 1 >= argc) {
-					throw invalid_argument("Too few arguments for -os 2");
+			int arg = atoi(argv[i]);
+			switch (arg) {
+				case 1: {
+					output = CConsole().clone();
+					break;
 				}
-				++i;
-				output = CFile(argv[i]).clone();
-				continue;
+				case 2: {
+					if (i + 1 >= argc) {
+						throw invalid_argument("Too few arguments for -os 2");
+					}
+					++i;
+					output = CFile(argv[i]).clone();
+					break;
+				}
+				case 3: {
+					output = CPresentation().clone();
+					break;
+				}
+				default: {
+					throw invalid_argument("Unknown argument for -os");
+				}
 			}
-
-			throw invalid_argument("Unknown argument for -os");
+			continue;
 		}
 
 		if (strcmp(argv[i], "-fs") == 0) {
